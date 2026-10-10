@@ -3,7 +3,7 @@ title: "¿Ha bajado el nivel?"
 numero: 14
 nivel: 1
 duracion: "20 min"
-lectura: "Feinstein, Sosin y Wells (1985)"
+lectura: "[Feinstein, Sosin y Wells (1985)](https://nuevasomosaguas.github.io/biblioteca.html#huntingtonklein2021effect)"
 semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
 dificultad: "Iniciación"
 categories: [demografía, sesgo de selección, paradojas de agregación]

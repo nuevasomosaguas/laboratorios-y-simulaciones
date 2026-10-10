@@ -3,7 +3,7 @@ title: "En burro a Somosaguas"
 numero: 10
 nivel: 1
 duracion: "20 min"
-lectura: "Hägerstrand (1970)"
+lectura: "[Hägerstrand (1970)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
 dificultad: "Iniciación"
 categories: [DBO]
 description: "Con los mismos deseos y las mismas creencias, el conjunto de opciones reales cambia con la tecnología del transporte."

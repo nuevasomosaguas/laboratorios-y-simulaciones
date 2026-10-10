@@ -3,7 +3,7 @@ title: "La ley de Benford y el fraude electoral"
 numero: 16
 nivel: 1
 duracion: "25 min"
-lectura: "Deckert, Myagkov y Ordeshook (2011)"
+lectura: "[Deckert, Myagkov y Ordeshook (2011)](https://nuevasomosaguas.github.io/biblioteca.html#blitzstein2019introduction)"
 dificultad: "Iniciación"
 categories: [estadística]
 description: "El primer dígito de muchos datos reales es un 1 casi un tercio de las veces. Y los votos limpios de una mesa electoral no cumplen la ley."

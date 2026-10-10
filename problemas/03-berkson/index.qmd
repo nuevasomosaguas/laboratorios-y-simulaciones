@@ -3,7 +3,7 @@ title: "El talento y el esfuerzo de los admitidos"
 numero: 3
 nivel: 1
 duracion: "15 min"
-lectura: "Berkson (1946)"
+lectura: "[Berkson (1946)](https://nuevasomosaguas.github.io/biblioteca.html#pearl2016causal)"
 dificultad: "Iniciación"
 categories: [inferencia causal, sesgo de selección]
 description: "Entre los admitidos, quien tiene más talento parece esforzarse menos. Encuentra el error del análisis."

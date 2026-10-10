@@ -3,7 +3,7 @@ title: "¿Grande o significativo?"
 numero: 7
 nivel: 1
 duracion: "30 min"
-lectura: "Cohen (1988)"
+lectura: "[Cohen (1988)](https://nuevasomosaguas.github.io/biblioteca.html#dienes2008understanding)"
 semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
 dificultad: "Iniciación"
 categories: [estadística, sesgo de selección]

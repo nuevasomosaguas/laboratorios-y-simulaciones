@@ -3,7 +3,7 @@ title: "Preguntar lo que nadie confiesa"
 numero: 32
 nivel: 1
 duracion: "20 min"
-lectura: "[Kuran (1995)](https://nuevasomosaguas.github.io/biblioteca.html#kuran1995private); Warner (1965)"
+lectura: "[Kuran (1995)](https://nuevasomosaguas.github.io/biblioteca.html#kuran1995private); [Warner (1965)](https://nuevasomosaguas.github.io/biblioteca.html#kuran1995private)"
 semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
 dificultad: "Iniciación"
 categories: [estadística, DBO]

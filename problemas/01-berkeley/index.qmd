@@ -3,7 +3,7 @@ title: "La paradoja de Simpson en Berkeley"
 numero: 1
 nivel: 1
 duracion: "20 min"
-lectura: "Bickel, Hammel y O'Connell (1975)"
+lectura: "[Bickel, Hammel y O'Connell (1975)](https://nuevasomosaguas.github.io/biblioteca.html#pearl2016causal)"
 dificultad: "Iniciación"
 categories: [paradojas de agregación, inferencia causal]
 description: "Las admisiones de posgrado de Berkeley en 1973: agregar los datos invierte la conclusión."

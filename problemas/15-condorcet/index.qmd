@@ -3,7 +3,7 @@ title: "La paradoja de Condorcet"
 numero: 15
 nivel: 2
 duracion: "30 min"
-lectura: "Black (1948)"
+lectura: "[Black (1948)](https://nuevasomosaguas.github.io/biblioteca.html#mueller2003public)"
 dificultad: "Intermedio"
 categories: [juegos y votación, paradojas de agregación]
 description: "Cada votante tiene preferencias coherentes, y la mayoría prefiere A a B, B a C y C a A."
