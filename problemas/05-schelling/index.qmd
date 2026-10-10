@@ -3,7 +3,7 @@ title: "La segregación de Schelling"
 numero: 5
 nivel: 2
 duracion: "40 min"
-lectura: "[Schelling (1978)](https://nuevasomosaguas.github.io/biblioteca.html)"
+lectura: "[Schelling (1978)](https://nuevasomosaguas.github.io/biblioteca.html#schelling1978micromotives)"
 dificultad: "Intermedio"
 categories: [modelos de agentes, paradojas de agregación]
 description: "Nadie quiere ser minoría absoluta en su barrio, y aun así la ciudad acaba segregada."

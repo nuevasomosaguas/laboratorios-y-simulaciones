@@ -3,7 +3,7 @@ title: "Los umbrales de Granovetter"
 numero: 2
 nivel: 1
 duracion: "15 min"
-lectura: "[Granovetter (1978)](https://nuevasomosaguas.github.io/biblioteca.html)"
+lectura: "[Granovetter (1978)](https://nuevasomosaguas.github.io/biblioteca.html#granovetter1978threshold)"
 semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
 dificultad: "Iniciación"
 categories: [modelos de agentes]

@@ -5,7 +5,7 @@ numero: 99           # el siguiente número libre
 nivel: 1             # 1 Iniciación, 2 Intermedio, 3 Avanzado: ordena el índice
 dificultad: "Iniciación"
 duracion: "20 min"
-lectura: "Autor (año)"  # si la obra está en la biblioteca, enlázala: "[Autor (año)](https://nuevasomosaguas.github.io/biblioteca.html)"
+lectura: "Autor (año)"  # si la obra está en la biblioteca, enlázala a su ficha: "[Autor (año)](https://nuevasomosaguas.github.io/biblioteca.html#clave)"
 # semana: "[Semana N](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-NN/)"  # solo si encaja de verdad
 # Una a tres de las etiquetas que ya existen; una nueva solo si la van a compartir varios problemas:
 # paradojas de agregación, inferencia causal, sesgo de selección, estadística, modelos de agentes,

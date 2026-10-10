@@ -3,7 +3,7 @@ title: "Tres municipios, un mismo 20 %"
 numero: 8
 nivel: 1
 duracion: "25 min"
-lectura: "[Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html)"
+lectura: "[Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
 dificultad: "Iniciación"
 categories: [DBO]
 description: "El mismo resultado puede tener tres causas distintas, y la política que funciona en un sitio es inútil en otro."

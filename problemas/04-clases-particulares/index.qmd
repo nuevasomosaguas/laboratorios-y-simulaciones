@@ -3,7 +3,7 @@ title: "¿Sirven las clases particulares?"
 numero: 4
 nivel: 2
 duracion: "30 min"
-lectura: "Cinelli, Forney y Pearl (2022)"
+lectura: "Cinelli, Forney y Pearl (2024)"
 semana: "[Semana 4](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-04/)"
 dificultad: "Intermedio"
 categories: [inferencia causal, estadística]
@@ -34,7 +34,7 @@ El efecto *total* de las clases es de **0,5 puntos**: 0,3 directos y 0,2 que lle
 
 `ingresos` es un *confusor*: causa a la vez las clases y la nota, así que hay que controlarlo. `horas`, en cambio, es un *mediador*: está en el camino entre las clases y la nota. Controlarla bloquea parte del efecto que queremos medir, y el coeficiente baja a unos 0,3. Meter en la regresión todas las variables disponibles no es prudencia: es un control malo.
 
-Cinelli, C., Forney, A. y Pearl, J. (2022). A crash course in good and bad controls. *Sociological Methods & Research*.
+Cinelli, C., Forney, A. y Pearl, J. (2024). A crash course in good and bad controls. *Sociological Methods & Research*, 53(3), 1071–1104.
 :::
 :::
 

@@ -3,7 +3,7 @@ title: "La revolución que nadie vio venir"
 numero: 6
 nivel: 2
 duracion: "30 min"
-lectura: "[Kuran (1995)](https://nuevasomosaguas.github.io/biblioteca.html)"
+lectura: "[Kuran (1995)](https://nuevasomosaguas.github.io/biblioteca.html#kuran1995private)"
 semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
 dificultad: "Intermedio"
 categories: [modelos de agentes, equilibrios y dinámica]
