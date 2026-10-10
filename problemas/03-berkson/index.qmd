@@ -1,0 +1,91 @@
+---
+title: "El talento y el esfuerzo de los admitidos"
+numero: 3
+nivel: 1
+duracion: "15 min"
+lectura: "Berkson (1946)"
+dificultad: "Iniciación"
+categories: [inferencia causal, sesgo de selección]
+description: "Entre los admitidos, quien tiene más talento parece esforzarse menos. Encuentra el error del análisis."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un programa de posgrado admite cada año al 10 % de sus candidatos, los de mejor puntuación en una prueba que mide a la vez el talento y el esfuerzo. Un profesor, intrigado, cruza las dos medidas de sus estudiantes y llega a una conclusión que repite en cada claustro:
+
+> Entre nuestros estudiantes, los de más talento son los que menos se esfuerzan. Quien vale no necesita trabajar.
+
+El código de la derecha reproduce su análisis con una población simulada de 10 000 candidatos. En ella, el talento y el esfuerzo son independientes: lo sabemos porque los hemos generado así.
+
+**Tu tarea.** Encuentra el error del análisis y corrígelo: la última línea debe devolver la correlación entre talento y esfuerzo *en toda la población de candidatos*. Después compárala con la del profesor, que ronda −0,7.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La admisión depende del talento y del esfuerzo a la vez: es un *colisionador*. Entre los admitidos, quien tiene poco talento ha tenido que compensarlo con mucho esfuerzo para pasar el corte, y quien tiene mucho talento ha podido pasarlo con menos. Seleccionar la muestra por una consecuencia de las dos variables fabrica una correlación negativa que no existe en la población.
+
+Berkson, J. (1946). Limitations of the application of fourfold table analysis to hospital data. *Biometrics Bulletin*, 2(3), 47–53.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: berkson
+#| caption: "Tu código"
+set.seed(1946)
+n <- 10000
+talento <- rnorm(n)
+esfuerzo <- rnorm(n)
+
+# Se admite al 10 % con mejor puntuación en la prueba
+puntuacion <- talento + esfuerzo
+admitido <- puntuacion > quantile(puntuacion, 0.9)
+estudiantes <- data.frame(talento, esfuerzo)[admitido, ]
+
+# El análisis del profesor
+cor(estudiantes$talento, estudiantes$esfuerzo)
+```
+
+```{webr}
+#| exercise: berkson
+#| solution: true
+set.seed(1946)
+n <- 10000
+talento <- rnorm(n)
+esfuerzo <- rnorm(n)
+
+puntuacion <- talento + esfuerzo
+admitido <- puntuacion > quantile(puntuacion, 0.9)
+estudiantes <- data.frame(talento, esfuerzo)[admitido, ]
+
+cor(talento, esfuerzo)
+```
+
+```{webr}
+#| exercise: berkson
+#| check: true
+if (isTRUE(all.equal(.result, .solution))) {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! En la población la correlación es ", format(round(.solution, 3), decimal.mark = ","),
+    ": nada. La del profesor la fabrica la selección."))
+} else if (is.numeric(.result) && length(.result) == 1 && .result < -0.3) {
+  list(correct = FALSE, message = "Esa sigue siendo la correlación entre los admitidos, la del profesor.")
+} else {
+  list(correct = FALSE, message = "La última línea debe devolver un solo número: la correlación entre talento y esfuerzo de todos los candidatos.")
+}
+```
+
+::: {.hint exercise="berkson"}
+¿A quién estudia el profesor? ¿Sobre quién quiere sacar una conclusión? Los vectores `talento` y `esfuerzo` contienen a todos los candidatos.
+:::
+
+::: {.solution exercise="berkson"}
+`cor(talento, esfuerzo)`, con todos los candidatos y no solo con los admitidos.
+:::
+:::
+
+::::

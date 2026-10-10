@@ -1,0 +1,121 @@
+---
+title: "Tres municipios, un mismo 20 %"
+numero: 8
+nivel: 1
+duracion: "25 min"
+lectura: "[Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html)"
+dificultad: "Iniciación"
+categories: [DBO]
+description: "El mismo resultado puede tener tres causas distintas, y la política que funciona en un sitio es inútil en otro."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Tres municipios ofrecen el mismo curso gratuito de formación a sus parados, y en los tres se apunta solo el 20 %. El curso es igual de útil en todas partes: a quien lo hace le sirve, de verdad, en un 0,7.
+
+Según el esquema DBO de Hedström, una acción se explica por tres componentes: los *deseos*, las *creencias* y las *oportunidades*. Aquí, cada parado se apunta si su deseo de formarse multiplicado por su creencia en que el curso le servirá llega a 0,3, y si además tiene la oportunidad real de ir.
+
+Hay tres intervenciones posibles:
+
+- Una **subvención**, que aumenta el deseo en 0,2, hasta un máximo de 1.
+- Una **campaña de información**, que corrige la creencia: nadie sigue creyendo que el curso sirve menos que su utilidad real, 0,7.
+- Un **autobús**, que da a todos la oportunidad de llegar.
+
+**Tu tarea.** Completa `se_apunta()` y las dos últimas columnas de la tabla, que da la proporción de parados que se apunta en cada municipio con cada intervención. ¿Cuál funciona en cada uno? ¿Por qué?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En el municipio A falta deseo; en el B, la gente subestima la utilidad del curso; en el C no hay forma de llegar. El dato agregado, un 20 % en los tres, no dice nada sobre el mecanismo, y la política que funciona en uno es inútil en otro: el autobús no sirve donde nadie quiere ir, y la campaña de información no sirve donde nadie puede llegar.
+
+Fíjate también en la subvención en el municipio B: sube la participación al 40 %. Un evaluador que solo probase la subvención concluiría que funciona a medias, cuando el problema era otro. Es la idea central de Hedström: sin mecanismo no hay diagnóstico.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: dbo
+#| caption: "Tu código"
+# Diez parados en cada municipio
+municipio <- rep(c("A", "B", "C"), each = 10)
+deseo <- c(0.9, 0.8, 0.3, 0.3, 0.25, 0.2, 0.2, 0.15, 0.1, 0.1, rep(0.8, 20))
+creencia <- c(rep(0.8, 10), 0.7, 0.7, 0.32, 0.32, 0.25, 0.2, 0.2, 0.15, 0.1, 0.1, rep(0.7, 10))
+oportunidad <- c(rep(TRUE, 22), rep(FALSE, 8))
+data.frame(municipio, deseo, creencia, oportunidad)
+
+# TRUE para quien se apunta
+se_apunta <- function(deseo, creencia, oportunidad) {
+  ______
+}
+
+# Proporción que se apunta en cada municipio
+tasa <- function(deseo, creencia, oportunidad) {
+  tapply(se_apunta(deseo, creencia, oportunidad), municipio, mean)
+}
+
+cbind(
+  ninguna = tasa(deseo, creencia, oportunidad),
+  subvencion = tasa(pmin(1, deseo + 0.2), creencia, oportunidad),
+  informacion = ______,
+  autobus = ______
+)
+```
+
+```{webr}
+#| exercise: dbo
+#| solution: true
+municipio <- rep(c("A", "B", "C"), each = 10)
+deseo <- c(0.9, 0.8, 0.3, 0.3, 0.25, 0.2, 0.2, 0.15, 0.1, 0.1, rep(0.8, 20))
+creencia <- c(rep(0.8, 10), 0.7, 0.7, 0.32, 0.32, 0.25, 0.2, 0.2, 0.15, 0.1, 0.1, rep(0.7, 10))
+oportunidad <- c(rep(TRUE, 22), rep(FALSE, 8))
+data.frame(municipio, deseo, creencia, oportunidad)
+
+se_apunta <- function(deseo, creencia, oportunidad) {
+  deseo * creencia >= 0.3 & oportunidad
+}
+
+tasa <- function(deseo, creencia, oportunidad) {
+  tapply(se_apunta(deseo, creencia, oportunidad), municipio, mean)
+}
+
+cbind(
+  ninguna = tasa(deseo, creencia, oportunidad),
+  subvencion = tasa(pmin(1, deseo + 0.2), creencia, oportunidad),
+  informacion = tasa(deseo, pmax(creencia, 0.7), oportunidad),
+  autobus = tasa(deseo, creencia, TRUE)
+)
+```
+
+```{webr}
+#| exercise: dbo
+#| check: true
+f <- .envir_result$se_apunta
+esperado_f <- c(TRUE, FALSE, FALSE, FALSE)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función se_apunta().")
+} else if (!identical(as.logical(f(c(0.9, 0.9, 0.2, 0.9), c(0.8, 0.8, 0.8, 0.2), c(TRUE, FALSE, TRUE, TRUE))), esperado_f)) {
+  list(correct = FALSE, message = "se_apunta() no acierta: hace falta que deseo × creencia llegue a 0,3 y, además, tener la oportunidad. ¿Funciona con vectores?")
+} else if (!isTRUE(all.equal(.result, .solution, check.attributes = FALSE))) {
+  columnas <- colnames(.solution)[colSums(abs(.result - .solution)) > 1e-9]
+  list(correct = FALSE, message = paste0("se_apunta() está bien, pero no la columna ", paste(columnas, collapse = " ni la "), "."))
+} else {
+  list(correct = TRUE, message = "¡Correcto! El mismo 20 % y tres diagnósticos: cada intervención solo funciona del todo en su municipio.")
+}
+```
+
+::: {.hint exercise="dbo"}
+`&` combina dos condiciones elemento a elemento. La campaña de información sube cada creencia a 0,7 si está por debajo: `pmax()`. El autobús hace que `oportunidad` sea `TRUE` para todos.
+:::
+
+::: {.solution exercise="dbo"}
+`deseo * creencia >= 0.3 & oportunidad`; `tasa(deseo, pmax(creencia, 0.7), oportunidad)` y `tasa(deseo, creencia, TRUE)`.
+:::
+:::
+
+::::

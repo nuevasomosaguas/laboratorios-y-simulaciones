@@ -1,0 +1,141 @@
+---
+title: "En burro a Somosaguas"
+numero: 10
+nivel: 1
+duracion: "20 min"
+lectura: "Hägerstrand (1970)"
+dificultad: "Iniciación"
+categories: [DBO]
+description: "Con los mismos deseos y las mismas creencias, el conjunto de opciones reales cambia con la tecnología del transporte."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En [los tres municipios](../08-tres-municipios/index.qmd), la oportunidad era un sí o un no: había autobús o no lo había. La geografía del tiempo de Hägerstrand la mide: nadie puede estar en dos sitios a la vez, y cada desplazamiento consume un tiempo que no se recupera. Lo que está a nuestro alcance depende de dónde estamos, de cuánto tiempo tenemos y de a qué velocidad nos movemos.
+
+Una persona vive en Fuenlabrada. El mapa, simplificado, da la posición de varios centros de estudio y de trabajo, en kilómetros al este (`x`) y al norte (`y`) de su casa. Puede moverse de tres maneras, cada una con su velocidad y con un tiempo de espera fijo: ir hasta la parada o la estación y esperar.
+
+**Tu tarea.** Completa `minutos()`, el tiempo de viaje: la distancia en línea recta, al ritmo de cada medio, más la espera. Después cuenta cuántos destinos quedan a una hora o menos con cada medio.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+A pie o en burro, a unos 4,5 km/h, en una hora solo se llega al taller del barrio; en autobús, a cuatro destinos; en tren, a los siete. Los 20 kilómetros hasta la facultad de Somosaguas son cuatro horas y media en burro y menos de tres cuartos de hora en tren. Los deseos y las creencias de esta persona pueden ser idénticos en los tres casos, pero el conjunto de opciones reales cambia por completo con la tecnología del transporte.
+
+**Para ir más allá:** el *prisma* de Hägerstrand. Si tiene que estar en casa catorce horas al día, entre el sueño y los cuidados, y la jornada es de ocho, le quedan dos horas de viaje: una hora de ida como máximo. ¿Y si la jornada es de nueve? Cambia el presupuesto de tiempo y vuelve a contar.
+
+Hägerstrand, T. (1970). What about people in regional science? *Papers of the Regional Science Association*, 24(1), 7–21.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: hagerstrand
+#| caption: "Tu código"
+destinos <- data.frame(
+  nombre = c("Taller del barrio", "Polígono industrial", "Hospital", "Centro comercial",
+             "Oficinas del centro", "Facultad de Somosaguas", "Aeropuerto"),
+  x = c(1, 4, 6, -9, 5, 0, 20),
+  y = c(2, -3, 8, 12, 17, 20, 21)
+)
+medios <- data.frame(
+  medio = c("a pie o en burro", "autobús", "tren"),
+  velocidad = c(4.5, 20, 45),  # km/h
+  espera = c(0, 10, 15)        # minutos
+)
+
+# Minutos de viaje desde casa, en (0, 0)
+minutos <- function(x, y, velocidad, espera) {
+  ______
+}
+
+tiempos <- sapply(seq_len(nrow(medios)), function(i)
+  minutos(destinos$x, destinos$y, medios$velocidad[i], medios$espera[i]))
+dimnames(tiempos) <- list(destinos$nombre, medios$medio)
+round(tiempos)
+
+# El mapa: hasta dónde se llega en una hora con cada medio
+radio <- (60 - medios$espera) / 60 * medios$velocidad
+colores <- c("#c0392b", "#2980b9", "#18bc9c")
+plot(destinos$x, destinos$y, pch = 19, asp = 1, xlim = c(-35, 35), ylim = c(-35, 35),
+     xlab = "km al este", ylab = "km al norte")
+text(destinos$x, destinos$y, destinos$nombre, pos = 4, cex = 0.7)
+points(0, 0, pch = 15)
+text(0, 0, "Casa", pos = 1)
+symbols(rep(0, 3), rep(0, 3), circles = radio, inches = FALSE, add = TRUE, fg = colores, lwd = 2)
+legend("bottomright", legend = medios$medio, col = colores, lwd = 2, bty = "n")
+
+# Destinos a una hora o menos con cada medio
+colSums(tiempos <= 60)
+```
+
+```{webr}
+#| exercise: hagerstrand
+#| solution: true
+destinos <- data.frame(
+  nombre = c("Taller del barrio", "Polígono industrial", "Hospital", "Centro comercial",
+             "Oficinas del centro", "Facultad de Somosaguas", "Aeropuerto"),
+  x = c(1, 4, 6, -9, 5, 0, 20),
+  y = c(2, -3, 8, 12, 17, 20, 21)
+)
+medios <- data.frame(
+  medio = c("a pie o en burro", "autobús", "tren"),
+  velocidad = c(4.5, 20, 45),
+  espera = c(0, 10, 15)
+)
+
+minutos <- function(x, y, velocidad, espera) {
+  sqrt(x^2 + y^2) / velocidad * 60 + espera
+}
+
+tiempos <- sapply(seq_len(nrow(medios)), function(i)
+  minutos(destinos$x, destinos$y, medios$velocidad[i], medios$espera[i]))
+dimnames(tiempos) <- list(destinos$nombre, medios$medio)
+round(tiempos)
+
+radio <- (60 - medios$espera) / 60 * medios$velocidad
+colores <- c("#c0392b", "#2980b9", "#18bc9c")
+plot(destinos$x, destinos$y, pch = 19, asp = 1, xlim = c(-35, 35), ylim = c(-35, 35),
+     xlab = "km al este", ylab = "km al norte")
+text(destinos$x, destinos$y, destinos$nombre, pos = 4, cex = 0.7)
+points(0, 0, pch = 15)
+text(0, 0, "Casa", pos = 1)
+symbols(rep(0, 3), rep(0, 3), circles = radio, inches = FALSE, add = TRUE, fg = colores, lwd = 2)
+legend("bottomright", legend = medios$medio, col = colores, lwd = 2, bty = "n")
+
+colSums(tiempos <= 60)
+```
+
+```{webr}
+#| exercise: hagerstrand
+#| check: true
+f <- .envir_result$minutos
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función minutos().")
+} else if (!isTRUE(all.equal(f(3, 4, 5, 0), 60))) {
+  list(correct = FALSE, message = paste0(
+    "A 5 km (3 al este y 4 al norte) y a 5 km/h, sin espera, el viaje dura 60 minutos, y minutos() da ",
+    format(round(f(3, 4, 5, 0), 1), decimal.mark = ","), ". Revisa la distancia en línea recta y el paso de horas a minutos."))
+} else if (!isTRUE(all.equal(f(c(3, 0), c(4, 10), 20, 10), c(25, 40)))) {
+  list(correct = FALSE, message = "minutos() falla con la espera, o con vectores de destinos.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! En una hora se llega a ", .result[[1]], " destino a pie, a ", .result[[2]],
+    " en autobús y a ", .result[[3]], " en tren."))
+}
+```
+
+::: {.hint exercise="hagerstrand"}
+La distancia en línea recta desde (0, 0) es `sqrt(x^2 + y^2)`. Distancia entre velocidad da horas; por 60, minutos.
+:::
+
+::: {.solution exercise="hagerstrand"}
+`sqrt(x^2 + y^2) / velocidad * 60 + espera`.
+:::
+:::
+
+::::

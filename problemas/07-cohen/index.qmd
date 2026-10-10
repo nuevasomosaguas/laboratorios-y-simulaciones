@@ -1,0 +1,154 @@
+---
+title: "¿Grande o significativo?"
+numero: 7
+nivel: 1
+duracion: "30 min"
+lectura: "Cohen (1988)"
+semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
+dificultad: "Iniciación"
+categories: [estadística, sesgo de selección]
+description: "Un efecto puede ser estadísticamente significativo y, a la vez, casi irrelevante. Y al revés."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+La *d de Cohen* mide la diferencia entre las medias de dos grupos en unidades de desviación típica:
+
+$$d = \frac{\bar{x}_1 - \bar{x}_2}{s}, \qquad s = \sqrt{\frac{(n_1 - 1)\,s_1^2 + (n_2 - 1)\,s_2^2}{n_1 + n_2 - 2}},$$
+
+donde $s$ es la desviación típica combinada de los dos grupos. Como no depende de las unidades, permite comparar efectos de estudios muy distintos. Cohen propuso como referencia 0,2 para un efecto pequeño, 0,5 para uno mediano y 0,8 para uno grande, aunque él mismo advirtió que no debían usarse de forma mecánica.
+
+**Tu tarea.**
+
+1. Completa `cohen_d(x, y)` con la desviación típica combinada. Con los datos de prueba debe dar 1,633.
+2. Traduce la d a algo intuitivo. `superioridad(d)` es la probabilidad de que un miembro al azar del primer grupo supere a uno al azar del segundo, $\Phi(d/\sqrt{2})$. `solapamiento(d)` es la proporción en que se solapan las dos distribuciones, $2\Phi(-|d|/2)$. En R, $\Phi$ es `pnorm()`.
+3. El resto ya está escrito; léelo y fíjate en lo que devuelve. Dos grupos de 100 000 personas cuyas medias difieren en 0,02 desviaciones típicas: ¿qué dice el valor p? ¿Y la d?
+4. Diez mil estudios con un efecto real de d = 0,2 y 20 personas por grupo, de los que solo se publican los que salen significativos (p < 0,05) y a favor. ¿Qué proporción se publica, y cuál es la d media de lo publicado? La simulación tarda unos segundos.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La tarea 2 desmonta la intuición sobre los efectos «pequeños»: con d = 0,2, las dos distribuciones se solapan en un 92 %, y un miembro del primer grupo supera a uno del segundo apenas el 55,6 % de las veces. Para comparar, la diferencia de estatura entre hombres y mujeres adultos ronda una d de 2, con una probabilidad de superioridad del 92 %.
+
+La tarea 3 muestra que con muestras enormes casi cualquier diferencia es significativa: el valor p dice si un efecto se distingue de cero, no si importa.
+
+Y la tarea 4 es el mecanismo de buena parte de la crisis de replicación. Con estudios pequeños, solo un 9 % sale significativo, y para salirlo la d estimada tiene que ser enorme: la media de lo publicado ronda 0,8, cuatro veces el efecto real. Con una literatura que solo publica lo significativo, los efectos publicados se inflan sistemáticamente. Es una selección oculta, de la misma familia que la de [Kuran](../06-kuran/index.qmd): lo que vemos en las revistas no es lo que hay en los cajones.
+
+**Para ir más allá:** la d sobrestima un poco el efecto en muestras pequeñas. La corrección de Hedges la multiplica por $1 - 3/(4(n_1 + n_2) - 9)$. Escribe `hedges_g()` y compara.
+
+Cohen, J. (1988). *Statistical Power Analysis for the Behavioral Sciences* (2.ª ed.). Lawrence Erlbaum.
+
+Gelman, A. y Carlin, J. (2014). Beyond power calculations: Assessing type S (sign) and type M (magnitude) errors. *Perspectives on Psychological Science*, 9(6), 641–651.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: cohen
+#| caption: "Tu código"
+# 1. La d de Cohen
+cohen_d <- function(x, y) {
+  n1 <- length(x)
+  n2 <- length(y)
+  s <- ______  # desviación típica combinada, con n - 1 en cada grupo
+  (mean(x) - mean(y)) / s
+}
+cohen_d(c(5, 7, 8, 6, 9), c(4, 5, 6, 5, 5))
+
+# 2. La d, traducida
+superioridad <- function(d) ______
+solapamiento <- function(d) ______
+d <- c(pequeño = 0.2, mediano = 0.5, grande = 0.8)
+round(rbind(superioridad = superioridad(d), solapamiento = solapamiento(d)), 3)
+
+# 3. Una diferencia minúscula con una muestra enorme
+set.seed(3)
+a <- rnorm(1e5, mean = 0.02)
+b <- rnorm(1e5)
+c(p = t.test(a, b)$p.value, d = cohen_d(a, b))
+
+# 4. Lo que llega a publicarse
+set.seed(4)
+estudios <- replicate(10000, {
+  x <- rnorm(20, mean = 0.2)
+  y <- rnorm(20)
+  c(p = t.test(x, y)$p.value, d = cohen_d(x, y))
+})
+publicados <- estudios["p", ] < 0.05 & estudios["d", ] > 0
+c(publicados = mean(publicados), d_publicada = mean(estudios["d", publicados]))
+```
+
+```{webr}
+#| exercise: cohen
+#| solution: true
+cohen_d <- function(x, y) {
+  n1 <- length(x)
+  n2 <- length(y)
+  s <- sqrt(((n1 - 1) * var(x) + (n2 - 1) * var(y)) / (n1 + n2 - 2))
+  (mean(x) - mean(y)) / s
+}
+cohen_d(c(5, 7, 8, 6, 9), c(4, 5, 6, 5, 5))
+
+superioridad <- function(d) pnorm(d / sqrt(2))
+solapamiento <- function(d) 2 * pnorm(-abs(d) / 2)
+d <- c(pequeño = 0.2, mediano = 0.5, grande = 0.8)
+round(rbind(superioridad = superioridad(d), solapamiento = solapamiento(d)), 3)
+
+set.seed(3)
+a <- rnorm(1e5, mean = 0.02)
+b <- rnorm(1e5)
+c(p = t.test(a, b)$p.value, d = cohen_d(a, b))
+
+set.seed(4)
+estudios <- replicate(10000, {
+  x <- rnorm(20, mean = 0.2)
+  y <- rnorm(20)
+  c(p = t.test(x, y)$p.value, d = cohen_d(x, y))
+})
+publicados <- estudios["p", ] < 0.05 & estudios["d", ] > 0
+c(publicados = mean(publicados), d_publicada = mean(estudios["d", publicados]))
+```
+
+```{webr}
+#| exercise: cohen
+#| check: true
+e <- .envir_result
+coma <- function(x, digitos = 3) format(round(x, digitos), nsmall = digitos, decimal.mark = ",")
+# Grupos de distinto tamaño: distinguen la combinada de sd(c(x, y)) y de la media de las dos
+x1 <- c(1, 2, 3, 4); y1 <- c(2, 4, 6)
+combinada <- (mean(x1) - mean(y1)) / sqrt((3 * var(x1) + 2 * var(y1)) / 5)
+d_prueba <- c(-0.5, 0, 0.2, 0.8, 2)
+if (!all(c("cohen_d", "superioridad", "solapamiento") %in% ls(e))) {
+  list(correct = FALSE, message = "Faltan funciones: cohen_d(), superioridad() o solapamiento().")
+} else if (!isTRUE(all.equal(e$cohen_d(c(5, 7, 8, 6, 9), c(4, 5, 6, 5, 5)), 2 / sqrt(1.5)))) {
+  list(correct = FALSE, message = paste0(
+    "Con los datos de prueba cohen_d() debería dar 1,633, y da ",
+    coma(e$cohen_d(c(5, 7, 8, 6, 9), c(4, 5, 6, 5, 5))), "."))
+} else if (!isTRUE(all.equal(e$cohen_d(x1, y1), combinada))) {
+  list(correct = FALSE, message = "Con grupos de distinto tamaño, cohen_d() falla: cada varianza debe pesar según sus n - 1 grados de libertad.")
+} else if (!isTRUE(all.equal(e$superioridad(d_prueba), pnorm(d_prueba / sqrt(2))))) {
+  list(correct = FALSE, message = "superioridad() no da Φ(d/√2).")
+} else if (!isTRUE(all.equal(e$solapamiento(d_prueba), 2 * pnorm(-abs(d_prueba) / 2)))) {
+  list(correct = FALSE, message = "solapamiento() no da 2Φ(−|d|/2). ¿Has usado el valor absoluto de d?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Se publica el ", round(100 * .result[["publicados"]]), " % de los estudios, ",
+    "y su d media es ", coma(.result[["d_publicada"]], 2), ": unas ",
+    round(.result[["d_publicada"]] / 0.2), " veces el efecto real."))
+}
+```
+
+::: {.hint exercise="cohen"}
+`var(x)` ya divide por n − 1. La combinada pondera las dos varianzas por sus grados de libertad, divide por el total de grados de libertad y saca la raíz. Para $\Phi$, `pnorm()`; para $|d|$, `abs(d)`.
+:::
+
+::: {.solution exercise="cohen"}
+`s <- sqrt(((n1 - 1) * var(x) + (n2 - 1) * var(y)) / (n1 + n2 - 2))`, `superioridad <- function(d) pnorm(d / sqrt(2))` y `solapamiento <- function(d) 2 * pnorm(-abs(d) / 2)`.
+:::
+:::
+
+::::

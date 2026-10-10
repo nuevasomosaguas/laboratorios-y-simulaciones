@@ -1,0 +1,67 @@
+<script>
+// Progreso personal: los problemas resueltos se guardan solo en este navegador.
+(() => {
+  const CLAVE = "laboratorios:resueltos";
+  const ruta = (url) => new URL(url, location).pathname.replace(/index\.html$/, "");
+  const leer = () => {
+    try { return new Set(JSON.parse(localStorage.getItem(CLAVE)) ?? []); } catch { return new Set(); }
+  };
+  const marcar = () => {
+    const resueltos = leer();
+    document.querySelectorAll("a[href]").forEach((a) => {
+      if (resueltos.has(ruta(a.href))) a.classList.add("resuelto");
+    });
+    // La columna de estado del índice
+    document.querySelectorAll(".quarto-listing-table tr").forEach((fila) => {
+      const estado = fila.querySelector(".listing-estado");
+      if (estado && fila.querySelector("a.resuelto.listing-title")) estado.textContent = "✓";
+    });
+  };
+  // quarto-live pinta un .exercise-grade.alert-success cuando la comprobación acierta.
+  new MutationObserver(() => {
+    if (!document.querySelector(".exercise-grade.alert-success")) return;
+    const resueltos = leer();
+    if (resueltos.has(ruta(location.href))) return;
+    resueltos.add(ruta(location.href));
+    try { localStorage.setItem(CLAVE, JSON.stringify([...resueltos])); } catch {}
+    marcar();
+  }).observe(document.body, { childList: true, subtree: true });
+  marcar();
+})();
+
+// quarto-live solo habla inglés: se traducen sus textos en cuanto aparecen.
+(() => {
+  const traducciones = [
+    [/^Run Code$/, "Ejecutar y comprobar"],
+    [/^Start Over$/, "Empezar de nuevo"],
+    [/^Show Hint$/, "Pista"],
+    [/^Show Solution$/, "Solución"],
+    [/^Please replace ______ with valid code\.$/, "Sustituye ______ por código válido."],
+    [/^Downloading webR$/, "Descargando R (solo la primera vez)"],
+    [/^Downloading package: (.*)$/, "Descargando el paquete $1"],
+    [/^Downloading resource: (.*)$/, "Descargando $1"],
+    [/^(Initialise|Installing webR shims|WebR environment setup)$/, "Preparando R"],
+  ];
+  const traducir = (nodo) => {
+    const texto = nodo.nodeValue.trim();
+    for (const [patron, traduccion] of traducciones) {
+      if (patron.test(texto)) {
+        nodo.nodeValue = nodo.nodeValue.replace(texto, texto.replace(patron, traduccion));
+        return;
+      }
+    }
+  };
+  const recorrer = (raiz) => {
+    if (raiz.nodeType === Node.TEXT_NODE) return traducir(raiz);
+    const nodos = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+    while (nodos.nextNode()) traducir(nodos.currentNode);
+  };
+  new MutationObserver((cambios) => {
+    for (const cambio of cambios) {
+      if (cambio.type === "characterData") traducir(cambio.target);
+      else cambio.addedNodes.forEach(recorrer);
+    }
+  }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  recorrer(document.body);
+})();
+</script>

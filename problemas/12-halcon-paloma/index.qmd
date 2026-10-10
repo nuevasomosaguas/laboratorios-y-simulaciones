@@ -1,0 +1,123 @@
+---
+title: "Halcones y palomas"
+numero: 12
+nivel: 2
+duracion: "30 min"
+lectura: "Maynard Smith y Price (1973)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Intermedio"
+categories: [biología, juegos y votación, equilibrios y dinámica]
+description: "La evolución lleva a una mezcla de agresivos y pacíficos en la que todos salen peor que si nadie peleara."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Dos animales de la misma especie se disputan un recurso que vale $V$. Cada uno puede seguir una de dos estrategias:
+
+- **Halcón:** pelea siempre, hasta ganar o salir herido.
+- **Paloma:** amenaza, pero se retira si el otro pelea.
+
+Dos halcones pelean: cada uno gana la mitad de las veces y paga un coste $C$ cuando pierde, así que de media obtiene $(V - C)/2$. Un halcón contra una paloma se lleva $V$, y la paloma, 0. Dos palomas se reparten el recurso: $V/2$ cada una.
+
+Si en la población hay una proporción $x$ de halcones, cada animal se cruza con un halcón con probabilidad $x$ y con una paloma con probabilidad $1 - x$. La estrategia que paga más que la otra se reproduce más y gana terreno: es la *dinámica del replicador*.
+
+**Tu tarea.** Completa `pagos()`: el pago medio de un halcón y el de una paloma cuando hay una proporción `x` de halcones. ¿Adónde llega la población? ¿Cuánto gana de media cada animal, comparado con una población solo de palomas? Prueba después con otros costes `C`, también con uno menor que `V`.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con $V = 4$ y $C = 10$, la población acaba con un 40 % de halcones: $V/C$. Es una *estrategia evolutivamente estable*: si hubiese más halcones, se encontrarían demasiado entre ellos y les iría peor que a las palomas; si hubiese menos, les iría mejor. Ninguna población solo de palomas resiste: un halcón mutante se haría con todo.
+
+Pero en ese equilibrio cada animal gana de media 1,2, mientras que en una población solo de palomas ganaría 2. La selección no maximiza el bienestar del grupo, sino el éxito relativo de cada estrategia: un dilema social sin que nadie decida nada. Cuando la pelea sale barata, con $C < V$, los halcones lo invaden todo.
+
+Maynard Smith, J. y Price, G. R. (1973). The logic of animal conflict. *Nature*, 246, 15–18.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: halcon
+#| caption: "Tu código"
+V <- 4   # el valor del recurso
+C <- 10  # el coste de perder una pelea
+
+# Pago medio de cada estrategia con una proporción x de halcones
+pagos <- function(x, V, C) {
+  c(halcon = ______,
+    paloma = ______)
+}
+
+# Dinámica del replicador
+x <- 0.05
+trayectoria <- numeric(3000)
+for (t in seq_along(trayectoria)) {
+  p <- pagos(x, V, C)
+  x <- x + 0.01 * x * (1 - x) * (p[["halcon"]] - p[["paloma"]])
+  trayectoria[t] <- x
+}
+plot(trayectoria, type = "l", ylim = c(0, 1), xlab = "Generación", ylab = "Proporción de halcones")
+abline(h = min(1, V / C), lty = 2)
+
+c(halcones = x, pago_medio = sum(c(x, 1 - x) * pagos(x, V, C)), solo_palomas = V / 2)
+```
+
+```{webr}
+#| exercise: halcon
+#| solution: true
+V <- 4
+C <- 10
+
+pagos <- function(x, V, C) {
+  c(halcon = x * (V - C) / 2 + (1 - x) * V,
+    paloma = (1 - x) * V / 2)
+}
+
+x <- 0.05
+trayectoria <- numeric(3000)
+for (t in seq_along(trayectoria)) {
+  p <- pagos(x, V, C)
+  x <- x + 0.01 * x * (1 - x) * (p[["halcon"]] - p[["paloma"]])
+  trayectoria[t] <- x
+}
+plot(trayectoria, type = "l", ylim = c(0, 1), xlab = "Generación", ylab = "Proporción de halcones")
+abline(h = min(1, V / C), lty = 2)
+
+c(halcones = x, pago_medio = sum(c(x, 1 - x) * pagos(x, V, C)), solo_palomas = V / 2)
+```
+
+```{webr}
+#| exercise: halcon
+#| check: true
+f <- .envir_result$pagos
+correcto <- function(x, V, C) c(x * (V - C) / 2 + (1 - x) * V, (1 - x) * V / 2)
+casos <- list(c(0.3, 4, 10), c(0, 2, 6), c(1, 2, 6), c(0.5, 6, 2))
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función pagos().")
+} else if (!is.null(fallo <- Find(function(k) !isTRUE(all.equal(unname(f(k[1], k[2], k[3])), correcto(k[1], k[2], k[3]))), casos))) {
+  list(correct = FALSE, message = paste0(
+    "Con x = ", format(fallo[1], decimal.mark = ","), ", V = ", fallo[2], " y C = ", fallo[3], " los pagos deberían ser ",
+    paste(format(correcto(fallo[1], fallo[2], fallo[3]), decimal.mark = ","), collapse = " y "),
+    ". Un halcón se cruza con un halcón con probabilidad x y con una paloma con probabilidad 1 − x."))
+} else {
+  coma <- function(v) format(round(v, 2), nsmall = 2, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La población llega a un ", round(100 * .result[["halcones"]]), " % de halcones, ",
+    "y cada animal gana de media ", coma(.result[["pago_medio"]]), " frente a ", coma(.result[["solo_palomas"]]),
+    " si todos fuesen palomas."))
+}
+```
+
+::: {.hint exercise="halcon"}
+El pago de un halcón es la media de lo que gana contra cada rival, ponderada por la probabilidad de encontrárselo: $x \cdot \frac{V - C}{2} + (1 - x) \cdot V$. Haz lo mismo con la paloma.
+:::
+
+::: {.solution exercise="halcon"}
+`halcon = x * (V - C) / 2 + (1 - x) * V` y `paloma = (1 - x) * V / 2`.
+:::
+:::
+
+::::

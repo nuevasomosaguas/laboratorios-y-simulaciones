@@ -1,0 +1,57 @@
+/* Enunciado a la izquierda y ejercicio a la derecha; en pantallas estrechas, apilados. */
+@media (min-width: 992px) {
+  .laboratorio {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+.enunciado { overflow-wrap: break-word; }
+
+/* La interfaz y los títulos, en Inter; el texto, en EB Garamond. */
+h1, h2, h3, h4, h5, h6, .navbar, .sidebar, .nav-page, .btn, .card-header,
+.callout-header, .alert, .quarto-listing-table, .quarto-listing-category, .quarto-title-meta {
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Cifras alineadas en las tablas: EB Garamond las trae de estilo antiguo. */
+table { font-variant-numeric: lining-nums tabular-nums; }
+.quarto-listing-table th { font-weight: 600; }
+
+/* Sin ligaduras en el código: que <- no se vea como una flecha que nadie sabe teclear. */
+code, pre, .cm-editor, .cm-editor * {
+  font-variant-ligatures: none !important;
+  font-feature-settings: "calt" 0, "liga" 0 !important;
+}
+
+/* Problemas resueltos en este navegador: el índice, la barra lateral y las flechas. */
+a.resuelto::after { content: " ✓"; color: #18bc9c; }
+.quarto-listing-table a.resuelto::after { content: none; }
+.listing-estado { color: #18bc9c; }
+
+/* El editor de quarto-live (CodeMirror) trae su propia monoespaciada. */
+.cm-editor .cm-scroller { font-family: "Fira Code", monospace !important; }
+
+/* Como en freeCodeCamp: el editor tiene una altura fija y se desplaza por dentro,
+   en lugar de crecer con cada línea. */
+.ejercicio .exercise-editor-body > .cm-editor { height: max(20rem, 55vh); }
+.ejercicio .cm-scroller { overflow-x: hidden; overflow-y: auto; }
+
+/* Las líneas largas se parten en lugar de desplazarse en horizontal: lo mismo que hace
+   EditorView.lineWrapping de CodeMirror, que quarto-live no activa. */
+.ejercicio .cm-content {
+  white-space: pre-wrap !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  flex-shrink: 1 !important;
+}
+
+/* Las etiquetas del índice no caben en una pantalla: que bajen con la página en lugar de
+   quedarse fijas con su propia barra de desplazamiento. */
+#quarto-margin-sidebar {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}

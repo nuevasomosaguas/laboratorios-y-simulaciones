@@ -1,0 +1,161 @@
+---
+title: "La segregación de Schelling"
+numero: 5
+nivel: 2
+duracion: "40 min"
+lectura: "[Schelling (1978)](https://nuevasomosaguas.github.io/biblioteca.html)"
+dificultad: "Intermedio"
+categories: [modelos de agentes, paradojas de agregación]
+description: "Nadie quiere ser minoría absoluta en su barrio, y aun así la ciudad acaba segregada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Una ciudad es una cuadrícula de 20 × 20 casas, con dos grupos de vecinos, rojos y azules, y un 10 % de casas vacías. Cada vecino mira las ocho casas que lo rodean y se queda contento si al menos un tercio de sus vecinos son de su grupo. Si no, se muda a una casa vacía cualquiera.
+
+Nadie en esta ciudad quiere vivir solo entre los suyos: a todos les basta con no estar en minoría de dos a uno. Schelling (1971) mostró, con monedas sobre un tablero, adónde lleva eso.
+
+**Tu tarea.** Completa la función `parecidos()`, que devuelve la proporción de vecinos ocupados de la casa `(i, j)` que son de su mismo grupo. El resto de la simulación ya está escrito: mueve a los descontentos durante varias rondas, dibuja la ciudad y devuelve la proporción media de vecinos parecidos al principio y al final.
+
+Las casas del borde tienen menos vecinos. Un vecino sin nadie alrededor está contento: la función debe devolver 1.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Al principio, con los vecinos repartidos al azar, cada uno tiene de media un 50 % de vecinos parecidos. Al final, en torno al 75 %, mucho más de lo que nadie pedía. Cada mudanza deja a algún vecino del barrio de origen un poco más en minoría, y lo empuja a mudarse también. Una preferencia individual suave produce un resultado colectivo extremo: no se puede deducir la segregación de la ciudad del grado de prejuicio de sus habitantes, ni al revés.
+
+Schelling, T. C. (1971). Dynamic models of segregation. *Journal of Mathematical Sociology*, 1(2), 143–186.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: schelling
+#| caption: "Tu código"
+parecidos <- function(rejilla, i, j) {
+  filas <- max(1, i - 1):min(nrow(rejilla), i + 1)
+  columnas <- max(1, j - 1):min(ncol(rejilla), j + 1)
+  vecindario <- rejilla[filas, columnas]  # incluye la propia casa
+  propios <- ______   # vecinos del mismo grupo, sin contarse a sí mismo
+  ocupados <- ______  # vecinos ocupados, sin contarse a sí mismo
+  if (ocupados == 0) return(1)
+  propios / ocupados
+}
+
+# 0 = vacía, 1 = rojo, 2 = azul
+set.seed(1971)
+lado <- 20
+rejilla <- matrix(sample(0:2, lado^2, replace = TRUE, prob = c(0.1, 0.45, 0.45)), lado)
+umbral <- 1/3
+
+media_parecidos <- function(rejilla) {
+  ocupadas <- which(rejilla != 0, arr.ind = TRUE)
+  mean(apply(ocupadas, 1, function(p) parecidos(rejilla, p[1], p[2])))
+}
+inicial <- media_parecidos(rejilla)
+
+for (ronda in 1:30) {
+  ocupadas <- which(rejilla != 0, arr.ind = TRUE)
+  contento <- apply(ocupadas, 1, function(p) parecidos(rejilla, p[1], p[2]) >= umbral)
+  descontentos <- ocupadas[!contento, , drop = FALSE]
+  if (nrow(descontentos) == 0) break
+  for (k in sample(nrow(descontentos))) {
+    vacias <- which(rejilla == 0)
+    destino <- vacias[sample.int(length(vacias), 1)]
+    rejilla[destino] <- rejilla[descontentos[k, 1], descontentos[k, 2]]
+    rejilla[descontentos[k, 1], descontentos[k, 2]] <- 0
+  }
+}
+
+image(rejilla, col = c("white", "#c0392b", "#2c3e50"), axes = FALSE, asp = 1)
+c(inicial = inicial, final = media_parecidos(rejilla), rondas = ronda)
+```
+
+```{webr}
+#| exercise: schelling
+#| solution: true
+parecidos <- function(rejilla, i, j) {
+  filas <- max(1, i - 1):min(nrow(rejilla), i + 1)
+  columnas <- max(1, j - 1):min(ncol(rejilla), j + 1)
+  vecindario <- rejilla[filas, columnas]
+  propios <- sum(vecindario == rejilla[i, j]) - 1
+  ocupados <- sum(vecindario != 0) - 1
+  if (ocupados == 0) return(1)
+  propios / ocupados
+}
+
+set.seed(1971)
+lado <- 20
+rejilla <- matrix(sample(0:2, lado^2, replace = TRUE, prob = c(0.1, 0.45, 0.45)), lado)
+umbral <- 1/3
+
+media_parecidos <- function(rejilla) {
+  ocupadas <- which(rejilla != 0, arr.ind = TRUE)
+  mean(apply(ocupadas, 1, function(p) parecidos(rejilla, p[1], p[2])))
+}
+inicial <- media_parecidos(rejilla)
+
+for (ronda in 1:30) {
+  ocupadas <- which(rejilla != 0, arr.ind = TRUE)
+  contento <- apply(ocupadas, 1, function(p) parecidos(rejilla, p[1], p[2]) >= umbral)
+  descontentos <- ocupadas[!contento, , drop = FALSE]
+  if (nrow(descontentos) == 0) break
+  for (k in sample(nrow(descontentos))) {
+    vacias <- which(rejilla == 0)
+    destino <- vacias[sample.int(length(vacias), 1)]
+    rejilla[destino] <- rejilla[descontentos[k, 1], descontentos[k, 2]]
+    rejilla[descontentos[k, 1], descontentos[k, 2]] <- 0
+  }
+}
+
+image(rejilla, col = c("white", "#c0392b", "#2c3e50"), axes = FALSE, asp = 1)
+c(inicial = inicial, final = media_parecidos(rejilla), rondas = ronda)
+```
+
+```{webr}
+#| exercise: schelling
+#| check: true
+f <- .envir_result$parecidos
+prueba <- matrix(c(1, 1, 2,
+                   0, 1, 2,
+                   2, 2, 0), 3, byrow = TRUE)
+casos <- list(
+  list(i = 2, j = 2, esperado = 2/6),  # centro: 6 vecinos ocupados, 2 rojos
+  list(i = 1, j = 1, esperado = 2/2),  # esquina: 2 vecinos ocupados, los dos rojos
+  list(i = 3, j = 1, esperado = 1/2),  # esquina con una casa vacía al lado
+  list(i = 1, j = 3, esperado = 1/3)   # esquina: 3 ocupados, 1 azul
+)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función parecidos().")
+} else {
+  fallo <- Find(function(caso) !isTRUE(all.equal(f(prueba, caso$i, caso$j), caso$esperado)), casos)
+  solo <- tryCatch(f(matrix(c(1, 0, 0, 0), 2), 1, 1), error = function(e) NA)
+  if (!is.null(fallo)) {
+    list(correct = FALSE, message = paste0(
+      "En la casa (", fallo$i, ", ", fallo$j, ") de la matriz de prueba rbind(c(1, 1, 2), c(0, 1, 2), c(2, 2, 0)) ",
+      "la proporción debería ser ", format(round(fallo$esperado, 3), decimal.mark = ","),
+      ", y parecidos() devuelve ", format(round(f(prueba, fallo$i, fallo$j), 3), decimal.mark = ","), ". ¿Te estás contando a ti mismo?"))
+  } else if (!isTRUE(all.equal(solo, 1))) {
+    list(correct = FALSE, message = "Un vecino sin nadie alrededor está contento: parecidos() debe devolver 1.")
+  } else {
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! Los vecinos parecidos pasan del ", round(100 * .result[["inicial"]]),
+      " % al ", round(100 * .result[["final"]]), " %, y nadie pedía más de un tercio."))
+  }
+}
+```
+
+::: {.hint exercise="schelling"}
+`vecindario == rejilla[i, j]` marca las casas del mismo grupo y `vecindario != 0` las ocupadas. En las dos cuentas aparece la propia casa, que hay que restar.
+:::
+
+::: {.solution exercise="schelling"}
+`propios <- sum(vecindario == rejilla[i, j]) - 1` y `ocupados <- sum(vecindario != 0) - 1`.
+:::
+:::
+
+::::

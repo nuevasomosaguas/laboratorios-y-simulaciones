@@ -1,0 +1,81 @@
+---
+title: "La paradoja de Simpson en Berkeley"
+numero: 1
+nivel: 1
+duracion: "20 min"
+lectura: "Bickel, Hammel y O'Connell (1975)"
+dificultad: "Iniciación"
+categories: [paradojas de agregación, inferencia causal]
+description: "Las admisiones de posgrado de Berkeley en 1973: agregar los datos invierte la conclusión."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En el otoño de 1973, la Universidad de California en Berkeley admitió en sus estudios de posgrado al 44 % de los hombres que lo solicitaron y solo al 35 % de las mujeres. En sus seis departamentos más grandes, la diferencia era aún mayor: el 44,5 % frente al 30,4 %. Con una diferencia así, y miles de solicitudes, parece difícil no hablar de discriminación.
+
+Bickel, Hammel y O'Connell (1975) miraron los datos departamento por departamento. La admisión la decidía cada departamento, no la universidad, así que es ahí donde habría que buscar el sesgo.
+
+Los datos de los seis departamentos más grandes vienen con R, en la tabla de tres dimensiones `UCBAdmissions`: `Admit` (admitido o rechazado), `Gender` y `Dept` (de la A a la F).
+
+**Tu tarea.** Calcula la tasa de admisión de cada sexo *dentro de cada departamento*, como una tabla con el sexo en las filas y el departamento en las columnas. El código de partida ya calcula la tasa agregada; fíjate en cómo lo hace `prop.table()` con su segundo argumento.
+
+Cuando la tengas, cuenta en cuántos departamentos las mujeres tienen una tasa más alta que los hombres. Y piensa a qué departamentos se presentaron unas y otros: `margin.table(UCBAdmissions, c(2, 3))`.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En cuatro de los seis departamentos las mujeres tienen una tasa de admisión más alta que los hombres. La tasa agregada se invierte porque las mujeres se presentaron sobre todo a los departamentos más difíciles, como C y E, que rechazan a la mayoría de los solicitantes, y los hombres a los más fáciles, A y B. El departamento confunde la relación entre el sexo y la admisión: al agregar, se mezcla con ella.
+
+Bickel, P. J., Hammel, E. A. y O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: berkeley
+#| caption: "Tu código"
+# Tasa de admisión agregada de cada sexo
+agregada <- prop.table(margin.table(UCBAdmissions, c(1, 2)), 2)
+round(agregada["Admitted", ], 3)
+
+# Tasa de admisión de cada sexo dentro de cada departamento
+por_departamento <- ______
+round(por_departamento["Admitted", , ], 3)
+```
+
+```{webr}
+#| exercise: berkeley
+#| solution: true
+agregada <- prop.table(margin.table(UCBAdmissions, c(1, 2)), 2)
+round(agregada["Admitted", ], 3)
+
+por_departamento <- prop.table(UCBAdmissions, c(2, 3))
+round(por_departamento["Admitted", , ], 3)
+```
+
+```{webr}
+#| exercise: berkeley
+#| check: true
+if (isTRUE(all.equal(unclass(.result), unclass(.solution)))) {
+  list(correct = TRUE, message = "¡Correcto! Las mujeres salen por delante en cuatro de los seis departamentos.")
+} else if (isTRUE(all.equal(dim(.result), c(2L, 6L)))) {
+  list(correct = FALSE, message = "La tabla tiene la forma buena, pero no los valores: cada pareja de admitidos y rechazados de un sexo y un departamento debe sumar 1.")
+} else {
+  list(correct = FALSE, message = "La última línea debe devolver una tabla con 2 filas (sexo) y 6 columnas (departamento).")
+}
+```
+
+::: {.hint exercise="berkeley"}
+`prop.table(x, margin)` divide cada celda por el total de las dimensiones que indica `margin`. Para la tasa agregada, `margin = 2` (el sexo). Dentro de cada departamento, hay que fijar dos dimensiones a la vez.
+:::
+
+::: {.solution exercise="berkeley"}
+`prop.table(UCBAdmissions, c(2, 3))` divide por el total de cada combinación de sexo y departamento.
+:::
+:::
+
+::::

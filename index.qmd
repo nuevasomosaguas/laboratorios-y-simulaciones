@@ -1,0 +1,24 @@
+---
+title: "Problemas"
+listing:
+  contents: problemas
+  type: table
+  # De menos a más difícil; dentro de cada nivel, por número.
+  sort: [nivel, numero]
+  sort-ui: false
+  fields: [estado, numero, title, dificultad, duracion, semana, lectura, categories]
+  field-display-names:
+    estado: "✓"
+    numero: "Nº"
+    title: "Problema"
+    dificultad: "Dificultad"
+    duracion: "Duración"
+    semana: "Bootcamp"
+    lectura: "Lectura"
+    categories: "Etiquetas"
+  categories: true
+---
+
+Problemas de ciencias sociales cuantitativas que se resuelven escribiendo código de R en el navegador, sin instalar nada. R funciona gracias a [webR](https://docs.r-wasm.org/webr/latest/): la primera vez descarga unos megas y tarda unos segundos; después queda en la caché.
+
+No hay clasificación: los problemas resueltos se marcan con ✓ solo en este navegador.

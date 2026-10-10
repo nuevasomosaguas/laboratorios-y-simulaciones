@@ -1,0 +1,111 @@
+---
+title: "¿Ha bajado el nivel?"
+numero: 14
+nivel: 1
+duracion: "20 min"
+lectura: "Feinstein, Sosin y Wells (1985)"
+semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
+dificultad: "Iniciación"
+categories: [demografía, sesgo de selección, paradojas de agregación]
+description: "El Bachillerato se abre a más alumnos y baja la media de los que entran. Y también la de los que se quedan fuera."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un profesor de instituto lleva cuarenta años dando clase y está convencido de que el nivel ha bajado: sus alumnos de hoy saben menos que los de antes. Pero entre tanto el Bachillerato ha pasado de ser cosa de una minoría a serlo de la mayoría.
+
+Supongamos que la capacidad de cada generación no ha cambiado nada: se distribuye igual, como una normal estándar. Y que entra en el Bachillerato la proporción `acceso` de cada generación con más capacidad, la que queda por encima del corte $z$. La media de los que entran es la de una normal truncada:
+
+$$E[X \mid X > z] = \frac{\varphi(z)}{1 - \Phi(z)},$$
+
+donde $\varphi$ es la densidad normal, `dnorm()`, y $1 - \Phi(z)$ es justamente `acceso`.
+
+**Tu tarea.** Completa `media_dentro()` y `media_fuera()`, la media de los que entran y la de los que se quedan fuera. La tabla las compara con una simulación de un millón de personas. ¿Qué le pasa a cada grupo cuando se amplía el acceso?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con un acceso del 20 %, la media de los que entran es 1,40 desviaciones típicas; con un 80 %, 0,35. El profesor tiene razón en lo que ve y se equivoca en la causa: nadie ha empeorado, ha cambiado quién entra. Es un *efecto composición*.
+
+Y hay algo más raro: la media de los que se quedan fuera también baja, de −0,35 a −1,40. Los que pasan de un grupo al otro están por debajo de la media de los que ya estaban dentro, y por encima de la de los que se quedan fuera, así que las dos medias bajan a la vez, aunque la media de todos siga en 0. En medicina se llama *fenómeno de Will Rogers*: con mejores pruebas diagnósticas, enfermos leves pasan al grupo de los graves, y la supervivencia de los dos grupos mejora sin que nadie viva más.
+
+Feinstein, A. R., Sosin, D. M. y Wells, C. K. (1985). The Will Rogers phenomenon. *New England Journal of Medicine*, 312(25), 1604–1608.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: bachillerato
+#| caption: "Tu código"
+# Media de los que entran: la normal truncada por abajo en el corte
+media_dentro <- function(acceso) {
+  z <- qnorm(1 - acceso)
+  ______
+}
+
+# Media de los que se quedan fuera
+media_fuera <- function(acceso) {
+  z <- qnorm(1 - acceso)
+  ______
+}
+
+# Comprobación por simulación: un millón de personas
+set.seed(1970)
+capacidad <- rnorm(1e6)
+acceso <- c(0.2, 0.4, 0.6, 0.8)
+simulada <- sapply(acceso, function(a) mean(capacidad[capacidad > quantile(capacidad, 1 - a)]))
+
+round(cbind(acceso, dentro = media_dentro(acceso), simulada, fuera = media_fuera(acceso)), 3)
+```
+
+```{webr}
+#| exercise: bachillerato
+#| solution: true
+media_dentro <- function(acceso) {
+  z <- qnorm(1 - acceso)
+  dnorm(z) / acceso
+}
+
+media_fuera <- function(acceso) {
+  z <- qnorm(1 - acceso)
+  -dnorm(z) / (1 - acceso)
+}
+
+set.seed(1970)
+capacidad <- rnorm(1e6)
+acceso <- c(0.2, 0.4, 0.6, 0.8)
+simulada <- sapply(acceso, function(a) mean(capacidad[capacidad > quantile(capacidad, 1 - a)]))
+
+round(cbind(acceso, dentro = media_dentro(acceso), simulada, fuera = media_fuera(acceso)), 3)
+```
+
+```{webr}
+#| exercise: bachillerato
+#| check: true
+e <- .envir_result
+a <- c(0.1, 0.25, 0.5, 0.9)
+if (!is.function(e$media_dentro) || !is.function(e$media_fuera)) {
+  list(correct = FALSE, message = "No encuentro media_dentro() o media_fuera().")
+} else if (!isTRUE(all.equal(e$media_dentro(a), dnorm(qnorm(1 - a)) / a))) {
+  list(correct = FALSE, message = "media_dentro() no coincide con φ(z) / (1 − Φ(z)). Recuerda que 1 − Φ(z) es el propio acceso.")
+} else if (!isTRUE(all.equal(e$media_fuera(a), -dnorm(qnorm(1 - a)) / (1 - a)))) {
+  list(correct = FALSE, message = "media_dentro() está bien; media_fuera() no. Pista: la media de todos es 0, así que acceso · dentro + (1 − acceso) · fuera = 0.")
+} else {
+  list(correct = TRUE, message = "¡Correcto! Al ampliar el acceso bajan las dos medias, la de dentro y la de fuera, y nadie ha cambiado.")
+}
+```
+
+::: {.hint exercise="bachillerato"}
+La media de todos es 0, y se reparte entre los dos grupos: `acceso * dentro + (1 - acceso) * fuera` tiene que dar 0. Despeja `fuera`.
+:::
+
+::: {.solution exercise="bachillerato"}
+`dnorm(z) / acceso` y `-dnorm(z) / (1 - acceso)`.
+:::
+:::
+
+::::

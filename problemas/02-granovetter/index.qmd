@@ -1,0 +1,103 @@
+---
+title: "Los umbrales de Granovetter"
+numero: 2
+nivel: 1
+duracion: "15 min"
+lectura: "[Granovetter (1978)](https://nuevasomosaguas.github.io/biblioteca.html)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Iniciación"
+categories: [modelos de agentes]
+description: "Cien personas ante un disturbio: cambiar el umbral de una sola basta para que no pase nada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Cien personas se reúnen en una plaza. Cada una tiene un *umbral*: el número de personas que tienen que estar ya armando jaleo para que ella se sume. Quien tiene umbral 0 empieza por su cuenta; quien tiene umbral 10 se une cuando ve a diez.
+
+Granovetter (1978) imaginó una plaza con los umbrales 0, 1, 2, …, 99, uno por persona. La de umbral 0 empieza, eso arrastra a la de umbral 1, las dos arrastran a la de umbral 2, y así hasta que se suman las cien. Ahora cambia una sola persona: la de umbral 1 pasa a tener umbral 2. La primera empieza y nadie la sigue.
+
+Las dos plazas son casi idénticas, persona a persona. Un periodista diría que la primera estaba llena de radicales y la segunda de gente pacífica.
+
+**Tu tarea.** Completa la función `cascada()`, que recibe un vector de umbrales y devuelve cuántas personas acaban sumándose. En cada ronda se suman todas las personas cuyo umbral no supera el número de las que ya participan, y el proceso se detiene cuando una ronda no añade a nadie.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El resultado colectivo no se deduce de la media ni de la distribución aproximada de las preferencias individuales: depende de que no haya ningún hueco en la cadena de umbrales. Por eso dos grupos casi iguales pueden comportarse de manera opuesta, y por eso es arriesgado leer las intenciones de la gente en lo que acabó pasando.
+
+Granovetter, M. (1978). Threshold models of collective behavior. *American Journal of Sociology*, 83(6), 1420–1443.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: granovetter
+#| caption: "Tu código"
+cascada <- function(umbrales) {
+  activos <- 0
+  repeat {
+    # Cuántas personas tienen un umbral que no supera a los activos
+    nuevos <- ______
+    if (nuevos == activos) return(activos)
+    activos <- nuevos
+  }
+}
+
+uniforme <- 0:99
+casi_uniforme <- replace(uniforme, 2, 2)  # la de umbral 1 pasa a umbral 2
+c(uniforme = cascada(uniforme), casi_uniforme = cascada(casi_uniforme))
+```
+
+```{webr}
+#| exercise: granovetter
+#| solution: true
+cascada <- function(umbrales) {
+  activos <- 0
+  repeat {
+    nuevos <- sum(umbrales <= activos)
+    if (nuevos == activos) return(activos)
+    activos <- nuevos
+  }
+}
+
+uniforme <- 0:99
+casi_uniforme <- replace(uniforme, 2, 2)
+c(uniforme = cascada(uniforme), casi_uniforme = cascada(casi_uniforme))
+```
+
+```{webr}
+#| exercise: granovetter
+#| check: true
+# Cada umbral, escrito como código de R, con las personas que deberían sumarse
+casos <- c("0:99" = 100, "replace(0:99, 2, 2)" = 1, "c(1, 1, 1)" = 0,
+           "c(0, 1, 1, 3, 3)" = 5, "c(0, 0, 3, 3)" = 2)
+f <- .envir_result$cascada
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función cascada().")
+} else {
+  obtenido <- sapply(names(casos), function(u) as.numeric(f(eval(str2lang(u)))))
+  fallo <- which(obtenido != casos)[1]
+  if (is.na(fallo)) {
+    list(correct = TRUE, message = "¡Correcto! Cien personas en una plaza y una sola en la otra.")
+  } else {
+    list(correct = FALSE, message = paste0(
+      "Con los umbrales ", names(casos)[fallo], " deberían sumarse ",
+      casos[[fallo]], " personas, y cascada() devuelve ", obtenido[[fallo]], "."))
+  }
+}
+```
+
+::: {.hint exercise="granovetter"}
+`umbrales <= activos` es un vector lógico, y `sum()` cuenta sus `TRUE`.
+:::
+
+::: {.solution exercise="granovetter"}
+`sum(umbrales <= activos)`: se suma toda persona cuyo umbral no supera a los que ya participan.
+:::
+:::
+
+::::

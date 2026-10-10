@@ -1,0 +1,44 @@
+project:
+  type: website
+  output-dir: _site
+
+lang: es
+
+website:
+  title: "Laboratorios y simulaciones"
+  site-url: "https://nuevasomosaguas.github.io/laboratorios-y-simulaciones"
+  repo-url: "https://github.com/nuevasomosaguas/laboratorios-y-simulaciones"
+  favicon: https://nuevasomosaguas.github.io/images/logo/favicon.svg
+  # Las flechas de anterior y siguiente siguen el orden de la barra lateral.
+  page-navigation: true
+  navbar:
+    background: "#1a1a1a"
+    foreground: "#f8f9fa"
+    left:
+      - text: "Problemas"
+        href: index.qmd
+    right:
+      - text: "Nueva Somosaguas"
+        href: https://nuevasomosaguas.github.io
+  sidebar:
+    style: docked
+    contents: problemas
+
+# quarto-live: R en el navegador con webR, sin servidor.
+format:
+  live-html:
+    theme:
+      light: flatly
+      dark: darkly
+    respect-user-color-scheme: true
+    # EB Garamond para el texto, Inter para la interfaz y los títulos, Fira Code para el código.
+    mainfont: "'EB Garamond', Garamond, Georgia, serif"
+    monofont: "'Fira Code', monospace"
+    include-in-header:
+      text: |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Fira+Code:wght@300..700&family=Inter:wght@400..700&display=swap">
+    css: laboratorio.css
+    include-after-body: laboratorio.html
+    toc: false

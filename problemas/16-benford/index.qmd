@@ -1,0 +1,125 @@
+---
+title: "La ley de Benford y el fraude electoral"
+numero: 16
+nivel: 1
+duracion: "25 min"
+lectura: "Deckert, Myagkov y Ordeshook (2011)"
+dificultad: "Iniciación"
+categories: [estadística]
+description: "El primer dígito de muchos datos reales es un 1 casi un tercio de las veces. Y los votos limpios de una mesa electoral no cumplen la ley."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1881, el astrónomo Simon Newcomb notó que las primeras páginas de las tablas de logaritmos estaban mucho más gastadas que las últimas. En 1938, el físico Frank Benford lo comprobó con veinte mil números de todo tipo: en muchos conjuntos de datos reales, el primer dígito es un 1 en el 30 % de los casos y un 9 en menos del 5 %. La *ley de Benford* da la proporción de cada primer dígito:
+
+$$P(d) = \log_{10}\left(1 + \frac{1}{d}\right), \qquad d = 1, \dots, 9.$$
+
+La cumplen los datos que abarcan varios órdenes de magnitud y crecen de forma multiplicativa, como las poblaciones de los municipios. Las personas que se inventan números no saben imitarla, y por eso se usa en auditoría contable para detectar fraudes. También se ha propuesto para los resultados electorales.
+
+**Tu tarea.** Completa `primer_digito()`, para números positivos, también decimales como 0,034. Después compara con la ley tres conjuntos de datos simulados: poblaciones de municipios, números inventados entre 100 y 999, y los votos de un partido en 5000 mesas electorales limpias, sin ningún fraude. La medida es la desviación absoluta media (MAD); Nigrini considera que más de 0,015 es un incumplimiento.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Las poblaciones cumplen la ley (MAD 0,005) y los números inventados no (0,059): hasta aquí, la ley funciona. Pero los votos limpios la incumplen todavía más (0,104). Una mesa tiene entre 300 y 700 electores, así que los votos de un partido se mueven en un rango estrecho, entre 67 y 253, y casi siempre empiezan por 1 o por 2. No abarcan órdenes de magnitud, y no tienen por qué cumplir Benford.
+
+Un test de Benford que «detecta» fraude en unas elecciones limpias no detecta nada. Deckert, Myagkov y Ordeshook mostraron que puede fallar en los dos sentidos: señalar fraudes donde no los hay y pasar por alto fraudes reales. Antes de aplicar una ley empírica hay que preguntarse por el mecanismo que la produce, y si ese mecanismo está presente en los datos.
+
+Benford, F. (1938). The law of anomalous numbers. *Proceedings of the American Philosophical Society*, 78(4), 551–572.
+
+Deckert, J., Myagkov, M. y Ordeshook, P. C. (2011). Benford's law and the detection of election fraud. *Political Analysis*, 19(3), 245–268.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: benford
+#| caption: "Tu código"
+benford <- log10(1 + 1 / (1:9))
+
+# El primer dígito significativo de cada número
+primer_digito <- function(x) {
+  ______
+}
+
+frecuencias <- function(x) as.numeric(table(factor(primer_digito(x), levels = 1:9))) / length(x)
+mad <- function(x) mean(abs(frecuencias(x) - benford))
+
+set.seed(1938)
+poblaciones <- round(rlnorm(5000, meanlog = 7, sdlog = 2))
+poblaciones <- poblaciones[poblaciones >= 1]
+inventados <- sample(100:999, 5000, replace = TRUE)
+electores <- sample(300:700, 5000, replace = TRUE)
+votos <- rbinom(5000, electores, 0.7 * 0.45)  # participación del 70 %; el partido saca el 45 %
+
+barplot(rbind(benford, frecuencias(poblaciones), frecuencias(inventados), frecuencias(votos)),
+        beside = TRUE, names.arg = 1:9, col = c("grey30", "#18bc9c", "#2980b9", "#c0392b"),
+        legend.text = c("Benford", "Poblaciones", "Inventados", "Votos"), xlab = "Primer dígito")
+
+round(c(poblaciones = mad(poblaciones), inventados = mad(inventados), votos = mad(votos)), 4)
+```
+
+```{webr}
+#| exercise: benford
+#| solution: true
+benford <- log10(1 + 1 / (1:9))
+
+primer_digito <- function(x) {
+  floor(x / 10^floor(log10(x)))
+}
+
+frecuencias <- function(x) as.numeric(table(factor(primer_digito(x), levels = 1:9))) / length(x)
+mad <- function(x) mean(abs(frecuencias(x) - benford))
+
+set.seed(1938)
+poblaciones <- round(rlnorm(5000, meanlog = 7, sdlog = 2))
+poblaciones <- poblaciones[poblaciones >= 1]
+inventados <- sample(100:999, 5000, replace = TRUE)
+electores <- sample(300:700, 5000, replace = TRUE)
+votos <- rbinom(5000, electores, 0.7 * 0.45)
+
+barplot(rbind(benford, frecuencias(poblaciones), frecuencias(inventados), frecuencias(votos)),
+        beside = TRUE, names.arg = 1:9, col = c("grey30", "#18bc9c", "#2980b9", "#c0392b"),
+        legend.text = c("Benford", "Poblaciones", "Inventados", "Votos"), xlab = "Primer dígito")
+
+round(c(poblaciones = mad(poblaciones), inventados = mad(inventados), votos = mad(votos)), 4)
+```
+
+```{webr}
+#| exercise: benford
+#| check: true
+f <- .envir_result$primer_digito
+prueba <- c(1, 9, 10, 99, 123, 1000, 54321, 0.034, 7.5, 0.9)
+esperado <- c(1, 9, 1, 9, 1, 1, 5, 3, 7, 9)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función primer_digito().")
+} else if (!isTRUE(all.equal(as.numeric(f(prueba)), esperado))) {
+  list(correct = FALSE, message = paste0(
+    "primer_digito(c(", toString(prueba), ")) debería dar ", toString(esperado),
+    ", y da ", toString(f(prueba)), ". ¿Funciona con decimales menores que 1?"))
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "primer_digito() está bien, pero los resultados no coinciden. ¿Has cambiado los datos?")
+} else {
+  coma <- function(v) format(v, nsmall = 3, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! MAD de ", coma(.result[["poblaciones"]]), " en las poblaciones, ",
+    coma(.result[["inventados"]]), " en los números inventados y ", coma(.result[["votos"]]),
+    " en los votos limpios: el «fraude» más claro es el que no existe."))
+}
+```
+
+::: {.hint exercise="benford"}
+`floor(log10(x))` es el orden de magnitud: 2 para 345, −2 para 0,034. Divide `x` por 10 elevado a ese orden y quédate con la parte entera.
+:::
+
+::: {.solution exercise="benford"}
+`floor(x / 10^floor(log10(x)))`.
+:::
+:::
+
+::::

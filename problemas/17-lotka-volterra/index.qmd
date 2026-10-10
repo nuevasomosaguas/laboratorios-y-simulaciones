@@ -1,0 +1,221 @@
+---
+title: "Peces, guerra y depredadores"
+numero: 17
+nivel: 2
+duracion: "40 min"
+lectura: "Volterra (1926)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Intermedio"
+categories: [biología, equilibrios y dinámica]
+description: "Durante la Primera Guerra Mundial se pescó menos en el Adriático, y en los mercados aumentó la proporción de peces depredadores. ¿Por qué?"
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Durante la Primera Guerra Mundial se pescó mucho menos en el Adriático, y en los mercados aumentó la proporción de peces depredadores, como tiburones y rayas. El biólogo Umberto D'Ancona se lo planteó a su suegro, el matemático Vito Volterra, que respondió con un modelo de dos ecuaciones. Alfred Lotka había llegado al mismo modelo por otro camino:
+
+$$\frac{dx}{dt} = \alpha x - \beta x y, \qquad \frac{dy}{dt} = \delta x y - \gamma y.$$
+
+Las presas $x$ crecen a una tasa $\alpha$ y son devoradas a un ritmo $\beta x y$; los depredadores $y$ se alimentan a un ritmo $\delta x y$ y mueren a una tasa $\gamma$. El modelo conserva exactamente la cantidad $V = \delta x - \gamma \ln x + \beta y - \alpha \ln y$: cada órbita es una curva cerrada, y la población da vueltas sin fin alrededor del equilibrio.
+
+**Tu tarea.**
+
+1. Encuentra en papel el equilibrio con las dos especies presentes, el punto en el que las dos derivadas se anulan con $x, y > 0$, y escríbelo en `equilibrio()`. `f()` debe dar 0 en él.
+2. El código integra desde 40 presas y 9 depredadores hasta $t = 50$ con el método de Euler, con paso 0,01 y 0,001. Compara el valor de $V$ al principio y al final.
+3. Completa `paso_rk4()`, un paso del método de Runge-Kutta de orden 4, y compara otra vez.
+4. Cerca del equilibrio, las oscilaciones tienen un periodo de $2\pi / \sqrt{\alpha\gamma}$. El código lo mide con una simulación que parte muy cerca del equilibrio.
+5. La pesca, con una intensidad $h$, reduce el crecimiento de las presas y aumenta la mortalidad de los depredadores: $\alpha$ pasa a $\alpha - h$ y $\gamma$ a $\gamma + h$. ¿Qué proporción de los peces son depredadores con pesca y sin ella?
+
+La simulación con paso 0,001 tarda unos segundos.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El equilibrio es de 25 presas y 10 depredadores: $x^* = \gamma/\delta$ e $y^* = \alpha/\beta$. El de las presas solo depende de los parámetros de los depredadores, y al revés. Por eso la pesca, que perjudica a las dos especies, beneficia en proporción a las presas: con $h = 0{,}2$ el equilibrio pasa a 35 presas y 8 depredadores, y la proporción de depredadores baja de 0,286 a 0,186. Cuando la guerra redujo la pesca, la proporción de depredadores subió. Es el *principio de Volterra*, y vale también para los pesticidas, que matan a la plaga y a sus depredadores y pueden acabar favoreciendo a la plaga.
+
+Las tareas 2 y 3 son las de la [semana 5 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/). $V$ vale −2,3417 al principio. Con Euler y paso 0,01 sube hasta −2,3216: las órbitas, que deberían ser cerradas, se abren en espiral hacia fuera. Con paso 0,001 solo llega a −2,3399; el error baja unas diez veces al dividir el paso por diez, como corresponde a un método de orden 1. Con Runge-Kutta, $V$ se conserva hasta el decimotercer decimal. Es otro caso en que el método numérico inventa una dinámica que el modelo no tiene.
+
+**Para ampliar.** El ciclo de linces y liebres de la Compañía de la Bahía de Hudson, con el que suele ilustrarse este modelo, es más complicado: los experimentos de Krebs y sus colegas en el Yukón mostraron que la comida de las liebres importa tanto como los depredadores. En ciencias sociales, Richard Goodwin usó en 1967 estas mismas ecuaciones para los ciclos de la participación de los salarios y el empleo, con los salarios en el papel del depredador. Y Turchin y Nefedov (2009), en [la biblioteca](https://nuevasomosaguas.github.io/biblioteca.html), usan sistemas de este tipo para los ciclos seculares de las sociedades agrarias.
+
+Volterra, V. (1926). Fluctuations in the abundance of a species considered mathematically. *Nature*, 118, 558–560.
+
+Krebs, C. J., Boutin, S., Boonstra, R., Sinclair, A. R. E., Smith, J. N. M., Dale, M. R. T., Martin, K. y Turkington, R. (1995). Impact of food and predation on the snowshoe hare cycle. *Science*, 269(5227), 1112–1115.
+
+Goodwin, R. M. (1967). A growth cycle. En C. H. Feinstein (ed.), *Socialism, Capitalism and Economic Growth* (pp. 54–58). Cambridge University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: lotka
+#| caption: "Tu código"
+alfa <- 1      # crecimiento de las presas
+beta <- 0.1    # ritmo al que los depredadores devoran presas
+gamma <- 0.5   # mortalidad de los depredadores
+delta <- 0.02  # ritmo al que las presas alimentan a los depredadores
+
+# s = c(presas, depredadores)
+f <- function(s) c(alfa * s[1] - beta * s[1] * s[2],
+                   delta * s[1] * s[2] - gamma * s[2])
+V <- function(s) delta * s[1] - gamma * log(s[1]) + beta * s[2] - alfa * log(s[2])
+
+# 1. El equilibrio con las dos especies
+equilibrio <- function(alfa, beta, gamma, delta) c(x = ______, y = ______)
+eq <- equilibrio(alfa, beta, gamma, delta)
+f(eq)
+
+# 2 y 3. Un paso de Euler y uno de Runge-Kutta
+paso_euler <- function(s, h) s + h * f(s)
+paso_rk4 <- function(s, h) {
+  k1 <- f(s)
+  k2 <- f(s + h / 2 * k1)
+  k3 <- f(s + h / 2 * k2)
+  k4 <- ______
+  ______
+}
+
+trayectoria <- function(s, h, T, paso) {
+  n <- round(T / h)
+  camino <- matrix(NA, n + 1, 2)
+  camino[1, ] <- s
+  for (i in seq_len(n)) camino[i + 1, ] <- paso(camino[i, ], h)
+  camino
+}
+final <- function(camino) camino[nrow(camino), ]
+
+inicio <- c(40, 9)
+euler_01 <- trayectoria(inicio, 0.01, 50, paso_euler)
+euler_001 <- trayectoria(inicio, 0.001, 50, paso_euler)
+rk4 <- trayectoria(inicio, 0.01, 50, paso_rk4)
+
+plot(euler_01, type = "l", col = "#c0392b", xlab = "Presas", ylab = "Depredadores")
+lines(rk4, col = "#2c3e50", lwd = 2)
+points(eq[1], eq[2], pch = 19)
+legend("topright", c("Euler, paso 0,01", "Runge-Kutta 4"), col = c("#c0392b", "#2c3e50"), lwd = 2, bty = "n")
+
+# 4. El periodo de las oscilaciones pequeñas: tiempo entre dos cruces de x* hacia arriba
+cerca <- trayectoria(eq + c(0.1, 0), 0.01, 100, paso_rk4)
+sube <- which(cerca[-1, 1] >= eq[["x"]] & cerca[-nrow(cerca), 1] < eq[["x"]])
+periodo <- mean(diff(sube)) * 0.01
+
+# 5. Con pesca
+pesca <- 0.2
+con_pesca <- equilibrio(alfa - pesca, beta, gamma + pesca, delta)
+depredadores <- function(e) e[["y"]] / sum(e)
+
+c(V_inicio = V(inicio),
+  V_euler_0.01 = V(final(euler_01)),
+  V_euler_0.001 = V(final(euler_001)),
+  V_rk4 = V(final(rk4)),
+  periodo = periodo,
+  periodo_teorico = 2 * pi / sqrt(alfa * gamma),
+  depredadores_sin_pesca = depredadores(eq),
+  depredadores_con_pesca = depredadores(con_pesca))
+```
+
+```{webr}
+#| exercise: lotka
+#| solution: true
+alfa <- 1
+beta <- 0.1
+gamma <- 0.5
+delta <- 0.02
+
+f <- function(s) c(alfa * s[1] - beta * s[1] * s[2],
+                   delta * s[1] * s[2] - gamma * s[2])
+V <- function(s) delta * s[1] - gamma * log(s[1]) + beta * s[2] - alfa * log(s[2])
+
+equilibrio <- function(alfa, beta, gamma, delta) c(x = gamma / delta, y = alfa / beta)
+eq <- equilibrio(alfa, beta, gamma, delta)
+f(eq)
+
+paso_euler <- function(s, h) s + h * f(s)
+paso_rk4 <- function(s, h) {
+  k1 <- f(s)
+  k2 <- f(s + h / 2 * k1)
+  k3 <- f(s + h / 2 * k2)
+  k4 <- f(s + h * k3)
+  s + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+}
+
+trayectoria <- function(s, h, T, paso) {
+  n <- round(T / h)
+  camino <- matrix(NA, n + 1, 2)
+  camino[1, ] <- s
+  for (i in seq_len(n)) camino[i + 1, ] <- paso(camino[i, ], h)
+  camino
+}
+final <- function(camino) camino[nrow(camino), ]
+
+inicio <- c(40, 9)
+euler_01 <- trayectoria(inicio, 0.01, 50, paso_euler)
+euler_001 <- trayectoria(inicio, 0.001, 50, paso_euler)
+rk4 <- trayectoria(inicio, 0.01, 50, paso_rk4)
+
+plot(euler_01, type = "l", col = "#c0392b", xlab = "Presas", ylab = "Depredadores")
+lines(rk4, col = "#2c3e50", lwd = 2)
+points(eq[1], eq[2], pch = 19)
+legend("topright", c("Euler, paso 0,01", "Runge-Kutta 4"), col = c("#c0392b", "#2c3e50"), lwd = 2, bty = "n")
+
+cerca <- trayectoria(eq + c(0.1, 0), 0.01, 100, paso_rk4)
+sube <- which(cerca[-1, 1] >= eq[["x"]] & cerca[-nrow(cerca), 1] < eq[["x"]])
+periodo <- mean(diff(sube)) * 0.01
+
+pesca <- 0.2
+con_pesca <- equilibrio(alfa - pesca, beta, gamma + pesca, delta)
+depredadores <- function(e) e[["y"]] / sum(e)
+
+c(V_inicio = V(inicio),
+  V_euler_0.01 = V(final(euler_01)),
+  V_euler_0.001 = V(final(euler_001)),
+  V_rk4 = V(final(rk4)),
+  periodo = periodo,
+  periodo_teorico = 2 * pi / sqrt(alfa * gamma),
+  depredadores_sin_pesca = depredadores(eq),
+  depredadores_con_pesca = depredadores(con_pesca))
+```
+
+```{webr}
+#| exercise: lotka
+#| check: true
+e <- .envir_result
+coma <- function(v, d = 4) format(round(v, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$equilibrio) || !is.function(e$paso_rk4)) {
+  list(correct = FALSE, message = "No encuentro equilibrio() o paso_rk4().")
+} else if (!isTRUE(all.equal(unname(e$equilibrio(2, 0.5, 1, 0.1)), c(10, 4)))) {
+  list(correct = FALSE, message = paste0(
+    "Con α = 2, β = 0,5, γ = 1 y δ = 0,1 el equilibrio es de 10 presas y 4 depredadores, y equilibrio() da ",
+    toString(e$equilibrio(2, 0.5, 1, 0.1)), ". Iguala a cero cada derivada y despeja: ¿de qué depende cada especie?"))
+} else {
+  # Un paso de RK4 de referencia, con el mismo f del alumno
+  rk4 <- function(s, h) {
+    k1 <- e$f(s); k2 <- e$f(s + h / 2 * k1); k3 <- e$f(s + h / 2 * k2); k4 <- e$f(s + h * k3)
+    s + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+  }
+  if (!isTRUE(all.equal(e$paso_rk4(c(40, 9), 0.1), rk4(c(40, 9), 0.1), tolerance = 1e-12))) {
+    list(correct = FALSE, message = "paso_rk4() no da un paso de Runge-Kutta de orden 4. k4 evalúa f en s + h · k3, y el paso combina las cuatro pendientes con pesos 1, 2, 2 y 1, divididos entre 6.")
+  } else if (!isTRUE(all.equal(.result, .solution))) {
+    list(correct = FALSE, message = "Las funciones están bien, pero los resultados no coinciden. ¿Has cambiado los parámetros o las simulaciones?")
+  } else {
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! V empieza en ", coma(.result[["V_inicio"]]), "; Euler la lleva a ", coma(.result[["V_euler_0.01"]]),
+      " y Runge-Kutta la conserva. Con pesca, la proporción de depredadores baja de ",
+      coma(.result[["depredadores_sin_pesca"]], 3), " a ", coma(.result[["depredadores_con_pesca"]], 3), "."))
+  }
+}
+```
+
+::: {.hint exercise="lotka"}
+Para el equilibrio, iguala cada derivada a cero y divide por $x$ o por $y$: $\alpha - \beta y = 0$ y $\delta x - \gamma = 0$. Para Runge-Kutta, `k4` es la pendiente al final del paso, `f(s + h * k3)`, y el paso avanza `h / 6` veces la suma ponderada de las cuatro pendientes.
+:::
+
+::: {.solution exercise="lotka"}
+`c(x = gamma / delta, y = alfa / beta)`; `k4 <- f(s + h * k3)` y `s + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)`.
+:::
+:::
+
+::::

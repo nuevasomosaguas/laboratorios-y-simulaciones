@@ -1,0 +1,100 @@
+---
+title: "¿Sirven las clases particulares?"
+numero: 4
+nivel: 2
+duracion: "30 min"
+lectura: "Cinelli, Forney y Pearl (2022)"
+semana: "[Semana 4](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-04/)"
+dificultad: "Intermedio"
+categories: [inferencia causal, estadística]
+description: "Recupera un efecto causal conocido de datos simulados, con una trampa de confusión y otra de mediación."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+¿Cuánto sube la nota de selectividad por ir a clases particulares? Comparar a quienes van con quienes no van da 1,7 puntos, pero las familias con más ingresos pagan más clases y sus hijos ya sacaban mejores notas.
+
+Los datos de la derecha son simulados, así que conocemos la respuesta. Cada estudiante tiene:
+
+- `ingresos`: los ingresos de su familia, estandarizados.
+- `clases`: 1 si va a clases particulares. Es más probable cuanto más ingresos.
+- `horas`: horas de estudio semanales. Las clases hacen que se estudie una hora más.
+- `nota`: la nota final, que depende de las tres cosas.
+
+El efecto *total* de las clases es de **0,5 puntos**: 0,3 directos y 0,2 que llegan a través de la hora de estudio de más.
+
+**Tu tarea.** Cambia la regresión para que el coeficiente de `clases` estime ese efecto total. La última línea debe devolver ese coeficiente.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+`ingresos` es un *confusor*: causa a la vez las clases y la nota, así que hay que controlarlo. `horas`, en cambio, es un *mediador*: está en el camino entre las clases y la nota. Controlarla bloquea parte del efecto que queremos medir, y el coeficiente baja a unos 0,3. Meter en la regresión todas las variables disponibles no es prudencia: es un control malo.
+
+Cinelli, C., Forney, A. y Pearl, J. (2022). A crash course in good and bad controls. *Sociological Methods & Research*.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: clases
+#| caption: "Tu código"
+set.seed(2022)
+n <- 5000
+ingresos <- rnorm(n)
+clases <- rbinom(n, 1, plogis(1.5 * ingresos))
+horas <- 10 + clases + rnorm(n)
+nota <- 5 + 0.3 * clases + 0.2 * horas + 1.2 * ingresos + rnorm(n)
+datos <- data.frame(nota, clases, horas, ingresos)
+
+# La comparación ingenua
+modelo <- lm(nota ~ clases, data = datos)
+coef(modelo)["clases"]
+```
+
+```{webr}
+#| exercise: clases
+#| solution: true
+set.seed(2022)
+n <- 5000
+ingresos <- rnorm(n)
+clases <- rbinom(n, 1, plogis(1.5 * ingresos))
+horas <- 10 + clases + rnorm(n)
+nota <- 5 + 0.3 * clases + 0.2 * horas + 1.2 * ingresos + rnorm(n)
+datos <- data.frame(nota, clases, horas, ingresos)
+
+modelo <- lm(nota ~ clases + ingresos, data = datos)
+coef(modelo)["clases"]
+```
+
+```{webr}
+#| exercise: clases
+#| check: true
+estimado <- unname(as.numeric(.result))
+con_mediador <- coef(lm(nota ~ clases + horas + ingresos, data = .envir_result$datos))["clases"]
+if (length(estimado) != 1) {
+  list(correct = FALSE, message = "La última línea debe devolver un solo número: el coeficiente de clases.")
+} else if (isTRUE(all.equal(estimado, unname(.solution)))) {
+  list(correct = TRUE, message = paste0("¡Correcto! ", format(round(estimado, 2), nsmall = 2, decimal.mark = ","), ", muy cerca del 0,5 verdadero."))
+} else if (isTRUE(all.equal(estimado, unname(con_mediador)))) {
+  list(correct = FALSE, message = "Has controlado las horas de estudio, que están entre las clases y la nota: así se pierde parte del efecto.")
+} else if (estimado > 1) {
+  list(correct = FALSE, message = "El coeficiente sigue inflado: falta controlar lo que causa a la vez las clases y la nota.")
+} else {
+  list(correct = FALSE, message = "Ese no es el coeficiente que buscamos. ¿Qué variables causan a la vez las clases y la nota?")
+}
+```
+
+::: {.hint exercise="clases"}
+Dibuja el grafo: `ingresos → clases`, `ingresos → nota`, `clases → horas → nota` y `clases → nota`. ¿Qué caminos entre `clases` y `nota` hay que cerrar, y cuáles hay que dejar abiertos?
+:::
+
+::: {.solution exercise="clases"}
+`lm(nota ~ clases + ingresos, data = datos)`: se controla el confusor y se deja el mediador fuera.
+:::
+:::
+
+::::

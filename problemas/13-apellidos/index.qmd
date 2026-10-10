@@ -1,0 +1,134 @@
+---
+title: "La extinción de los apellidos"
+numero: 13
+nivel: 2
+duracion: "30 min"
+lectura: "Lotka (1931)"
+semana: "[Semana 10](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-10/)"
+dificultad: "Intermedio"
+categories: [demografía]
+description: "La población crece y, aun así, la mayoría de los apellidos desaparece."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1873, Francis Galton planteó en una revista una pregunta: ¿por qué se extinguen tantos apellidos de familias ilustres? El reverendo Henry Watson le contestó con un modelo. Si el apellido pasa de padres a hijos varones, y cada hombre tiene $k$ hijos varones con probabilidad $p_k$, cada apellido es un árbol que se ramifica al azar.
+
+La herramienta es la *función generatriz* $f(s) = \sum_k p_k s^k$. La probabilidad $q$ de que el apellido acabe extinguiéndose es el menor punto fijo de $f$, el menor $q$ con $q = f(q)$, y se encuentra iterando desde 0: $f(0)$ es la probabilidad de extinguirse en una generación, $f(f(0))$ en dos, y así.
+
+Alfred Lotka estimó la distribución de hijos varones de los hombres blancos de Estados Unidos en 1920: $p_0 = 0{,}4825$ y $p_k = 0{,}2126 \cdot 0{,}5893^{k-1}$ para $k \geq 1$, cuya función generatriz es
+
+$$f(s) = \frac{0{,}4825 - 0{,}0717\,s}{1 - 0{,}5893\,s}.$$
+
+**Tu tarea.** Completa `extincion()`, que itera $q \leftarrow f(q)$ desde 0 hasta que deja de cambiar. Compara el resultado con la simulación de 2000 apellidos durante 30 generaciones, y con la media de hijos varones. La simulación tarda unos segundos.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Cada hombre tiene de media 1,26 hijos varones, así que la población crece. Y sin embargo, el 82 % de los apellidos acaba extinguiéndose. No hay contradicción: casi la mitad de los hombres no tiene ningún hijo varón, y un apellido recién nacido depende de muy pocas personas. Los que sobreviven crecen mucho, y compensan con creces a los que desaparecen. Por eso unos pocos apellidos acaban dominando, en Corea o en China, sin que ninguna familia haya sido especialmente prolífica.
+
+Lo que sale de esta pregunta victoriana, los procesos de ramificación, describe también las cadenas de contagio, las reacciones nucleares en cadena y la supervivencia de una mutación nueva.
+
+Watson, H. W. y Galton, F. (1875). On the probability of the extinction of families. *Journal of the Anthropological Institute*, 4, 138–144.
+
+Lotka, A. J. (1931). The extinction of families. *Journal of the Washington Academy of Sciences*, 21, 377–380 y 453–459.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: apellidos
+#| caption: "Tu código"
+f_lotka <- function(s) (0.4825 - 0.0717 * s) / (1 - 0.5893 * s)
+
+# La probabilidad de extinción: iterar q <- f(q) desde 0
+extincion <- function(f) {
+  q <- 0
+  repeat {
+    nueva <- ______
+    if (abs(nueva - q) < 1e-12) return(nueva)
+    q <- nueva
+  }
+}
+
+# La distribución de Lotka, hasta 30 hijos varones
+hijos <- 0:30
+prob <- c(0.4825, 0.2126 * 0.5893^(hijos[-1] - 1))
+
+# 2000 apellidos, cada uno con un solo portador, durante 30 generaciones
+set.seed(1931)
+varones <- rep(1, 2000)
+for (generacion in 1:30) {
+  varones <- vapply(varones, function(n) {
+    if (n == 0) 0 else sum(sample(hijos, n, replace = TRUE, prob = prob))
+  }, numeric(1))
+}
+
+c(hijos_medios = sum(hijos * prob),
+  extincion = extincion(f_lotka),
+  simulada = mean(varones == 0))
+```
+
+```{webr}
+#| exercise: apellidos
+#| solution: true
+f_lotka <- function(s) (0.4825 - 0.0717 * s) / (1 - 0.5893 * s)
+
+extincion <- function(f) {
+  q <- 0
+  repeat {
+    nueva <- f(q)
+    if (abs(nueva - q) < 1e-12) return(nueva)
+    q <- nueva
+  }
+}
+
+hijos <- 0:30
+prob <- c(0.4825, 0.2126 * 0.5893^(hijos[-1] - 1))
+
+set.seed(1931)
+varones <- rep(1, 2000)
+for (generacion in 1:30) {
+  varones <- vapply(varones, function(n) {
+    if (n == 0) 0 else sum(sample(hijos, n, replace = TRUE, prob = prob))
+  }, numeric(1))
+}
+
+c(hijos_medios = sum(hijos * prob),
+  extincion = extincion(f_lotka),
+  simulada = mean(varones == 0))
+```
+
+```{webr}
+#| exercise: apellidos
+#| check: true
+f <- .envir_result$extincion
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función extincion().")
+} else if (!isTRUE(all.equal(f(function(s) exp(1.5 * (s - 1))), 0.4171885, tolerance = 1e-6))) {
+  list(correct = FALSE, message = "Con hijos de Poisson de media 1,5, la probabilidad de extinción es 0,417, y extincion() da otra cosa. Cada paso es q <- f(q).")
+} else if (!isTRUE(all.equal(f(function(s) 0.25 + 0.25 * s + 0.5 * s^2), 0.5, tolerance = 1e-6))) {
+  list(correct = FALSE, message = "extincion() no encuentra el menor punto fijo de f. ¿Empiezas en q = 0?")
+} else {
+  coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con ", coma(.result[["hijos_medios"]]), " hijos varones de media, se extingue el ",
+    round(100 * .result[["extincion"]]), " % de los apellidos; en la simulación, el ",
+    round(100 * .result[["simulada"]]), " % en 30 generaciones."))
+}
+```
+
+::: {.hint exercise="apellidos"}
+`f` es una función: `f(q)` da la probabilidad de extinguirse en una generación más que `q`.
+:::
+
+::: {.solution exercise="apellidos"}
+`nueva <- f(q)`.
+:::
+:::
+
+::::

@@ -1,0 +1,121 @@
+---
+title: "Dos aldeas en equilibrio, una muestra que no lo está"
+numero: 11
+nivel: 1
+duracion: "25 min"
+lectura: "Hardy (1908); Wahlund (1928)"
+dificultad: "Iniciación"
+categories: [biología, paradojas de agregación, estadística]
+description: "Dos poblaciones en equilibrio genético, juntas, parecen no estarlo: la agregación vuelve a engañar."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El grupo sanguíneo MN depende de un solo gen con dos alelos, M y N, y cada persona tiene dos copias: es MM, MN o NN. Si el alelo M tiene una frecuencia $p$ y las parejas se forman sin tener en cuenta el gen, las proporciones de cada genotipo se estabilizan en una generación:
+
+$$MM: p^2, \qquad MN: 2p(1-p), \qquad NN: (1-p)^2.$$
+
+Es el *equilibrio de Hardy-Weinberg*. Para contrastarlo se estima $p$ con los genotipos observados, se calculan los esperados y se compara con la $\chi^2$ de Pearson, $\sum (O - E)^2 / E$, con un grado de libertad.
+
+Un equipo estudia dos aldeas de un valle, de 500 habitantes cada una. Para ahorrar, una segunda investigadora junta las dos muestras.
+
+**Tu tarea.** Completa `hw_esperados()`, con la frecuencia del alelo M, y `chi2()`. Después mira la tabla: ¿está cada aldea en equilibrio? ¿Y las dos juntas?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Cada aldea está en equilibrio perfecto, pero las dos juntas tienen muchos menos heterocigotos de los esperados: 320 frente a 500, y una $\chi^2$ de casi 130. Nadie se empareja de forma selectiva; simplemente, el alelo M es raro en una aldea y común en la otra, y al mezclar las muestras se mezclan dos frecuencias distintas. Es el *efecto Wahlund*: la misma trampa de la agregación que en [Berkeley](../01-berkeley/index.qmd), ahora en genética de poblaciones. Un déficit de heterocigotos puede indicar endogamia, o solo que la muestra junta subpoblaciones.
+
+Hardy, G. H. (1908). Mendelian proportions in a mixed population. *Science*, 28(706), 49–50.
+
+Wahlund, S. (1928). Zusammensetzung von Populationen und Korrelationserscheinungen vom Standpunkt der Vererbungslehre aus betrachtet. *Hereditas*, 11(1), 65–106.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: hardy
+#| caption: "Tu código"
+aldeas <- rbind(norte = c(MM = 20, MN = 160, NN = 320),
+                sur = c(MM = 320, MN = 160, NN = 20))
+juntas <- colSums(aldeas)
+
+# Genotipos esperados con Hardy-Weinberg
+hw_esperados <- function(genotipos) {
+  n <- sum(genotipos)
+  p <- ______  # frecuencia del alelo M: cada MM aporta dos copias y cada MN, una
+  n * c(MM = p^2, MN = 2 * p * (1 - p), NN = (1 - p)^2)
+}
+
+# La chi cuadrado de Pearson
+chi2 <- function(genotipos) {
+  esperados <- hw_esperados(genotipos)
+  ______
+}
+
+resumen <- function(g) {
+  c(MN_observados = g[["MN"]], MN_esperados = hw_esperados(g)[["MN"]],
+    chi2 = chi2(g), p = pchisq(chi2(g), df = 1, lower.tail = FALSE))
+}
+rbind(norte = resumen(aldeas["norte", ]), sur = resumen(aldeas["sur", ]), juntas = resumen(juntas))
+```
+
+```{webr}
+#| exercise: hardy
+#| solution: true
+aldeas <- rbind(norte = c(MM = 20, MN = 160, NN = 320),
+                sur = c(MM = 320, MN = 160, NN = 20))
+juntas <- colSums(aldeas)
+
+hw_esperados <- function(genotipos) {
+  n <- sum(genotipos)
+  p <- (2 * genotipos[["MM"]] + genotipos[["MN"]]) / (2 * n)
+  n * c(MM = p^2, MN = 2 * p * (1 - p), NN = (1 - p)^2)
+}
+
+chi2 <- function(genotipos) {
+  esperados <- hw_esperados(genotipos)
+  sum((genotipos - esperados)^2 / esperados)
+}
+
+resumen <- function(g) {
+  c(MN_observados = g[["MN"]], MN_esperados = hw_esperados(g)[["MN"]],
+    chi2 = chi2(g), p = pchisq(chi2(g), df = 1, lower.tail = FALSE))
+}
+rbind(norte = resumen(aldeas["norte", ]), sur = resumen(aldeas["sur", ]), juntas = resumen(juntas))
+```
+
+```{webr}
+#| exercise: hardy
+#| check: true
+e <- .envir_result
+prueba <- c(MM = 50, MN = 30, NN = 20)  # p = 0,65
+if (!is.function(e$hw_esperados) || !is.function(e$chi2)) {
+  list(correct = FALSE, message = "No encuentro hw_esperados() o chi2().")
+} else if (!isTRUE(all.equal(unname(e$hw_esperados(prueba)), c(42.25, 45.5, 12.25)))) {
+  list(correct = FALSE, message = "Con 50 MM, 30 MN y 20 NN, p es 0,65 y los esperados son 42,25, 45,5 y 12,25. Revisa la frecuencia del alelo: hay 2n copias, no n.")
+} else if (!isTRUE(all.equal(e$chi2(prueba), sum((prueba - c(42.25, 45.5, 12.25))^2 / c(42.25, 45.5, 12.25))))) {
+  list(correct = FALSE, message = "hw_esperados() está bien; chi2() no: es la suma de (observados − esperados)² / esperados.")
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "Las funciones están bien, pero la tabla no coincide. ¿Has cambiado los datos?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Cada aldea está en equilibrio, y juntas dan una chi cuadrado de ",
+    format(round(.result["juntas", "chi2"], 1), decimal.mark = ","), ": 320 heterocigotos donde se esperaban 500."))
+}
+```
+
+::: {.hint exercise="hardy"}
+Hay $2n$ copias del gen; las MM aportan dos copias de M y las MN, una: $p = (2 \cdot MM + MN) / 2n$. En R, `genotipos[["MM"]]` saca un elemento por su nombre.
+:::
+
+::: {.solution exercise="hardy"}
+`p <- (2 * genotipos[["MM"]] + genotipos[["MN"]]) / (2 * n)` y `sum((genotipos - esperados)^2 / esperados)`.
+:::
+:::
+
+::::

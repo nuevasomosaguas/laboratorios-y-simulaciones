@@ -1,0 +1,155 @@
+---
+title: "Las creencias se forman en red"
+numero: 9
+nivel: 2
+duracion: "35 min"
+lectura: "DeGroot (1974)"
+semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
+dificultad: "Intermedio"
+categories: [DBO, equilibrios y dinámica]
+description: "Nadie cambia sus deseos ni sus oportunidades, solo sus creencias, y la conducta colectiva cambia."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Cinco personas en paro estiman su probabilidad de encontrar empleo: 0,9, 0,6, 0,4, 0,2 y 0,1. Cada periodo, cada una actualiza su creencia como la media ponderada de las creencias de las personas a las que escucha: es el modelo de DeGroot. La fila $i$ de la matriz `W` dice cuánto escucha la persona $i$ a cada una, y todos escuchan bastante a la primera.
+
+Una persona busca empleo activamente si su deseo de trabajar multiplicado por su creencia en que lo encontrará llega a 0,3, la misma regla que en [los tres municipios](../08-tres-municipios/index.qmd).
+
+**Tu tarea.**
+
+1. Completa `consenso()`: un paso de DeGroot es multiplicar `W` por el vector de creencias.
+2. Calcula la `influencia` de cada persona en el consenso: el autovector izquierdo de `W` con autovalor 1, normalizado para que sume 1. El consenso es la media de las creencias iniciales ponderada por esa influencia.
+3. Mira la tabla: cuántas personas buscan empleo antes y después de hablar entre ellas, y qué cambia si la persona influyente es pesimista, con una creencia inicial de 0,3.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Nadie ha cambiado sus deseos ni sus oportunidades, solo sus creencias, y la conducta colectiva cambia: de 3 personas buscando empleo a 5, o a 4 si la persona influyente es pesimista.
+
+El consenso tampoco es la media de las opiniones. La media de las creencias iniciales es 0,44, y el grupo acaba en 0,70, porque la primera persona pesa casi la mitad: 0,48. Ese peso es el autovector de la [semana 11 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/), el mismo que da la población estable en la matriz de Leslie.
+
+Es la lógica del estudio de Hedström y sus colegas sobre el desempleo juvenil en Estocolmo, donde el paro de los contactos cercanos influía en las expectativas de los jóvenes. Y enlaza con [Granovetter](../02-granovetter/index.qmd) y con [Kuran](../06-kuran/index.qmd): en los tres casos, lo decisivo es lo que cada uno cree que piensan o hacen los demás.
+
+DeGroot, M. H. (1974). Reaching a consensus. *Journal of the American Statistical Association*, 69(345), 118–121.
+
+Hedström, P., Kolm, A.-S. y Åberg, Y. (2003). Social interactions and unemployment. *IFAU Working Paper*, 2003:15.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: degroot
+#| caption: "Tu código"
+W <- matrix(c(0.6, 0.4, 0.0, 0.0, 0.0,
+              0.4, 0.4, 0.2, 0.0, 0.0,
+              0.3, 0.2, 0.3, 0.2, 0.0,
+              0.3, 0.0, 0.2, 0.3, 0.2,
+              0.3, 0.0, 0.0, 0.2, 0.5), nrow = 5, byrow = TRUE)
+creencia0 <- c(0.9, 0.6, 0.4, 0.2, 0.1)
+deseo <- c(0.5, 0.9, 0.9, 0.9, 0.9)
+
+# 1. Itera hasta que las creencias dejan de moverse
+consenso <- function(W, creencia) {
+  repeat {
+    nueva <- ______
+    if (max(abs(nueva - creencia)) < 1e-12) return(c(nueva))
+    creencia <- nueva
+  }
+}
+
+# 2. El peso de cada persona en el consenso
+v <- Re(eigen(t(W))$vectors[, 1])  # autovector izquierdo de autovalor 1
+influencia <- ______                # normalizado para que sume 1
+round(influencia, 2)
+
+# 3. Antes y después
+buscan <- function(creencia) sum(deseo * creencia >= 0.3)
+pesimista <- replace(creencia0, 1, 0.3)
+rbind(
+  optimista = c(consenso = consenso(W, creencia0)[1],
+                ponderada = sum(influencia * creencia0),
+                buscan_antes = buscan(creencia0),
+                buscan_despues = buscan(consenso(W, creencia0))),
+  pesimista = c(consenso(W, pesimista)[1],
+                sum(influencia * pesimista),
+                buscan(pesimista),
+                buscan(consenso(W, pesimista)))
+)
+```
+
+```{webr}
+#| exercise: degroot
+#| solution: true
+W <- matrix(c(0.6, 0.4, 0.0, 0.0, 0.0,
+              0.4, 0.4, 0.2, 0.0, 0.0,
+              0.3, 0.2, 0.3, 0.2, 0.0,
+              0.3, 0.0, 0.2, 0.3, 0.2,
+              0.3, 0.0, 0.0, 0.2, 0.5), nrow = 5, byrow = TRUE)
+creencia0 <- c(0.9, 0.6, 0.4, 0.2, 0.1)
+deseo <- c(0.5, 0.9, 0.9, 0.9, 0.9)
+
+consenso <- function(W, creencia) {
+  repeat {
+    nueva <- W %*% creencia
+    if (max(abs(nueva - creencia)) < 1e-12) return(c(nueva))
+    creencia <- nueva
+  }
+}
+
+v <- Re(eigen(t(W))$vectors[, 1])
+influencia <- v / sum(v)
+round(influencia, 2)
+
+buscan <- function(creencia) sum(deseo * creencia >= 0.3)
+pesimista <- replace(creencia0, 1, 0.3)
+rbind(
+  optimista = c(consenso = consenso(W, creencia0)[1],
+                ponderada = sum(influencia * creencia0),
+                buscan_antes = buscan(creencia0),
+                buscan_despues = buscan(consenso(W, creencia0))),
+  pesimista = c(consenso(W, pesimista)[1],
+                sum(influencia * pesimista),
+                buscan(pesimista),
+                buscan(consenso(W, pesimista)))
+)
+```
+
+```{webr}
+#| exercise: degroot
+#| check: true
+e <- .envir_result
+coma <- function(x) format(round(x, 3), nsmall = 3, decimal.mark = ",")
+if (!is.function(e$consenso)) {
+  list(correct = FALSE, message = "No encuentro la función consenso().")
+} else if (!isTRUE(all.equal(e$consenso(e$W, c(1, 0, 0, 0, 0)), rep(0.4796, 5), tolerance = 1e-3))) {
+  list(correct = FALSE, message = "consenso() no llega al consenso de DeGroot. Un paso es W %*% creencia: cada fila de W pondera lo que escucha esa persona.")
+} else if (!isTRUE(all.equal(c(e$influencia), c(0.4796, 0.3572, 0.1124, 0.0363, 0.0145), tolerance = 1e-3))) {
+  if (isTRUE(all.equal(sum(e$influencia), 1)))
+    list(correct = FALSE, message = "influencia suma 1, pero no es el autovector izquierdo. ¿Has partido de v?")
+  else
+    list(correct = FALSE, message = "influencia debe sumar 1: divide v por su suma.")
+} else if (!isTRUE(all.equal(.result, .solution, check.attributes = FALSE))) {
+  list(correct = FALSE, message = "Las funciones están bien, pero la tabla final no coincide. ¿Has cambiado algo más?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El grupo acaba en ", coma(.result[1, 1]), ", no en la media simple, 0,44. ",
+    "Buscan empleo ", .result[1, 3], " personas antes y ", .result[1, 4], " después; con una líder pesimista, ",
+    .result[2, 4], "."))
+}
+```
+
+::: {.hint exercise="degroot"}
+`%*%` es el producto de matrices en R. Un vector normalizado para que sume 1 es el vector dividido por su suma.
+:::
+
+::: {.solution exercise="degroot"}
+`nueva <- W %*% creencia` e `influencia <- v / sum(v)`.
+:::
+:::
+
+::::

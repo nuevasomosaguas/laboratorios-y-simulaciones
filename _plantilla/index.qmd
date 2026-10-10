@@ -1,0 +1,83 @@
+---
+# Copia esta carpeta a problemas/NN-nombre-corto/ y rellena cada hueco.
+title: "Un título que sea una pregunta o una paradoja"
+numero: 99           # el siguiente número libre
+nivel: 1             # 1 Iniciación, 2 Intermedio, 3 Avanzado: ordena el índice
+dificultad: "Iniciación"
+duracion: "20 min"
+lectura: "Autor (año)"  # si la obra está en la biblioteca, enlázala: "[Autor (año)](https://nuevasomosaguas.github.io/biblioteca.html)"
+# semana: "[Semana N](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-NN/)"  # solo si encaja de verdad
+# Una a tres de las etiquetas que ya existen; una nueva solo si la van a compartir varios problemas:
+# paradojas de agregación, inferencia causal, sesgo de selección, estadística, modelos de agentes,
+# equilibrios y dinámica, DBO, biología, demografía, juegos y votación
+categories: [paradojas de agregación, estadística]
+description: "Una frase que dé ganas de abrirlo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El contexto: el fenómeno, quién lo estudió y por qué sorprende. Dos o tres párrafos.
+
+El modelo o los datos, con lo justo para entender el código de la derecha.
+
+**Tu tarea.** Qué tiene que completar el alumno, y qué tiene que mirar en el resultado.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La explicación del resultado, con los números que da la solución. Y la lección: qué mecanismo hay detrás y dónde más aparece.
+
+Autor, A. (año). Título. *Revista*, volumen(número), páginas.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: nombre
+#| caption: "Tu código"
+# El código de partida: completo salvo uno o dos huecos marcados con ______
+mi_funcion <- function(x) {
+  ______
+}
+mi_funcion(1:10)
+```
+
+```{webr}
+#| exercise: nombre
+#| solution: true
+mi_funcion <- function(x) {
+  sum(x)
+}
+mi_funcion(1:10)
+```
+
+```{webr}
+#| exercise: nombre
+#| check: true
+# .result es el último valor del alumno; .solution, el de la solución; .envir_result, sus variables.
+# Mejor comprobar las funciones con casos propios que solo el resultado final: así se puede
+# explicar qué falla, y el alumno puede cambiar los parámetros sin que deje de valer.
+f <- .envir_result$mi_funcion
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función mi_funcion().")
+} else if (!isTRUE(all.equal(f(c(2, 3)), 5))) {
+  list(correct = FALSE, message = "Con c(2, 3), mi_funcion() debería dar 5. Un mensaje que oriente sin dar la solución.")
+} else {
+  list(correct = TRUE, message = "¡Correcto! Una frase con el resultado y con lo que significa.")
+}
+```
+
+::: {.hint exercise="nombre"}
+Una pista que acerque sin resolver: qué función de R usar, o qué mirar.
+:::
+
+::: {.solution exercise="nombre"}
+La línea que falta, en una frase.
+:::
+:::
+
+::::

@@ -1,0 +1,168 @@
+---
+title: "La revolución que nadie vio venir"
+numero: 6
+nivel: 2
+duracion: "30 min"
+lectura: "[Kuran (1995)](https://nuevasomosaguas.github.io/biblioteca.html)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Intermedio"
+categories: [modelos de agentes, equilibrios y dinámica]
+description: "Una sociedad puede callar en público lo que casi todos piensan en privado, hasta que deja de hacerlo de golpe."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1989, los regímenes comunistas de Europa del Este cayeron en cuestión de semanas, y casi nadie lo había previsto: ni los servicios de inteligencia, ni los expertos, ni los propios disidentes. Timur Kuran propuso una explicación: la *falsificación de preferencias*. Mucha gente rechaza el régimen en privado, pero en público dice apoyarlo, porque disentir en solitario sale caro.
+
+Es el mecanismo de [los umbrales de Granovetter](../02-granovetter/index.qmd), con una pregunta nueva: qué pasa con lo que no se ve. Cada opositor se atreve a disentir en público solo cuando ve que lo hace una proporción suficiente de la población: ese es su umbral. Cuanto más fuerte es su convicción, más bajo es su umbral.
+
+En el modelo, el 70 % de la población rechaza el régimen en privado. La convicción de cada opositor es un número entre 0 y 1, la mayoría bastante convencidos, y su umbral es `1 - conviccion / coste`, donde `coste` mide lo caro que resulta disentir en solitario. Si en un periodo disiente en público una proporción S de la población, en el siguiente disienten todos los opositores con umbral menor o igual que S.
+
+**Tu tarea.**
+
+1. Completa la última línea: `falsifican` es la proporción de la población que rechaza el régimen en privado pero no lo dice en público.
+2. Una *chispa*, como una manifestación inesperada, eleva por un momento el disenso público a S₀. Completa `chispa_minima()`, que busca, en pasos de 0,01 y hasta 0,6, la chispa más pequeña con la que la sociedad acaba en un disenso público mayoritario, de más de la mitad.
+3. Cuando la comprobación te dé por bueno el código, sube la represión a `coste <- 1.2` y vuelve a ejecutar. ¿Cuánto más grande tiene que ser la chispa?
+4. Vuelve a `coste <- 1` y baja la oposición privada a `privado <- 0.5`. ¿Qué disenso público ves antes de la chispa? ¿Hay alguna chispa que provoque la cascada?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La tarea 4 es el corazón del ejercicio. Desde fuera, las dos sociedades son idénticas: nadie disiente en público. Pero una es un polvorín que estalla con una chispa del 15 %, y la otra es estable. Como las preferencias privadas y los umbrales no se ven, ni los observadores ni los propios ciudadanos pueden saber en cuál viven, y por eso las revoluciones de 1989 sorprendieron a todo el mundo. Las encuestas tampoco ayudan: miden lo que la gente dice, no lo que piensa.
+
+La tarea 3 muestra que la represión no actúa solo castigando a los disidentes: hace que la chispa necesaria sea mucho mayor, del 44 % en lugar del 15 %.
+
+Prueba también una chispa de exactamente 0,14. El disenso ni crece ni se apaga: es un *punto de inflexión*, un equilibrio inestable entre los dos estables, el silencio y la revolución. Cualquier chispa por debajo se apaga; cualquiera por encima prende.
+
+Kuran, T. (1991). Now out of never: The element of surprise in the East European revolution of 1989. *World Politics*, 44(1), 7–48.
+
+Kuran, T. (1995). *Private Truths, Public Lies: The Social Consequences of Preference Falsification*. Harvard University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: kuran
+#| caption: "Tu código"
+N <- 1000
+privado <- 0.7  # proporción que rechaza el régimen en privado
+coste <- 1      # lo caro que resulta disentir en solitario
+conviccion <- qbeta(ppoints(N * privado), 5, 2)
+umbral <- pmax(0, 1 - conviccion / coste)
+
+# El disenso público al que llega la sociedad partiendo de S0
+equilibrio <- function(umbral, N, S0 = 0) {
+  S <- S0
+  repeat {
+    nuevo <- sum(umbral <= S) / N
+    if (nuevo == S) return(S)
+    S <- nuevo
+  }
+}
+
+# La chispa más pequeña que acaba en un disenso público mayoritario; NA si ninguna
+chispa_minima <- function(umbral, N) {
+  for (S0 in seq(0, 0.6, by = 0.01)) {
+    if (______) return(S0)
+  }
+  NA
+}
+
+publico <- equilibrio(umbral, N)
+chispa <- chispa_minima(umbral, N)
+c(publico = publico,
+  falsifican = ______,
+  chispa = chispa,
+  tras_la_chispa = if (is.na(chispa)) NA else equilibrio(umbral, N, chispa))
+```
+
+```{webr}
+#| exercise: kuran
+#| solution: true
+N <- 1000
+privado <- 0.7
+coste <- 1
+conviccion <- qbeta(ppoints(N * privado), 5, 2)
+umbral <- pmax(0, 1 - conviccion / coste)
+
+equilibrio <- function(umbral, N, S0 = 0) {
+  S <- S0
+  repeat {
+    nuevo <- sum(umbral <= S) / N
+    if (nuevo == S) return(S)
+    S <- nuevo
+  }
+}
+
+chispa_minima <- function(umbral, N) {
+  for (S0 in seq(0, 0.6, by = 0.01)) {
+    if (equilibrio(umbral, N, S0) > 0.5) return(S0)
+  }
+  NA
+}
+
+publico <- equilibrio(umbral, N)
+chispa <- chispa_minima(umbral, N)
+c(publico = publico,
+  falsifican = privado - publico,
+  chispa = chispa,
+  tras_la_chispa = if (is.na(chispa)) NA else equilibrio(umbral, N, chispa))
+```
+
+```{webr}
+#| exercise: kuran
+#| check: true
+# Se comprueban las funciones y la fórmula, no los parámetros: las tareas 3 y 4 los cambian.
+f <- .envir_result$chispa_minima
+umbrales <- function(privado, coste, N = 1000) pmax(0, 1 - qbeta(ppoints(N * privado), 5, 2) / coste)
+casos <- list(
+  list(privado = 0.7, coste = 1, esperado = 0.15),
+  list(privado = 0.7, coste = 1.2, esperado = 0.44),
+  list(privado = 0.5, coste = 1, esperado = NA)
+)
+acierta <- function(caso) {
+  obtenido <- f(umbrales(caso$privado, caso$coste), 1000)
+  if (is.na(caso$esperado)) return(length(obtenido) == 1 && is.na(obtenido))
+  isTRUE(all.equal(obtenido, caso$esperado))
+}
+coma <- function(x) format(round(x, 3), decimal.mark = ",")
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función chispa_minima().")
+} else if (!is.null(fallo <- Find(Negate(acierta), casos))) {
+  obtenido <- f(umbrales(fallo$privado, fallo$coste), 1000)
+  if (isTRUE(all.equal(obtenido, fallo$esperado - 0.01))) {
+    list(correct = FALSE, message = paste0(
+      "Con una chispa de ", coma(obtenido), " el disenso no se apaga, pero tampoco crece: se queda en ",
+      coma(obtenido), ". Es un punto de inflexión, no una cascada. La cascada acaba en más de la mitad."))
+  } else {
+    list(correct = FALSE, message = paste0(
+      "Con privado = ", fallo$privado, " y coste = ", fallo$coste, ", chispa_minima() debería devolver ",
+      if (is.na(fallo$esperado)) "NA" else coma(fallo$esperado), ", y devuelve ", coma(obtenido), "."))
+  }
+} else if (!isTRUE(all.equal(unname(.result["falsifican"]), .envir_result$privado - unname(.result["publico"])))) {
+  list(correct = FALSE, message = "chispa_minima() está bien. Falta falsifican: los que rechazan el régimen en privado menos los que lo dicen en público.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! ",
+    if (.result[["publico"]] == 0) "Nadie disiente en público"
+    else paste0("Disiente en público el ", round(100 * .result[["publico"]]), " %"),
+    " y el ", round(100 * .result[["falsifican"]]), " % de la población calla lo que piensa. ",
+    if (is.na(.result[["chispa"]])) "Y ninguna chispa provoca la cascada."
+    else paste0("Una chispa de ", coma(.result[["chispa"]]), " la lleva a un disenso de ", coma(.result[["tras_la_chispa"]]), ".")))
+}
+```
+
+::: {.hint exercise="kuran"}
+`equilibrio(umbral, N, S0)` dice dónde acaba la sociedad tras una chispa `S0`. La cascada ha prendido si ese disenso final supera la mitad. Y quienes falsifican son los opositores privados, `privado`, que no están entre los que disienten en público, `publico`.
+:::
+
+::: {.solution exercise="kuran"}
+`equilibrio(umbral, N, S0) > 0.5` en `chispa_minima()`, y `falsifican = privado - publico`.
+:::
+:::
+
+::::
