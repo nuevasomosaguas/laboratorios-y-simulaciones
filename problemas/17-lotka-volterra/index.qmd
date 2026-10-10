@@ -3,7 +3,7 @@ title: "Peces, guerra y depredadores"
 numero: 17
 nivel: 2
 duracion: "40 min"
-lectura: "Volterra (1926)"
+lectura: "[Volterra (1926)](https://nuevasomosaguas.github.io/biblioteca.html#turchin2009secular)"
 semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
 dificultad: "Intermedio"
 categories: [biología, equilibrios y dinámica]

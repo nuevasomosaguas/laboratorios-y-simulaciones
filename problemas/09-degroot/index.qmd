@@ -3,7 +3,7 @@ title: "Las creencias se forman en red"
 numero: 9
 nivel: 2
 duracion: "35 min"
-lectura: "DeGroot (1974)"
+lectura: "[DeGroot (1974)](https://nuevasomosaguas.github.io/biblioteca.html#jackson2008social)"
 semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
 dificultad: "Intermedio"
 categories: [DBO, equilibrios y dinámica]

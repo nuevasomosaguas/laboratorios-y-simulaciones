@@ -3,7 +3,7 @@ title: "Dos aldeas en equilibrio, una muestra que no lo está"
 numero: 11
 nivel: 1
 duracion: "25 min"
-lectura: "Hardy (1908); Wahlund (1928)"
+lectura: "[Hardy (1908); Wahlund (1928)](https://nuevasomosaguas.github.io/biblioteca.html#falconer2009introduction)"
 dificultad: "Iniciación"
 categories: [biología, paradojas de agregación, estadística]
 description: "Dos poblaciones en equilibrio genético, juntas, parecen no estarlo: la agregación vuelve a engañar."

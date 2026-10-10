@@ -3,7 +3,7 @@ title: "La ley de Lanchester"
 numero: 36
 nivel: 1
 duracion: "25 min"
-lectura: "Epstein (1997)"
+lectura: "[Epstein (1997)](https://nuevasomosaguas.github.io/biblioteca.html#strogatz2015nonlinear)"
 semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
 dificultad: "Iniciación"
 categories: [equilibrios y dinámica]
