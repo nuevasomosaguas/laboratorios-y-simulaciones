@@ -1,0 +1,126 @@
+---
+title: "¿Desigualdad entre regiones o dentro de ellas?"
+numero: 20
+nivel: 2
+duracion: "30 min"
+lectura: "Theil (1967); Shorrocks (1980)"
+dificultad: "Intermedio"
+categories: [desigualdad, paradojas de agregación]
+description: "El índice de Theil separa la desigualdad de un país en la que hay entre sus regiones y la que hay dentro de cada una."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un país **imaginario** tiene tres regiones, Norte, Centro y Sur, con 2000 hogares cada una. Las rentas son **simuladas**: no corresponden a ningún país real. El Norte es, de media, el doble de rico que el Sur. ¿Cuánta de la desigualdad del país se debe a esa diferencia entre regiones, y cuánta a la que hay dentro de cada una?
+
+El índice de Gini no permite responder: no se puede partir en una suma de componentes cuando los grupos se solapan. El índice de Theil, que viene de la teoría de la información, sí:
+
+$$T = \frac{1}{n}\sum_i \frac{x_i}{\mu} \ln\frac{x_i}{\mu}.$$
+
+Vale 0 si todos ganan lo mismo, y se descompone exactamente en dos partes. Si $s_g$ es la parte de la renta total que se lleva la región $g$, $\mu_g$ su renta media y $T_g$ su índice de Theil,
+
+$$T = \underbrace{\sum_g s_g\, T_g}_{\text{dentro}} + \underbrace{\sum_g s_g \ln\frac{\mu_g}{\mu}}_{\text{entre}}.$$
+
+**Tu tarea.** Completa `theil()` y la parte `entre`. El código comprueba que las dos partes suman el total. ¿Qué proporción de la desigualdad se debe a las diferencias entre regiones?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El índice de Theil del país es 0,160. La parte entre regiones es 0,037, el 23 % del total; el 77 % restante es desigualdad dentro de cada región. Aunque el Norte duplique al Sur, la mayor parte de la desigualdad está entre vecinos de la misma región. Una política que igualase por completo la renta media de las tres regiones dejaría intacto ese 77 %.
+
+La descomposición sirve para cualquier partición: entre hombres y mujeres, entre niveles de estudios, entre el campo y la ciudad. Shorrocks demostró que las medidas que se descomponen así forman una familia concreta, la de la entropía generalizada, a la que pertenece el índice de Theil y no el de Gini.
+
+**Para ir más allá:** haz que el Sur converja con el Centro, cambiando su renta media en la simulación, y mira cómo cambia la parte entre regiones.
+
+Theil, H. (1967). *Economics and Information Theory*. North-Holland.
+
+Shorrocks, A. F. (1980). The class of additively decomposable inequality measures. *Econometrica*, 48(3), 613–625.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: theil
+#| caption: "Tu código"
+# Rentas simuladas de un país imaginario: 2000 hogares en cada región
+set.seed(1967)
+region <- rep(c("Norte", "Centro", "Sur"), each = 2000)
+medianas <- c(30000, 22000, 15000)
+renta <- rlnorm(6000, meanlog = rep(log(medianas), each = 2000), sdlog = 0.5)
+
+# El índice de Theil
+theil <- function(x) {
+  ______
+}
+
+total <- theil(renta)
+s <- tapply(renta, region, sum) / sum(renta)  # parte de la renta de cada región
+mu <- tapply(renta, region, mean)             # renta media de cada región
+dentro <- sum(s * tapply(renta, region, theil))
+entre <- ______
+
+boxplot(renta ~ factor(region, c("Sur", "Centro", "Norte")), log = "y", xlab = "",
+        ylab = "Renta del hogar (euros, escala logarítmica)", col = "grey90")
+
+c(total = total, dentro = dentro, entre = entre, suma = dentro + entre, parte_entre = entre / total)
+```
+
+```{webr}
+#| exercise: theil
+#| solution: true
+set.seed(1967)
+region <- rep(c("Norte", "Centro", "Sur"), each = 2000)
+medianas <- c(30000, 22000, 15000)
+renta <- rlnorm(6000, meanlog = rep(log(medianas), each = 2000), sdlog = 0.5)
+
+theil <- function(x) {
+  mean(x / mean(x) * log(x / mean(x)))
+}
+
+total <- theil(renta)
+s <- tapply(renta, region, sum) / sum(renta)
+mu <- tapply(renta, region, mean)
+dentro <- sum(s * tapply(renta, region, theil))
+entre <- sum(s * log(mu / mean(renta)))
+
+boxplot(renta ~ factor(region, c("Sur", "Centro", "Norte")), log = "y", xlab = "",
+        ylab = "Renta del hogar (euros, escala logarítmica)", col = "grey90")
+
+c(total = total, dentro = dentro, entre = entre, suma = dentro + entre, parte_entre = entre / total)
+```
+
+```{webr}
+#| exercise: theil
+#| check: true
+e <- .envir_result
+f <- e$theil
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función theil().")
+} else if (!isTRUE(all.equal(c(f(rep(3, 5)), f(c(2, 6))), c(0, (0.5 * log(0.5) + 1.5 * log(1.5)) / 2)))) {
+  list(correct = FALSE, message = "theil() falla: con rentas iguales debe dar 0, y con c(2, 6), cuya media es 4, la media de (x/μ)·ln(x/μ): (0,5 · ln 0,5 + 1,5 · ln 1,5) / 2 = 0,131.")
+} else if (!isTRUE(all.equal(e$dentro + e$entre, e$total))) {
+  list(correct = FALSE, message = "theil() está bien, pero dentro + entre no suma el total. La parte entre es la suma de s · ln(μ_g / μ), con μ la renta media de todo el país.")
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "La descomposición cuadra, pero los resultados no coinciden con los esperados. ¿Has cambiado la simulación?")
+} else {
+  coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Theil total ", coma(.result[["total"]]), ": ", coma(.result[["entre"]]), " entre regiones, el ",
+    round(100 * .result[["parte_entre"]]), " %, y el resto dentro de cada una."))
+}
+```
+
+::: {.hint exercise="theil"}
+`x / mean(x)` es la renta relativa de cada hogar; el índice es la media de esa renta relativa por su logaritmo. Para la parte entre, `mu / mean(renta)` es la renta media de cada región relativa a la del país.
+:::
+
+::: {.solution exercise="theil"}
+`mean(x / mean(x) * log(x / mean(x)))` y `entre <- sum(s * log(mu / mean(renta)))`.
+:::
+:::
+
+::::

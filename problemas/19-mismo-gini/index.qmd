@@ -1,0 +1,134 @@
+---
+title: "El mismo Gini, dos países distintos"
+numero: 19
+nivel: 2
+duracion: "30 min"
+lectura: "Atkinson (1970)"
+dificultad: "Intermedio"
+categories: [desigualdad, estadística]
+description: "Dos países imaginarios con exactamente el mismo índice de Gini y repartos muy distintos de la renta."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Dos países **imaginarios**, A y B, no tienen datos: su reparto de la renta se define con una fórmula. En A, la renta sigue una distribución lognormal; en B, una de Pareto, con una cola larga de rentas muy altas. Sus curvas de Lorenz son
+
+$$L_A(p) = \Phi\left(\Phi^{-1}(p) - \sigma\right), \qquad L_B(p) = 1 - (1 - p)^{1 - 1/\alpha},$$
+
+con los parámetros elegidos a propósito para el ejercicio.
+
+El índice de Gini es el doble del área entre la diagonal y la curva de Lorenz, o lo que es lo mismo, $G = 1 - 2\int_0^1 L(p)\,dp$. Cuando no se sabe hacer la integral a mano, se aproxima con la regla del trapecio sobre una rejilla fina de valores de $p$.
+
+**Tu tarea.** Completa `gini_de_lorenz()`, que calcula el Gini de una curva de Lorenz por trapecios. El código lo aplica a los dos países y lo compara con otras tres medidas: la renta de la mitad más pobre, la del 10 % más rico y la *ratio de Palma*, lo que se lleva el 10 % más rico entre lo que se lleva el 40 % más pobre. ¿Qué país es más desigual?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Los dos países tienen un Gini de 0,40, y sin embargo reparten la renta de forma muy distinta. En B, la mitad más pobre recibe más que en A, el 25,7 % frente al 22,9 %, y el 10 % más rico también, el 37,3 % frente al 29,5 %. Quien sale perdiendo en B son las clases medias. Las dos curvas de Lorenz se cruzan hacia $p = 0{,}66$.
+
+Atkinson demostró en 1970 que, si dos curvas de Lorenz no se cruzan, todas las medidas razonables de desigualdad coinciden en cuál es más desigual. Si se cruzan, el orden depende de la medida, y cada medida encierra un juicio de valor sobre qué parte del reparto importa más: el Gini pesa sobre todo el centro; la ratio de Palma, solo los extremos. Ningún número único dice cuál de los dos países es más justo.
+
+Atkinson, A. B. (1970). On the measurement of inequality. *Journal of Economic Theory*, 2(3), 244–263.
+
+Palma, J. G. (2011). Homogeneous middles vs. heterogeneous tails, and the end of the 'inverted-U'. *Development and Change*, 42(1), 87–153.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: mismo-gini
+#| caption: "Tu código"
+# Dos países imaginarios, definidos por su curva de Lorenz
+sigma <- sqrt(2) * qnorm(0.7)  # país A, lognormal
+alfa <- 1.75                   # país B, Pareto
+L_A <- function(p) pnorm(qnorm(p) - sigma)
+L_B <- function(p) 1 - (1 - p)^(1 - 1 / alfa)
+
+# El Gini de una curva de Lorenz: 1 - 2 × el área bajo la curva, por trapecios
+gini_de_lorenz <- function(p, L) {
+  area <- ______  # cada trapecio: ancho diff(p) por la media de sus dos alturas
+  1 - 2 * area
+}
+
+p <- seq(0, 1, length.out = 10001)
+plot(p, L_A(p), type = "l", lwd = 2, col = "#2980b9", asp = 1,
+     xlab = "Proporción de la población, de más pobre a más rica", ylab = "Proporción de la renta")
+lines(p, L_B(p), lwd = 2, col = "#c0392b")
+abline(0, 1, lty = 2)
+legend("topleft", c("País A", "País B"), col = c("#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+medidas <- function(L) {
+  c(gini = gini_de_lorenz(p, L(p)),
+    mitad_pobre = L(0.5),
+    decil_rico = 1 - L(0.9),
+    palma = (1 - L(0.9)) / L(0.4))
+}
+round(rbind(A = medidas(L_A), B = medidas(L_B)), 3)
+```
+
+```{webr}
+#| exercise: mismo-gini
+#| solution: true
+sigma <- sqrt(2) * qnorm(0.7)
+alfa <- 1.75
+L_A <- function(p) pnorm(qnorm(p) - sigma)
+L_B <- function(p) 1 - (1 - p)^(1 - 1 / alfa)
+
+gini_de_lorenz <- function(p, L) {
+  area <- sum(diff(p) * (L[-1] + L[-length(L)]) / 2)
+  1 - 2 * area
+}
+
+p <- seq(0, 1, length.out = 10001)
+plot(p, L_A(p), type = "l", lwd = 2, col = "#2980b9", asp = 1,
+     xlab = "Proporción de la población, de más pobre a más rica", ylab = "Proporción de la renta")
+lines(p, L_B(p), lwd = 2, col = "#c0392b")
+abline(0, 1, lty = 2)
+legend("topleft", c("País A", "País B"), col = c("#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+medidas <- function(L) {
+  c(gini = gini_de_lorenz(p, L(p)),
+    mitad_pobre = L(0.5),
+    decil_rico = 1 - L(0.9),
+    palma = (1 - L(0.9)) / L(0.4))
+}
+round(rbind(A = medidas(L_A), B = medidas(L_B)), 3)
+```
+
+```{webr}
+#| exercise: mismo-gini
+#| check: true
+f <- .envir_result$gini_de_lorenz
+q <- seq(0, 1, length.out = 501)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro gini_de_lorenz().")
+} else if (!isTRUE(all.equal(f(q, q), 0, tolerance = 1e-9))) {
+  list(correct = FALSE, message = "Con la diagonal, L(p) = p, el reparto es igualitario y el Gini debe dar 0. Revisa el área: cada trapecio mide diff(p) de ancho y tiene de alto la media de sus dos lados.")
+} else if (!isTRUE(all.equal(f(q, q^2), 1 / 3, tolerance = 1e-5))) {
+  list(correct = FALSE, message = "Con L(p) = p², el área bajo la curva es 1/3 y el Gini, 1/3. gini_de_lorenz() da otra cosa.")
+} else if (!isTRUE(all.equal(f(c(0, 0.5, 1), c(0, 0.2, 1)), 0.3))) {
+  list(correct = FALSE, message = "gini_de_lorenz() debe valer con cualquier rejilla de p, no solo con la del ejercicio: usa diff(p).")
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "gini_de_lorenz() está bien, pero la tabla no coincide. ¿Has cambiado los parámetros?")
+} else {
+  coma <- function(v) format(v, nsmall = 3, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Los dos países tienen un Gini de ", coma(.result["A", "gini"]),
+    ", y en B la mitad más pobre y el 10 % más rico reciben más que en A: pierde la clase media."))
+}
+```
+
+::: {.hint exercise="mismo-gini"}
+El trapecio entre $p_i$ y $p_{i+1}$ tiene de área $(p_{i+1} - p_i) \cdot \frac{L_i + L_{i+1}}{2}$. En R, `diff(p)` da los anchos, `L[-1]` las alturas de la derecha y `L[-length(L)]` las de la izquierda.
+:::
+
+::: {.solution exercise="mismo-gini"}
+`area <- sum(diff(p) * (L[-1] + L[-length(L)]) / 2)`.
+:::
+:::
+
+::::

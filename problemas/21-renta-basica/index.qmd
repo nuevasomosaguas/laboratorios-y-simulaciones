@@ -1,0 +1,139 @@
+---
+title: "Impuestos, renta básica y el índice de Gini"
+numero: 21
+nivel: 1
+duracion: "20 min"
+lectura: "Dalton (1920)"
+dificultad: "Iniciación"
+categories: [desigualdad]
+description: "Subir todas las rentas un 10 % no cambia el Gini; dar 1000 euros a cada hogar, sí. Y un impuesto proporcional con renta básica lo reduce exactamente en su tipo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un país **imaginario** tiene 5000 hogares con rentas **simuladas**, que no corresponden a ningún país real. Su gobierno estudia varias políticas y quiere saber qué le hace cada una al índice de Gini:
+
+- **Crecimiento proporcional:** todas las rentas suben un 10 %.
+- **Cheque igual:** cada hogar recibe 1000 euros.
+- **Renta básica:** un impuesto proporcional del 30 % sobre todas las rentas, y lo recaudado se reparte a partes iguales. Cada hogar acaba con $(1 - t)\,x + t\,\mu$.
+- **Transferencia de Pigou-Dalton:** el hogar más rico da 1000 euros al más pobre.
+
+**Tu tarea.** Completa `renta_basica()` y `transferencia()`. El código calcula el Gini antes y después de cada política. ¿Cuál lo cambia, y cuánto?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El Gini de partida es 0,440. Subir todas las rentas un 10 % lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
+
+La renta básica lo reduce exactamente al 70 %, de 0,440 a 0,308, y no por casualidad: el impuesto proporcional, por sí solo, no cambia el Gini, como el crecimiento proporcional; lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
+
+La transferencia del más rico al más pobre apenas lo mueve, en el quinto decimal, pero lo baja. Es el *principio de Pigou-Dalton*: toda transferencia de un rico a un pobre que no invierta su orden debe reducir la desigualdad. Cualquier medida razonable lo cumple, y el Gini también.
+
+Dalton, H. (1920). The measurement of the inequality of incomes. *The Economic Journal*, 30(119), 348–361.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: renta-basica
+#| caption: "Tu código"
+# Rentas simuladas de un país imaginario
+set.seed(2021)
+renta <- rlnorm(5000, meanlog = log(20000), sdlog = 0.8)
+
+# El Gini, con la fórmula que ordena primero: no compara todas las parejas
+gini <- function(x) {
+  x <- sort(x)
+  n <- length(x)
+  2 * sum(seq_len(n) * x) / (n * sum(x)) - (n + 1) / n
+}
+
+# Impuesto proporcional t y reparto igual de lo recaudado
+renta_basica <- function(x, t) {
+  ______
+}
+
+# El más rico da `cantidad` al más pobre
+transferencia <- function(x, cantidad) {
+  ______
+  ______
+  x
+}
+
+c(inicial = gini(renta),
+  crecimiento_10 = gini(1.1 * renta),
+  cheque_1000 = gini(renta + 1000),
+  renta_basica_30 = gini(renta_basica(renta, 0.3)),
+  pigou_dalton = gini(transferencia(renta, 1000)))
+```
+
+```{webr}
+#| exercise: renta-basica
+#| solution: true
+set.seed(2021)
+renta <- rlnorm(5000, meanlog = log(20000), sdlog = 0.8)
+
+gini <- function(x) {
+  x <- sort(x)
+  n <- length(x)
+  2 * sum(seq_len(n) * x) / (n * sum(x)) - (n + 1) / n
+}
+
+renta_basica <- function(x, t) {
+  (1 - t) * x + t * mean(x)
+}
+
+transferencia <- function(x, cantidad) {
+  x[which.max(x)] <- x[which.max(x)] - cantidad
+  x[which.min(x)] <- x[which.min(x)] + cantidad
+  x
+}
+
+c(inicial = gini(renta),
+  crecimiento_10 = gini(1.1 * renta),
+  cheque_1000 = gini(renta + 1000),
+  renta_basica_30 = gini(renta_basica(renta, 0.3)),
+  pigou_dalton = gini(transferencia(renta, 1000)))
+```
+
+```{webr}
+#| exercise: renta-basica
+#| check: true
+e <- .envir_result
+if (!is.function(e$renta_basica) || !is.function(e$transferencia)) {
+  list(correct = FALSE, message = "No encuentro renta_basica() o transferencia().")
+} else if (!isTRUE(all.equal(e$renta_basica(c(10, 20, 30), 0.5), c(15, 20, 25)))) {
+  list(correct = FALSE, message = paste0(
+    "Con rentas 10, 20 y 30 y un tipo del 50 %, cada hogar paga la mitad y recibe la mitad de la media, 10: quedan 15, 20 y 25. renta_basica() da ",
+    toString(e$renta_basica(c(10, 20, 30), 0.5)), "."))
+} else if (!isTRUE(all.equal(sum(e$renta_basica(c(3, 8, 40, 1), 0.3)), 52))) {
+  list(correct = FALSE, message = "renta_basica() no reparte exactamente lo recaudado: la renta total tiene que ser la misma antes y después.")
+} else if (!isTRUE(all.equal(e$transferencia(c(5, 1, 9), 2), c(5, 3, 7)))) {
+  list(correct = FALSE, message = paste0(
+    "Con rentas 5, 1 y 9, si el más rico da 2 al más pobre quedan 5, 3 y 7, y transferencia() da ",
+    toString(e$transferencia(c(5, 1, 9), 2)), ". which.max() y which.min() dicen quién es quién."))
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "Las funciones están bien, pero los resultados no coinciden. ¿Has cambiado algo más?")
+} else {
+  coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El Gini pasa de ", coma(.result[["inicial"]]), " a ", coma(.result[["renta_basica_30"]]),
+    " con la renta básica, exactamente el 70 %. Subir todo un 10 % no lo mueve; el cheque igual lo baja a ",
+    coma(.result[["cheque_1000"]]), "."))
+}
+```
+
+::: {.hint exercise="renta-basica"}
+Con un tipo `t`, a cada hogar le queda `(1 - t) * x`, y recibe su parte de lo recaudado, `t * mean(x)`. Para la transferencia, `which.max(x)` da la posición del más rico: réstale `cantidad` y súmasela al de `which.min(x)`.
+:::
+
+::: {.solution exercise="renta-basica"}
+`(1 - t) * x + t * mean(x)`; `x[which.max(x)] <- x[which.max(x)] - cantidad` y `x[which.min(x)] <- x[which.min(x)] + cantidad`.
+:::
+:::
+
+::::

@@ -1,0 +1,143 @@
+---
+title: "La curva de Lorenz de un pueblo inventado"
+numero: 18
+nivel: 1
+duracion: "20 min"
+lectura: "Lorenz (1905); Gini (1912)"
+dificultad: "Iniciación"
+categories: [desigualdad, estadística]
+description: "Veinte hogares, una curva y un número: cómo se mide la desigualdad, y qué dice el índice de Gini."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un pueblo **inventado** tiene veinte hogares, con las rentas anuales, en miles de euros, del código de la derecha. Los datos no son de ningún sitio real: están hechos para el ejercicio.
+
+En 1905, el estadístico Max Lorenz propuso dibujar la desigualdad. Se ordenan los hogares de más pobre a más rico, y para cada proporción $p$ de los hogares más pobres se marca la proporción $L(p)$ de la renta total que reciben. Si todos ganasen lo mismo, la curva sería la diagonal: el 20 % más pobre tendría el 20 % de la renta. Cuanto más se aleja la curva de la diagonal, más desigual es el reparto.
+
+En 1912, Corrado Gini resumió esa distancia en un número: la diferencia absoluta media entre dos hogares cualesquiera, dividida por el doble de la renta media,
+
+$$G = \frac{\sum_i \sum_j |x_i - x_j|}{2 n^2 \mu}.$$
+
+Vale 0 si todos ganan lo mismo y se acerca a 1 si un hogar se lo lleva todo. Y es el doble del área entre la diagonal y la curva de Lorenz.
+
+**Tu tarea.** Completa `lorenz()`, con la renta acumulada de los hogares ordenados, y `gini()`, con la fórmula. El código comprueba que el Gini coincide con el doble del área, dibuja la curva y compara lo que se llevan los dos hogares más ricos con lo que se lleva la mitad más pobre.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El Gini del pueblo es 0,34, y el cálculo por el área da exactamente lo mismo. Los dos hogares más ricos, el 10 %, se llevan el 28,5 % de la renta: más que los diez más pobres, que reúnen el 27,4 %. La media, 21 900 euros, queda muy por encima de la mediana, 16 500: unos pocos hogares de renta alta tiran de ella hacia arriba.
+
+El Gini resume toda la curva en un número, y en ese resumen se pierde información: dos curvas muy distintas pueden tener el mismo Gini, como se ve en [el problema siguiente](../19-mismo-gini/index.qmd).
+
+**Para ir más allá:** con muestras pequeñas, el Gini de la muestra subestima el de la población; se suele corregir multiplicando por $n/(n-1)$. Y la fórmula con `outer()` compara todas las parejas, $n^2$ operaciones: con un millón de hogares no cabe en memoria. Ordenando antes, basta con $G = \frac{2 \sum_i i\, x_{(i)}}{n \sum_i x_i} - \frac{n+1}{n}$.
+
+Lorenz, M. O. (1905). Methods of measuring the concentration of wealth. *Publications of the American Statistical Association*, 9(70), 209–219.
+
+Gini, C. (1912). *Variabilità e mutabilità*. Tipografia di Paolo Cuppini.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: lorenz
+#| caption: "Tu código"
+# Rentas inventadas de veinte hogares, en miles de euros
+renta <- c(8, 9, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 27, 30, 35, 45, 80)
+
+# La curva de Lorenz: proporción de hogares (p) y de la renta que reciben (L)
+lorenz <- function(x) {
+  n <- length(x)
+  data.frame(p = (0:n) / n,
+             L = ______)  # empieza en 0 y acaba en 1
+}
+
+# El índice de Gini, con la diferencia absoluta media
+gini <- function(x) {
+  n <- length(x)
+  ______  # outer(x, x, "-") da todas las diferencias x_i - x_j
+}
+
+curva <- lorenz(renta)
+plot(curva$p, curva$L, type = "b", pch = 19, asp = 1, xlab = "Proporción de hogares, de más pobre a más rico",
+     ylab = "Proporción de la renta")
+abline(0, 1, lty = 2)
+
+# El Gini como el doble del área entre la diagonal y la curva (por trapecios)
+n <- length(renta)
+gini_area <- 1 - sum((curva$L[-1] + curva$L[-(n + 1)]) / n)
+
+c(gini = gini(renta),
+  gini_area = gini_area,
+  dos_mas_ricos = sum(sort(renta, decreasing = TRUE)[1:2]) / sum(renta),
+  mitad_pobre = sum(sort(renta)[1:10]) / sum(renta))
+```
+
+```{webr}
+#| exercise: lorenz
+#| solution: true
+renta <- c(8, 9, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 27, 30, 35, 45, 80)
+
+lorenz <- function(x) {
+  n <- length(x)
+  data.frame(p = (0:n) / n,
+             L = c(0, cumsum(sort(x))) / sum(x))
+}
+
+gini <- function(x) {
+  n <- length(x)
+  sum(abs(outer(x, x, "-"))) / (2 * n^2 * mean(x))
+}
+
+curva <- lorenz(renta)
+plot(curva$p, curva$L, type = "b", pch = 19, asp = 1, xlab = "Proporción de hogares, de más pobre a más rico",
+     ylab = "Proporción de la renta")
+abline(0, 1, lty = 2)
+
+n <- length(renta)
+gini_area <- 1 - sum((curva$L[-1] + curva$L[-(n + 1)]) / n)
+
+c(gini = gini(renta),
+  gini_area = gini_area,
+  dos_mas_ricos = sum(sort(renta, decreasing = TRUE)[1:2]) / sum(renta),
+  mitad_pobre = sum(sort(renta)[1:10]) / sum(renta))
+```
+
+```{webr}
+#| exercise: lorenz
+#| check: true
+e <- .envir_result
+coma <- function(v, d = 3) format(round(v, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$lorenz) || !is.function(e$gini)) {
+  list(correct = FALSE, message = "No encuentro lorenz() o gini().")
+} else if (!isTRUE(all.equal(e$lorenz(c(4, 1, 3, 2))$L, c(0, 0.1, 0.3, 0.6, 1)))) {
+  list(correct = FALSE, message = paste0(
+    "Con las rentas c(4, 1, 3, 2), la curva de Lorenz es 0; 0,1; 0,3; 0,6; 1, y lorenz() da ",
+    paste(format(e$lorenz(c(4, 1, 3, 2))$L, decimal.mark = ",", trim = TRUE), collapse = "; "),
+    ". ¿Ordenas las rentas antes de acumular? ¿Empieza en 0?"))
+} else if (!isTRUE(all.equal(c(e$gini(rep(5, 10)), e$gini(c(0, 0, 0, 10)), e$gini(1:5)), c(0, 0.75, 4 / 15)))) {
+  list(correct = FALSE, message = paste0(
+    "gini() falla: con rentas iguales debe dar 0, con c(0, 0, 0, 10) 0,75 y con 1:5 0,267, y da ",
+    paste(coma(c(e$gini(rep(5, 10)), e$gini(c(0, 0, 0, 10)), e$gini(1:5))), collapse = ", "),
+    ". La suma es sobre todas las parejas, y se divide por 2 n² μ."))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El Gini del pueblo es ", coma(.result[["gini"]]), ", igual que el doble del área. Los dos hogares más ricos se llevan el ",
+    coma(100 * .result[["dos_mas_ricos"]], 1), " % de la renta, y la mitad más pobre, el ", coma(100 * .result[["mitad_pobre"]], 1), " %."))
+}
+```
+
+::: {.hint exercise="lorenz"}
+Para la curva: `cumsum(sort(x))` acumula las rentas de menor a mayor; añade un 0 delante y divide por el total. Para el Gini: `sum(abs(outer(x, x, "-")))` suma todas las diferencias absolutas.
+:::
+
+::: {.solution exercise="lorenz"}
+`L = c(0, cumsum(sort(x))) / sum(x)` y `sum(abs(outer(x, x, "-"))) / (2 * n^2 * mean(x))`.
+:::
+:::
+
+::::
