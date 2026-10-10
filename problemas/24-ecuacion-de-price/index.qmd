@@ -1,0 +1,208 @@
+---
+title: "El altruista que pierde en cada grupo y gana en el total"
+numero: 24
+nivel: 2
+duracion: "35 min"
+lectura: "[McElreath y Boyd (2007)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2007mathematical)"
+dificultad: "Intermedio"
+categories: [biología, paradojas de agregación, equilibrios y dinámica]
+description: "Dentro de cada grupo los altruistas salen perdiendo, y aun así son cada vez más. La ecuación de Price explica por qué, y de ella sale la regla de Hamilton."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un altruista paga un coste para dar un beneficio a los demás. Dentro de cualquier grupo, el egoísta que recibe la ayuda sin pagarla tiene más descendencia que el altruista, así que la selección natural debería acabar con el altruismo. Y sin embargo existe. Darwin ya vio que la salida podía estar en la competencia entre grupos: un grupo con más altruistas prospera más que uno con pocos.
+
+George Price escribió en 1970 una identidad que separa las dos fuerzas. Si $p_i$ es la proporción de altruistas en el grupo $i$, $W_i$ la descendencia media de sus miembros y $\Delta p_i$ el cambio de $p_i$ en una generación, el cambio de la proporción total $\bar p$ cumple
+
+$$\bar W \, \Delta \bar p = \underbrace{\operatorname{Cov}(W_i, p_i)}_{\text{entre grupos}} + \underbrace{\operatorname{E}(W_i \, \Delta p_i)}_{\text{dentro de los grupos}},$$
+
+donde la covarianza y la media se calculan con el peso de cada grupo, su tamaño entre el total. No es un modelo, sino contabilidad: vale para cualquier rasgo y cualquier forma de agruparlo.
+
+En el modelo, cada altruista paga un coste $c$ y cada miembro de un grupo recibe un beneficio $b \, p_i$, mayor cuanto más altruistas haya en él. Un egoísta tiene $1 + b \, p_i$ hijos, y un altruista, $1 - c + b \, p_i$. Hay dos grupos de 100 individuos: uno con un 20 % de altruistas y otro con un 80 %.
+
+**Tu tarea.**
+
+1. Completa los dos términos de `price()`: `entre`, la covarianza ponderada entre $W_i$ y $p_i$, y `dentro`, la media ponderada de $W_i \, \Delta p_i$.
+2. ¿Qué pasa con los altruistas dentro de cada grupo? ¿Y en el total?
+3. Cambia los grupos a `altruistas <- c(40, 60)` y `egoistas <- c(60, 40)`. La proporción total es la misma, el 50 %. ¿Qué cambia?
+4. Mira el gráfico: sigue a los dos grupos de partida durante doce generaciones, sin que se mezclen nunca.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En el grupo con pocos altruistas, su proporción baja del 20 % al 11 %; en el otro, del 80 % al 76 %. Y en el total sube del 50 % al 57 %, porque el grupo altruista crece mucho más: es otra vez [la paradoja de Simpson](../01-berkeley/index.qmd). La ecuación de Price lo cuantifica: la selección entre grupos aporta 0,36 y la selección dentro de ellos resta 0,16.
+
+**La regla de Hamilton.** Con este modelo, los dos términos se pueden escribir a mano. Dentro de un grupo, el altruista tiene siempre $c$ hijos menos que el egoísta, así que el término de dentro es $-c \, \operatorname{E}[p_i(1 - p_i)]$. Entre grupos, la descendencia media es $W_i = 1 + (b - c)\,p_i$, y el término de entre es $(b - c)\operatorname{Var}(p_i)$. La varianza total del rasgo, $\bar p(1 - \bar p)$, es la suma de la varianza entre grupos y la de dentro, $\operatorname{E}[p_i(1 - p_i)]$. Si llamamos $r$ a la parte de la varianza que está entre grupos,
+
+$$\bar W \, \Delta \bar p = \bar p(1 - \bar p)\,[(b - c)\,r - c\,(1 - r)] = \bar p(1 - \bar p)\,(r b - c).$$
+
+El altruismo avanza si y solo si $r b > c$. Es la regla de Hamilton, y $r$ es el *parentesco*: lo que se parecen, en el rasgo, los miembros de un mismo grupo, sean o no familia. Con los grupos de partida, $r = 0,36$ y $r b = 1,8$, mayor que $c = 1$. Con los grupos de la tarea 3, más parecidos entre sí, $r = 0,04$, $r b = 0,2$, y el altruismo retrocede en el total aunque la proporción inicial sea la misma: la selección entre grupos solo actúa sobre la variación que hay entre ellos.
+
+La tarea 4 muestra el límite: si los grupos no se rehacen nunca, el altruismo sube tres generaciones, hasta el 64 %, y luego cae hacia cero, porque dentro de cada grupo pierde siempre y la variación entre grupos se agota. Para que el altruismo se mantenga, los grupos tienen que disolverse y volver a formarse, de modo que se renueve la variación entre ellos: es el modelo de los *grupos de rasgo* de David Sloan Wilson.
+
+Price, G. R. (1970). Selection and covariance. *Nature*, 227, 520–521.
+
+Price, G. R. (1972). Extension of covariance selection mathematics. *Annals of Human Genetics*, 35(4), 485–490.
+
+Hamilton, W. D. (1964). The genetical evolution of social behaviour. I y II. *Journal of Theoretical Biology*, 7(1), 1–52.
+
+Wilson, D. S. (1975). A theory of group selection. *Proceedings of the National Academy of Sciences*, 72(1), 143–146.
+
+McElreath, R. y Boyd, R. (2007). *Mathematical Models of Social Evolution: A Guide for the Perplexed*. University of Chicago Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: price
+#| caption: "Tu código"
+beneficio <- 5
+coste <- 1
+altruistas <- c(20, 80)  # en cada grupo
+egoistas <- c(80, 20)
+
+# Los altruistas y los egoístas de la generación siguiente
+siguiente <- function(A, E, beneficio, coste) {
+  p <- A / (A + E)
+  list(A = A * (1 - coste + beneficio * p), E = E * (1 + beneficio * p))
+}
+
+# Los dos términos de la ecuación de Price, y su suma, W̄ Δp̄
+price <- function(A, E, beneficio, coste) {
+  n <- A + E
+  peso <- n / sum(n)
+  p <- A / n
+  sig <- siguiente(A, E, beneficio, coste)
+  W <- (sig$A + sig$E) / n        # descendencia media en cada grupo
+  delta <- sig$A / (sig$A + sig$E) - p
+  W_media <- sum(peso * W)
+  p_media <- sum(peso * p)
+  c(entre = ______,
+    dentro = ______,
+    total = W_media * (sum(sig$A) / sum(sig$A + sig$E) - p_media))
+}
+
+# Doce generaciones sin que los grupos se mezclen
+A <- altruistas
+E <- egoistas
+total <- sum(A) / sum(A + E)
+for (t in 1:12) {
+  sig <- siguiente(A, E, beneficio, coste)
+  A <- sig$A
+  E <- sig$E
+  total <- c(total, sum(A) / sum(A + E))
+}
+plot(0:12, total, type = "b", pch = 19, ylim = c(0, 1),
+     xlab = "Generación", ylab = "Proporción de altruistas en el total")
+
+p <- altruistas / (altruistas + egoistas)
+sig <- siguiente(altruistas, egoistas, beneficio, coste)
+peso <- (altruistas + egoistas) / sum(altruistas + egoistas)
+r <- sum(peso * (p - sum(peso * p))^2) / (sum(peso * p) * (1 - sum(peso * p)))
+c(cada_grupo = sig$A / (sig$A + sig$E) - p,
+  price(altruistas, egoistas, beneficio, coste),
+  r = r,
+  hamilton = r * beneficio - coste)
+```
+
+```{webr}
+#| exercise: price
+#| solution: true
+beneficio <- 5
+coste <- 1
+altruistas <- c(20, 80)
+egoistas <- c(80, 20)
+
+siguiente <- function(A, E, beneficio, coste) {
+  p <- A / (A + E)
+  list(A = A * (1 - coste + beneficio * p), E = E * (1 + beneficio * p))
+}
+
+price <- function(A, E, beneficio, coste) {
+  n <- A + E
+  peso <- n / sum(n)
+  p <- A / n
+  sig <- siguiente(A, E, beneficio, coste)
+  W <- (sig$A + sig$E) / n
+  delta <- sig$A / (sig$A + sig$E) - p
+  W_media <- sum(peso * W)
+  p_media <- sum(peso * p)
+  c(entre = sum(peso * (W - W_media) * (p - p_media)),
+    dentro = sum(peso * W * delta),
+    total = W_media * (sum(sig$A) / sum(sig$A + sig$E) - p_media))
+}
+
+A <- altruistas
+E <- egoistas
+total <- sum(A) / sum(A + E)
+for (t in 1:12) {
+  sig <- siguiente(A, E, beneficio, coste)
+  A <- sig$A
+  E <- sig$E
+  total <- c(total, sum(A) / sum(A + E))
+}
+plot(0:12, total, type = "b", pch = 19, ylim = c(0, 1),
+     xlab = "Generación", ylab = "Proporción de altruistas en el total")
+
+p <- altruistas / (altruistas + egoistas)
+sig <- siguiente(altruistas, egoistas, beneficio, coste)
+peso <- (altruistas + egoistas) / sum(altruistas + egoistas)
+r <- sum(peso * (p - sum(peso * p))^2) / (sum(peso * p) * (1 - sum(peso * p)))
+c(cada_grupo = sig$A / (sig$A + sig$E) - p,
+  price(altruistas, egoistas, beneficio, coste),
+  r = r,
+  hamilton = r * beneficio - coste)
+```
+
+```{webr}
+#| exercise: price
+#| check: true
+# Grupos de tamaños distintos: así se nota si falta ponderar.
+f <- .envir_result$price
+correcto <- function(A, E, b, k) {
+  n <- A + E; peso <- n / sum(n); p <- A / n
+  A2 <- A * (1 - k + b * p); E2 <- E * (1 + b * p)
+  W <- (A2 + E2) / n; Wm <- sum(peso * W); pm <- sum(peso * p)
+  c(sum(peso * (W - Wm) * (p - pm)), sum(peso * W * (A2 / (A2 + E2) - p)))
+}
+casos <- list(list(c(5, 90, 30), c(45, 60, 30), 3, 0.5), list(c(10, 40), c(90, 10), 4, 1))
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+acierta <- function(k) isTRUE(all.equal(unname(do.call(f, k)[c("entre", "dentro")]), do.call(correcto, k)))
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función price().")
+} else if (!is.null(fallo <- Find(Negate(acierta), casos))) {
+  obtenido <- do.call(f, fallo)
+  esperado <- do.call(correcto, fallo)
+  lista <- function(x) paste(x, collapse = ", ")
+  list(correct = FALSE, message = paste0(
+    "Con altruistas = (", lista(fallo[[1]]), "), egoistas = (", lista(fallo[[2]]), "), beneficio = ", fallo[[3]],
+    " y coste = ", format(fallo[[4]], decimal.mark = ","), ", entre y dentro deberían dar ", coma(esperado[1], 3), " y ", coma(esperado[2], 3),
+    if (isTRUE(all.equal(sum(obtenido[c("entre", "dentro")]), obtenido[["total"]]))) "." else
+      paste0(", y sumar el total, ", coma(obtenido[["total"]], 3), "."),
+    if (!isTRUE(all.equal(obtenido[["entre"]], esperado[1])))
+      " En la covarianza, cada grupo pesa según su tamaño: usa peso, no la media simple ni cov()."
+    else " El término de dentro es la media ponderada de W por Δp."))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Los altruistas ", if (all(.result[c("cada_grupo1", "cada_grupo2")] < 0)) "retroceden en los dos grupos" else "cambian en cada grupo",
+    ", y en el total la selección entre grupos aporta ", coma(.result[["entre"]]),
+    " y la de dentro, ", coma(.result[["dentro"]]), ". Con r = ", coma(.result[["r"]]), ", r·b − c = ", coma(.result[["hamilton"]]),
+    ": el altruismo ", if (.result[["hamilton"]] > 0) "avanza." else "retrocede."))
+}
+```
+
+::: {.hint exercise="price"}
+La covarianza ponderada es la media ponderada del producto de las desviaciones: `sum(peso * (W - W_media) * (p - p_media))`. El término de dentro, la media ponderada de `W * delta`. No uses `cov()`: no pondera por tamaño y divide entre n − 1.
+:::
+
+::: {.solution exercise="price"}
+`entre = sum(peso * (W - W_media) * (p - p_media))` y `dentro = sum(peso * W * delta)`.
+:::
+:::
+
+::::

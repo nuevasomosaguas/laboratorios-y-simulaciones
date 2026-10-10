@@ -32,7 +32,7 @@ En el modelo, el 70 % de la población rechaza el régimen en privado. La convic
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La tarea 4 es el corazón del ejercicio. Desde fuera, las dos sociedades son idénticas: nadie disiente en público. Pero una es un polvorín que estalla con una chispa del 15 %, y la otra es estable. Como las preferencias privadas y los umbrales no se ven, ni los observadores ni los propios ciudadanos pueden saber en cuál viven, y por eso las revoluciones de 1989 sorprendieron a todo el mundo. Las encuestas tampoco ayudan: miden lo que la gente dice, no lo que piensa.
+La tarea 4 es el corazón del ejercicio. Desde fuera, las dos sociedades son idénticas: nadie disiente en público. Pero una es un polvorín que estalla con una chispa del 15 %, y la otra es estable. Como las preferencias privadas y los umbrales no se ven, ni los observadores ni los propios ciudadanos pueden saber en cuál viven, y por eso las revoluciones de 1989 sorprendieron a todo el mundo. Las encuestas tampoco ayudan: miden lo que la gente dice, no lo que piensa, salvo que se pregunte de forma que nadie pueda saber qué ha contestado cada cual, como en [la respuesta aleatorizada](../32-respuesta-aleatorizada/index.qmd).
 
 La tarea 3 muestra que la represión no actúa solo castigando a los disidentes: hace que la chispa necesaria sea mucho mayor, del 44 % en lugar del 15 %.
 

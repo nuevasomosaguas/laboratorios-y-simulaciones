@@ -1,0 +1,167 @@
+---
+title: "Estado rico, votante rico"
+numero: 23
+nivel: 2
+duracion: "25 min"
+lectura: "[Gelman (2009)](https://nuevasomosaguas.github.io/biblioteca.html#gelman2009red)"
+dificultad: "Intermedio"
+categories: [paradojas de agregación, juegos y votación]
+description: "Los estados ricos votan a los demócratas y, dentro de cada estado, los ricos votan a los republicanos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En las elecciones presidenciales de Estados Unidos de 2004, los estados más ricos, como Connecticut o Nueva Jersey, votaron a John Kerry, el demócrata, y los más pobres, como Misisipi o Alabama, a George W. Bush, el republicano. De ahí salió un tópico de los comentaristas: los republicanos serían el partido de la América trabajadora, y los demócratas, el de las élites de la costa.
+
+Andrew Gelman y sus colaboradores miraron las encuestas votante a votante y encontraron lo contrario. Dentro de cada estado, cuanto más rico es un votante, más probable es que vote republicano. Y la diferencia entre ricos y pobres no es igual en todas partes: es enorme en los estados pobres y casi desaparece en los ricos.
+
+Concluir a partir de los estados algo sobre los votantes es la *falacia ecológica*, que Robinson describió en 1950: una correlación entre grupos no dice nada, por sí sola, de la correlación entre individuos.
+
+Los datos del código son inventados, pero imitan el patrón de 2004: nueve estados ordenados de más pobre a más rico, con 500 votantes cada uno, su renta en miles de dólares y si votan republicano (1) o no (0).
+
+**Tu tarea.**
+
+1. Completa `ricos_menos_pobres()`: la proporción de votantes republicanos en el tercio más rico de `d` menos la del tercio más pobre. Los cortes los da `quantile(d$renta, c(1/3, 2/3))`.
+2. Completa `entre_estados`: la correlación entre la renta media de cada estado y su proporción de voto republicano, en la tabla `por_estado`.
+3. Mira el gráfico: cada línea es un estado, con un punto por tercio de renta. ¿Hacia dónde apuntan las líneas, y hacia dónde los estados?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Entre estados, la correlación entre renta y voto republicano es de −0,97: los estados ricos votan demócrata. En el conjunto del país, el tercio más rico vota republicano 15 puntos más que el más pobre. Y dentro de cada estado, los ricos votan más republicano que los pobres: 44 puntos más en Misisipi, apenas 4 en Connecticut.
+
+Las dos cosas encajan porque los estados no se diferencian solo por la renta. En los estados ricos, el voto depende sobre todo de otras cosas, como la religión o los valores culturales, y los ricos de Connecticut votan casi igual que sus vecinos pobres. En los estados pobres, la renta pesa mucho. El gráfico lo muestra de un vistazo: líneas que suben, cada vez más planas, colocadas sobre una tendencia que baja.
+
+Gelman no se contenta con señalar la paradoja: la modeliza con una regresión multinivel, con un intercepto y una pendiente para cada estado que dependen a su vez de la renta del estado. Son las *pendientes variables*, la herramienta para cualquier pregunta en la que la relación entre dos variables cambie de un grupo a otro.
+
+Gelman, A., Shor, B., Bafumi, J. y Park, D. (2007). Rich state, poor state, red state, blue state: What's the matter with Connecticut? *Quarterly Journal of Political Science*, 2(4), 345–367.
+
+Gelman, A. (2009). *Red State, Blue State, Rich State, Poor State: Why Americans Vote the Way They Do*. Princeton University Press.
+
+Robinson, W. S. (1950). Ecological correlations and the behavior of individuals. *American Sociological Review*, 15(3), 351–357.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: gelman
+#| caption: "Tu código"
+# Nueve estados inventados, de más pobre a más rico
+estados <- data.frame(
+  estado = c("Misisipi", "Arkansas", "Alabama", "Ohio", "Florida", "California", "Nueva York", "Nueva Jersey", "Connecticut"),
+  renta = c(34, 36, 38, 46, 48, 58, 60, 68, 72),        # renta típica, en miles de dólares
+  republicano = seq(0.62, 0.40, length.out = 9),         # voto republicano a la renta típica
+  pendiente = seq(1.6, 0.1, length.out = 9))             # cuánto pesa la renta en el voto
+set.seed(2004)
+votantes <- do.call(rbind, lapply(1:9, function(i) {
+  renta <- estados$renta[i] * exp(rnorm(500, 0, 0.6))
+  p <- plogis(qlogis(estados$republicano[i]) + estados$pendiente[i] * log(renta / estados$renta[i]))
+  data.frame(estado = estados$estado[i], renta = renta, republicano = rbinom(500, 1, p))
+}))
+
+# Voto republicano del tercio más rico menos el del tercio más pobre
+ricos_menos_pobres <- function(d) {
+  cortes <- quantile(d$renta, c(1/3, 2/3))
+  ______
+}
+
+por_estado <- aggregate(cbind(renta, republicano) ~ estado, data = votantes, FUN = mean)
+por_estado <- por_estado[match(estados$estado, por_estado$estado), ]
+dentro <- sapply(split(votantes, votantes$estado)[estados$estado], ricos_menos_pobres)
+entre_estados <- ______
+
+# Una línea por estado: el voto republicano de cada tercio de renta
+plot(NULL, xlim = c(15, 200), ylim = c(0.1, 0.9), log = "x",
+     xlab = "Renta (miles de dólares, escala logarítmica)", ylab = "Voto republicano")
+for (d in split(votantes, votantes$estado)) {
+  tercio <- cut(d$renta, c(-Inf, quantile(d$renta, c(1/3, 2/3)), Inf))
+  lines(tapply(d$renta, tercio, mean), tapply(d$republicano, tercio, mean), col = "grey60")
+}
+points(por_estado$renta, por_estado$republicano, pch = 19, col = "#c0392b")
+text(por_estado$renta, por_estado$republicano, por_estado$estado, pos = 4, cex = 0.7)
+
+c(entre_estados = entre_estados,
+  en_el_pais = ricos_menos_pobres(votantes),
+  dentro_de_misisipi = dentro[["Misisipi"]],
+  dentro_de_connecticut = dentro[["Connecticut"]])
+```
+
+```{webr}
+#| exercise: gelman
+#| solution: true
+estados <- data.frame(
+  estado = c("Misisipi", "Arkansas", "Alabama", "Ohio", "Florida", "California", "Nueva York", "Nueva Jersey", "Connecticut"),
+  renta = c(34, 36, 38, 46, 48, 58, 60, 68, 72),
+  republicano = seq(0.62, 0.40, length.out = 9),
+  pendiente = seq(1.6, 0.1, length.out = 9))
+set.seed(2004)
+votantes <- do.call(rbind, lapply(1:9, function(i) {
+  renta <- estados$renta[i] * exp(rnorm(500, 0, 0.6))
+  p <- plogis(qlogis(estados$republicano[i]) + estados$pendiente[i] * log(renta / estados$renta[i]))
+  data.frame(estado = estados$estado[i], renta = renta, republicano = rbinom(500, 1, p))
+}))
+
+ricos_menos_pobres <- function(d) {
+  cortes <- quantile(d$renta, c(1/3, 2/3))
+  mean(d$republicano[d$renta > cortes[2]]) - mean(d$republicano[d$renta <= cortes[1]])
+}
+
+por_estado <- aggregate(cbind(renta, republicano) ~ estado, data = votantes, FUN = mean)
+por_estado <- por_estado[match(estados$estado, por_estado$estado), ]
+dentro <- sapply(split(votantes, votantes$estado)[estados$estado], ricos_menos_pobres)
+entre_estados <- cor(por_estado$renta, por_estado$republicano)
+
+plot(NULL, xlim = c(15, 200), ylim = c(0.1, 0.9), log = "x",
+     xlab = "Renta (miles de dólares, escala logarítmica)", ylab = "Voto republicano")
+for (d in split(votantes, votantes$estado)) {
+  tercio <- cut(d$renta, c(-Inf, quantile(d$renta, c(1/3, 2/3)), Inf))
+  lines(tapply(d$renta, tercio, mean), tapply(d$republicano, tercio, mean), col = "grey60")
+}
+points(por_estado$renta, por_estado$republicano, pch = 19, col = "#c0392b")
+text(por_estado$renta, por_estado$republicano, por_estado$estado, pos = 4, cex = 0.7)
+
+c(entre_estados = entre_estados,
+  en_el_pais = ricos_menos_pobres(votantes),
+  dentro_de_misisipi = dentro[["Misisipi"]],
+  dentro_de_connecticut = dentro[["Connecticut"]])
+```
+
+```{webr}
+#| exercise: gelman
+#| check: true
+f <- .envir_result$ricos_menos_pobres
+prueba <- data.frame(renta = 1:9, republicano = c(0, 0, 1, 0, 1, 1, 1, 1, 1))
+coma <- function(x) format(round(x, 2), nsmall = 2, decimal.mark = ",")
+puntos <- function(x) round(100 * x)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función ricos_menos_pobres().")
+} else if (isTRUE(all.equal(f(prueba), -2/3))) {
+  list(correct = FALSE, message = "ricos_menos_pobres() da el resultado con el signo cambiado: es el tercio rico menos el pobre.")
+} else if (!isTRUE(all.equal(f(prueba), 2/3))) {
+  list(correct = FALSE, message = paste0(
+    "Con rentas de 1 a 9 y votos 0, 0, 1, 0, 1, 1, 1, 1, 1, ricos_menos_pobres() debería dar 0,67: ",
+    "en el tercio rico (7, 8 y 9) votan republicano todos, y en el pobre (1, 2 y 3), uno de tres. Da ", coma(f(prueba)), "."))
+} else if (!isTRUE(all.equal(.envir_result$entre_estados, cor(.envir_result$por_estado$renta, .envir_result$por_estado$republicano)))) {
+  list(correct = FALSE, message = "ricos_menos_pobres() está bien. Falta entre_estados: la correlación entre las columnas renta y republicano de por_estado, un estado por fila.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Entre estados, la correlación entre renta y voto republicano es de ", coma(.result[["entre_estados"]]),
+    "; dentro de cada estado, los ricos votan más republicano: ", puntos(.result[["dentro_de_misisipi"]]),
+    " puntos más en Misisipi y ", puntos(.result[["dentro_de_connecticut"]]), " en Connecticut."))
+}
+```
+
+::: {.hint exercise="gelman"}
+`d$republicano[d$renta > cortes[2]]` son los votos del tercio más rico; su media es la proporción de republicanos. Haz lo mismo con el tercio más pobre y réstalas. Para la correlación, `cor(x, y)`.
+:::
+
+::: {.solution exercise="gelman"}
+`mean(d$republicano[d$renta > cortes[2]]) - mean(d$republicano[d$renta <= cortes[1]])`, y `entre_estados <- cor(por_estado$renta, por_estado$republicano)`.
+:::
+:::
+
+::::

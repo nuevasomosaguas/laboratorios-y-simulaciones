@@ -1,0 +1,177 @@
+---
+title: "Por qué Tasmania perdió tecnología"
+numero: 39
+nivel: 2
+duracion: "30 min"
+lectura: "[Henrich (2016)](https://nuevasomosaguas.github.io/biblioteca.html#henrich2016secret)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Si todos imitan al mejor y nadie lo copia del todo bien, una población pequeña olvida lo que sabía hacer."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Hace unos 10 000 años, la subida del mar inundó el estrecho de Bass y separó Tasmania de Australia. Quedaron aislados unos pocos miles de personas. Cuando llegaron los europeos, los tasmanos tenían una de las tecnologías más sencillas que se conocen: según el registro arqueológico, habían dejado de fabricar herramientas de hueso y de pescar, cosas que sus antepasados sí sabían hacer y que en el continente seguían haciéndose.
+
+Joseph Henrich propuso en 2004 que no hace falta ningún desastre para explicarlo: basta con que la población sea pequeña. En su modelo, cada aprendiz de una generación imita al más hábil de la anterior, de habilidad $z_h$, pero copiar es difícil y casi siempre sale peor. La habilidad del aprendiz es
+
+$$z = z_h - \alpha + \beta\,\varepsilon,$$
+
+donde $\alpha$ mide lo difícil que es la técnica, lo que se pierde de media al copiarla, y $\varepsilon$ es un error al azar con distribución de Gumbel, de escala $\beta$: casi todos copian peor que el modelo, pero de vez en cuando alguno lo supera. Con $N$ aprendices, el mejor de la nueva generación supera al de la anterior, de media, en
+
+$$\Delta z = -\alpha + \beta\,(\gamma + \ln N),$$
+
+donde $\gamma \approx 0{,}5772$ es la constante de Euler. Con muchos aprendices, alguno tiene suerte y la técnica mejora; con pocos, se degrada generación tras generación.
+
+**Tu tarea.**
+
+1. Completa `simular()`: cada generación, los `N[t]` aprendices copian al más hábil de la anterior, `max(z)`, con la pérdida `alfa` y un error de Gumbel de escala `beta`. La función `gumbel(n)` da `n` errores de escala 1.
+2. Completa `N_critico()`: el tamaño de población con el que $\Delta z = 0$, por debajo del cual la técnica se pierde.
+3. Mira la tabla: dos técnicas, una sencilla ($\alpha = 6$) y otra compleja ($\alpha = 10$), en una isla de 4000 personas y en un continente de 100 000, cifras redondas e inventadas. ¿Cuál se pierde, y dónde?
+4. El gráfico sigue la técnica compleja en una población de 100 000 personas que, en la generación 50, queda reducida a 4000.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La técnica sencilla tiene una población crítica de 227 personas, y mejora tanto en la isla como en el continente. La compleja necesita 12 367: en el continente mejora unas 2 unidades por generación, y en la isla pierde algo más de una. El gráfico es la historia de Tasmania en pequeño: durante 50 generaciones la técnica se acumula, y en cuanto la población se aísla empieza a perderse, sin que nadie haya olvidado nada por descuido. Cada generación copia lo mejor que puede al mejor que tiene, y con 4000 aprendices no basta.
+
+Lo que se pierde primero es lo más difícil de copiar, y la población crítica crece exponencialmente con la dificultad: $N^* = e^{\alpha/\beta - \gamma}$. Subir $\alpha$ de 6 a 10 multiplica la población necesaria por 55. Por eso Henrich habla de un *cerebro colectivo*: lo que una sociedad sabe hacer depende de cuántas personas aprenden unas de otras, no solo de lo listas que sean.
+
+La hipótesis es discutida. El registro arqueológico de otras poblaciones no siempre muestra que la complejidad técnica crezca con el tamaño de la población, y Vaesen y sus colegas argumentan que el aislamiento de Tasmania no explica por sí solo la pérdida. Lo que el modelo muestra es que el mecanismo es posible y que sus condiciones se pueden medir: el tamaño de la población que aprende, y la dificultad de lo que aprende.
+
+Henrich, J. (2004). Demography and cultural evolution: How adaptive cultural processes can produce maladaptive losses—The Tasmanian case. *American Antiquity*, 69(2), 197–214.
+
+Henrich, J. (2016). *The Secret of Our Success: How Culture Is Driving Human Evolution, Domesticating Our Species, and Making Us Smarter*. Princeton University Press.
+
+Vaesen, K., Collard, M., Cosgrove, R. y Roebroeks, W. (2016). Population size does not explain past changes in cultural complexity. *Proceedings of the National Academy of Sciences*, 113(16), E2241–E2247.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: tasmania
+#| caption: "Tu código"
+gumbel <- function(n) -log(-log(runif(n)))  # errores de Gumbel de escala 1
+euler <- 0.5772157                          # la constante de Euler, γ
+
+# 1. La habilidad media de cada generación; N tiene un tamaño por generación
+simular <- function(N, alfa, beta) {
+  z <- 0  # la habilidad de partida
+  media <- numeric(length(N))
+  for (t in seq_along(N)) {
+    z <- ______  # los N[t] aprendices de la generación t
+    media[t] <- mean(z)
+  }
+  media
+}
+
+# 2. La población con la que la técnica ni mejora ni empeora
+N_critico <- function(alfa, beta) {
+  ______
+}
+
+# 3. Dos técnicas, en una isla y en un continente, durante 100 generaciones
+set.seed(2004)
+casos <- expand.grid(N = c(4000, 1e5), alfa = c(6, 10))
+casos$beta <- 1
+casos$simulado <- mapply(function(N, alfa, beta) {
+  media <- simular(rep(N, 100), alfa, beta)
+  (media[100] - media[1]) / 99  # el cambio medio por generación
+}, casos$N, casos$alfa, casos$beta)
+casos$teorico <- -casos$alfa + casos$beta * (euler + log(casos$N))
+casos$N_critico <- N_critico(casos$alfa, casos$beta)
+
+# 4. La técnica compleja: 50 generaciones en el continente y 100 en la isla
+trayectoria <- simular(c(rep(1e5, 50), rep(4000, 100)), alfa = 10, beta = 1)
+plot(trayectoria, type = "l", lwd = 2, xlab = "Generación", ylab = "Habilidad media")
+abline(v = 50, lty = 2)
+
+round(casos, 2)
+```
+
+```{webr}
+#| exercise: tasmania
+#| solution: true
+gumbel <- function(n) -log(-log(runif(n)))
+euler <- 0.5772157
+
+simular <- function(N, alfa, beta) {
+  z <- 0
+  media <- numeric(length(N))
+  for (t in seq_along(N)) {
+    z <- max(z) - alfa + beta * gumbel(N[t])
+    media[t] <- mean(z)
+  }
+  media
+}
+
+N_critico <- function(alfa, beta) {
+  exp(alfa / beta - euler)
+}
+
+set.seed(2004)
+casos <- expand.grid(N = c(4000, 1e5), alfa = c(6, 10))
+casos$beta <- 1
+casos$simulado <- mapply(function(N, alfa, beta) {
+  media <- simular(rep(N, 100), alfa, beta)
+  (media[100] - media[1]) / 99
+}, casos$N, casos$alfa, casos$beta)
+casos$teorico <- -casos$alfa + casos$beta * (euler + log(casos$N))
+casos$N_critico <- N_critico(casos$alfa, casos$beta)
+
+trayectoria <- simular(c(rep(1e5, 50), rep(4000, 100)), alfa = 10, beta = 1)
+plot(trayectoria, type = "l", lwd = 2, xlab = "Generación", ylab = "Habilidad media")
+abline(v = 50, lty = 2)
+
+round(casos, 2)
+```
+
+```{webr}
+#| exercise: tasmania
+#| check: true
+# simular() se comprueba contra la fórmula, con muchas generaciones y una beta distinta de 1:
+# así vale cualquier forma correcta de sacar los errores de Gumbel.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+cambio <- function(N, alfa, beta, n = 400) {
+  set.seed(1)
+  media <- e$simular(rep(N, n), alfa, beta)
+  (media[n] - media[1]) / (n - 1)
+}
+teoria <- function(N, alfa, beta) -alfa + beta * (0.5772157 + log(N))
+if (!is.function(e$simular) || !is.function(e$N_critico)) {
+  list(correct = FALSE, message = "No encuentro simular() o N_critico().")
+} else if (length(e$simular(rep(10, 7), 1, 1)) != 7) {
+  list(correct = FALSE, message = "simular() debe devolver una habilidad media por generación.")
+} else if (abs(cambio(1000, 10, 2) - teoria(1000, 10, 2)) > 0.5 || abs(cambio(50, 10, 2) - teoria(50, 10, 2)) > 0.5) {
+  list(correct = FALSE, message = paste0(
+    "Con N = 1000, alfa = 10 y beta = 2, la habilidad debería cambiar unos ", coma(teoria(1000, 10, 2)),
+    " por generación, y con tu simular() cambia ", coma(cambio(1000, 10, 2)), ". ",
+    "Cada aprendiz copia al más hábil, max(z), pierde alfa y suma un error de Gumbel multiplicado por beta."))
+} else if (!isTRUE(all.equal(e$N_critico(c(6, 10), c(1, 2)), exp(c(6, 5) - 0.5772157), tolerance = 1e-3))) {
+  list(correct = FALSE, message = paste0(
+    "N_critico(10, 2) debería dar ", coma(exp(5 - 0.5772157), 1), ", y da ", coma(e$N_critico(10, 2), 1),
+    ". Es la N con la que -alfa + beta * (euler + log(N)) vale 0: despeja log(N)."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La técnica sencilla necesita ", round(r$N_critico[1]), " personas y la compleja, ",
+    format(round(r$N_critico[3]), big.mark = " "), ". En la isla de 4000, la compleja cambia ",
+    coma(r$simulado[3]), " por generación (la fórmula dice ", coma(r$teorico[3]), "): se pierde."))
+}
+```
+
+::: {.hint exercise="tasmania"}
+`max(z)` es el más hábil de la generación anterior, y `gumbel(N[t])` da un error para cada uno de los `N[t]` aprendices: la nueva `z` es un vector. Para la población crítica, iguala $-\alpha + \beta(\gamma + \ln N)$ a 0 y despeja $N$ con `exp()`.
+:::
+
+::: {.solution exercise="tasmania"}
+`z <- max(z) - alfa + beta * gumbel(N[t])` en `simular()`, y `exp(alfa / beta - euler)` en `N_critico()`.
+:::
+:::
+
+::::

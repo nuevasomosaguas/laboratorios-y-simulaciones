@@ -1,0 +1,164 @@
+---
+title: "La trampa malthusiana"
+numero: 31
+nivel: 2
+duracion: "30 min"
+lectura: "[Clark (2007)](https://nuevasomosaguas.github.io/biblioteca.html#clark2007farewell)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Durante milenios, cada invento acabó en más gente y no en gente más rica."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Gregory Clark abre *A Farewell to Alms* con una afirmación incómoda: en 1800, un inglés medio no vivía mejor que un cazador-recolector de hace 100 000 años. Hubo arados, molinos, imprenta y barcos que cruzaban el océano, y el nivel de vida apenas se movió. Para Clark, la explicación es la de Malthus: antes de la Revolución Industrial, cada mejora técnica acababa en más gente, no en gente más rica.
+
+El modelo tiene tres piezas, con números inventados pero de un orden razonable:
+
+- **Nacimientos.** Con más renta por persona, la gente se casa antes y tiene más hijos: $b(y) = 25 + 10\,y$ por mil habitantes y año.
+- **Muertes.** Con más renta se come mejor y se muere menos: $d(y) = 55 - 20\,y$ por mil.
+- **Tecnología.** La tierra no crece, así que cada persona más rinde menos: la renta por persona es $y = A / \sqrt{N}$, con $N$ en millones y $A$ el nivel técnico.
+
+Cada año, la población crece a la tasa $(b - d)/1000$.
+
+**Tu tarea.**
+
+1. Completa la línea de `simular()` que calcula la población del año siguiente.
+2. Completa `y_eq`, el salario de equilibrio, en el que los nacimientos igualan a las muertes. `uniroot()` busca el cero de una función.
+3. En el año 201, la técnica mejora un 20 %. Mira las dos gráficas: ¿qué pasa con la renta? ¿Y con la población? Prueba después a doblar `A` en lugar de subirla un 20 %.
+4. Vuelve a 3,6 y haz que se muera más a cualquier renta, con ciudades insalubres o guerras: `muertes <- function(y) 60 - 20 * y`. ¿Qué le pasa ahora al salario de equilibrio?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La mejora técnica sube la renta de 1 a 1,2 de golpe, pero la renta alta hace que nazca más gente y muera menos, y la población crece hasta que la renta vuelve a 1. Unos 190 años después de la mejora ya está a menos de un 1 % del equilibrio. Al final, la población ha pasado de 9 a 12,95 millones, y nadie vive mejor. El salario de equilibrio sale de igualar $b(y) = d(y)$, una ecuación en la que $A$ no aparece: la tecnología decide cuánta gente hay, no cómo vive.
+
+La tarea 4 es la paradoja que Clark pone en el centro del libro. Si se muere más a cualquier renta, el salario de equilibrio sube a 1,17: la población es menor y cada cual tiene más tierra. En el mundo malthusiano, los vicios eran virtudes. Las guerras, la peste y la suciedad de las ciudades subían el nivel de vida, y la higiene y la paz lo bajaban. Clark explica así, en parte, por qué la Inglaterra preindustrial, sucia y enferma, vivía mejor que el Japón de la época, mucho más limpio. Bajar los nacimientos, casándose más tarde, tiene el mismo efecto sin tanto sufrimiento.
+
+La trampa se rompe cuando la técnica crece más deprisa que la población puede alcanzarla, como en Inglaterra desde 1800, o cuando la fecundidad deja de subir con la renta.
+
+Clark, G. (2007). *A Farewell to Alms: A Brief Economic History of the World*. Princeton University Press.
+
+Malthus, T. R. (1798). *An Essay on the Principle of Population*. J. Johnson.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: malthus
+#| caption: "Tu código"
+nacimientos <- function(y) 25 + 10 * y  # por mil habitantes y año
+muertes <- function(y) 55 - 20 * y
+renta <- function(N, A) A / sqrt(N)     # N en millones; la tierra es fija
+
+# Población y renta año a año; A es el nivel técnico de cada año
+simular <- function(A, N0) {
+  N <- numeric(length(A))
+  N[1] <- N0
+  for (t in seq_along(A)[-1]) {
+    y <- renta(N[t - 1], A[t - 1])
+    N[t] <- ______
+  }
+  data.frame(ano = seq_along(A), N = N, y = renta(N, A))
+}
+
+A <- rep(c(3, 3.6), c(200, 400))  # en el año 201, la técnica mejora un 20 %
+s <- simular(A, N0 = 9)
+
+# El salario de equilibrio: los nacimientos igualan a las muertes
+y_eq <- uniroot(function(y) ______, c(0.1, 5))$root
+
+par(mfrow = c(1, 2))
+plot(s$ano, s$y, type = "l", lwd = 2, col = "#c0392b", xlab = "Año", ylab = "Renta por persona")
+abline(h = y_eq, lty = 2)
+plot(s$ano, s$N, type = "l", lwd = 2, col = "#2980b9", xlab = "Año", ylab = "Población (millones)")
+
+c(salario_equilibrio = y_eq,
+  renta_antes = s$y[200], renta_tras_la_mejora = s$y[201], renta_final = s$y[600],
+  poblacion_antes = s$N[200], poblacion_final = s$N[600])
+```
+
+```{webr}
+#| exercise: malthus
+#| solution: true
+nacimientos <- function(y) 25 + 10 * y
+muertes <- function(y) 55 - 20 * y
+renta <- function(N, A) A / sqrt(N)
+
+simular <- function(A, N0) {
+  N <- numeric(length(A))
+  N[1] <- N0
+  for (t in seq_along(A)[-1]) {
+    y <- renta(N[t - 1], A[t - 1])
+    N[t] <- N[t - 1] * (1 + (nacimientos(y) - muertes(y)) / 1000)
+  }
+  data.frame(ano = seq_along(A), N = N, y = renta(N, A))
+}
+
+A <- rep(c(3, 3.6), c(200, 400))
+s <- simular(A, N0 = 9)
+
+y_eq <- uniroot(function(y) nacimientos(y) - muertes(y), c(0.1, 5))$root
+
+par(mfrow = c(1, 2))
+plot(s$ano, s$y, type = "l", lwd = 2, col = "#c0392b", xlab = "Año", ylab = "Renta por persona")
+abline(h = y_eq, lty = 2)
+plot(s$ano, s$N, type = "l", lwd = 2, col = "#2980b9", xlab = "Año", ylab = "Población (millones)")
+
+c(salario_equilibrio = y_eq,
+  renta_antes = s$y[200], renta_tras_la_mejora = s$y[201], renta_final = s$y[600],
+  poblacion_antes = s$N[200], poblacion_final = s$N[600])
+```
+
+```{webr}
+#| exercise: malthus
+#| check: true
+# Se comprueban simular() y y_eq con las funciones del alumno: las tareas 3 y 4 cambian A y muertes().
+e <- .envir_result
+f <- e$simular
+referencia <- function(A, N0) {
+  N <- numeric(length(A))
+  N[1] <- N0
+  for (t in seq_along(A)[-1]) {
+    y <- e$renta(N[t - 1], A[t - 1])
+    N[t] <- N[t - 1] * (1 + (e$nacimientos(y) - e$muertes(y)) / 1000)
+  }
+  N
+}
+prueba <- rep(c(2, 4), c(5, 20))
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función simular().")
+} else if (!isTRUE(all.equal(f(prueba, 5)$N, referencia(prueba, 5), tolerance = 1e-6))) {
+  obtenido <- f(prueba, 5)$N[2]
+  esperado <- referencia(prueba, 5)[2]
+  list(correct = FALSE, message = paste0(
+    "simular() no da la población buena: con A = 2 y 5 millones, el segundo año debería haber ",
+    coma(esperado, 4), " millones, y hay ", coma(obtenido, 4),
+    ". La población se multiplica por 1 más la tasa de crecimiento, que está en tantos por mil."))
+} else if (!is.numeric(e$y_eq) ||
+           !isTRUE(all.equal(e$y_eq, uniroot(function(y) e$nacimientos(y) - e$muertes(y), c(0.1, 5))$root, tolerance = 1e-4))) {
+  list(correct = FALSE, message = "simular() está bien. Falta y_eq: la renta a la que nacimientos(y) y muertes(y) son iguales, es decir, a la que su diferencia es cero.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La mejora técnica sube la renta de ", coma(.result[["renta_antes"]]), " a ", coma(.result[["renta_tras_la_mejora"]]),
+    ", pero al final vuelve a ", coma(.result[["renta_final"]]), ", con ", coma(.result[["poblacion_final"]]),
+    " millones de personas en lugar de ", coma(.result[["poblacion_antes"]]), ". El salario de equilibrio, ",
+    coma(.result[["salario_equilibrio"]]), ", no depende de A."))
+}
+```
+
+::: {.hint exercise="malthus"}
+Si la tasa de crecimiento es $(b - d)/1000$, la población del año siguiente es la de este multiplicada por $1 + (b - d)/1000$, con `nacimientos(y)` y `muertes(y)`. Para `uniroot()`, la función tiene que valer cero en el equilibrio.
+:::
+
+::: {.solution exercise="malthus"}
+`N[t - 1] * (1 + (nacimientos(y) - muertes(y)) / 1000)` en `simular()`, y `nacimientos(y) - muertes(y)` en `uniroot()`.
+:::
+:::
+
+::::

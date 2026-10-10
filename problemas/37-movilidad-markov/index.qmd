@@ -1,0 +1,196 @@
+---
+title: "¿Cuántas generaciones dura la cuna?"
+numero: 37
+nivel: 1
+duracion: "25 min"
+lectura: "[Stachurski (2009)](https://nuevasomosaguas.github.io/biblioteca.html#stachurski2009economic)"
+semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
+dificultad: "Iniciación"
+categories: [desigualdad, equilibrios y dinámica]
+description: "Dos países con la misma desigualdad a la larga: en uno, la cuna se olvida en dos generaciones; en el otro, en seis."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El índice de Gini es una foto: dice cómo se reparte la renta hoy, no si los pobres de hoy son los hijos de los pobres de ayer. Para eso hay que seguir a las familias de una generación a la siguiente. La herramienta más sencilla es una *matriz de transición*: se reparte a los padres en quintiles de renta, del 20 % más pobre (Q1) al 20 % más rico (Q5), y se cuenta en qué quintil acaban sus hijos. La fila $i$ dice cómo se reparten los hijos de los padres del quintil $i$.
+
+Si cada generación repite la misma matriz $P$, las familias siguen una *cadena de Markov*. Una familia que empieza en Q1 tiene, en la generación siguiente, la distribución de la fila 1 de $P$; dentro de $t$ generaciones, la de la fila 1 de $P^t$. Con un vector fila de probabilidades $x$, un paso es $x \leftarrow x P$.
+
+Las dos matrices de la derecha son **inventadas**: un país rígido, donde más de la mitad de los hijos de los quintiles extremos se queda en el de sus padres, y uno fluido, donde la cuna pesa poco.
+
+**Tu tarea.**
+
+1. Completa `generaciones()`: cuántas generaciones tarda una familia que empieza en el quintil `desde` en olvidar su origen. La distancia al olvido es la *distancia de variación total* entre su distribución y el reparto uniforme, el 20 % en cada quintil, y la familia ha olvidado su origen cuando baja de 0,05. Falta el paso de la cadena.
+2. Completa `resumen()`: `lambda2` es el módulo del segundo autovalor de `P`. Los autovalores de `eigen()` vienen ordenados de mayor a menor módulo, y pueden ser complejos.
+3. Mira la tabla y el gráfico. ¿Cuál es la probabilidad de que el hijo de una familia de Q1 llegue a Q5? ¿Y el nieto?
+4. Prueba con una sociedad de castas, donde cada hijo hereda el quintil de sus padres: `resumen(diag(5))`.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+A la larga, los dos países son igual de desiguales: cada quintil tiene el 20 % de las familias. No podría ser de otra manera, porque un quintil es, por definición, el 20 % de los hijos: cada columna de $P$ suma 1, igual que cada fila, y la distribución estacionaria es la uniforme. Por eso la distribución a largo plazo no dice nada de la movilidad. Lo que dice algo es la velocidad a la que se llega a ella.
+
+En el país rígido, el hijo de una familia de Q1 tiene un 2 % de probabilidades de llegar a Q5, y el nieto, un 6,6 %. La familia tarda 6 generaciones en olvidar su origen, unos 150 años. En el país fluido, el hijo ya tiene un 12 %, el nieto un 18,2 %, y en 2 generaciones la cuna ya no importa. Las familias de Q3 olvidan antes en los dos países, en 3 y 1 generaciones, porque empiezan más cerca del centro.
+
+La velocidad la marca el segundo autovalor: la distancia al reparto uniforme se encoge más o menos como $\lambda_2^t$. En el país rígido, $\lambda_2 = 0{,}62$, y $0{,}62^t$ baja de 0,05 hacia $t \approx 6$; en el fluido, $\lambda_2 = 0{,}21$, y basta con 2. En la sociedad de castas, $\lambda_2 = 1$: nada se olvida, y `generaciones()` devuelve `NA`. Por eso $1 - \lambda_2$ es uno de los índices de movilidad clásicos.
+
+Es el mismo autovalor que, en la [semana 11 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/), dice lo deprisa que una población converge a su estructura estable con la matriz de Leslie, y el que en [el modelo de DeGroot](../09-degroot/index.qmd) dice lo deprisa que se llega al consenso.
+
+**Para ir más allá:** la matriz supone que la movilidad no depende de los abuelos, solo de los padres, y los datos de varias generaciones suelen decir que sí dependen. Una cadena de Markov es la primera aproximación, no la última.
+
+Shorrocks, A. F. (1978). The measurement of mobility. *Econometrica*, 46(5), 1013–1024.
+
+Stachurski, J. (2009). *Economic Dynamics: Theory and Computation*. MIT Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: markov
+#| caption: "Tu código"
+# Matrices inventadas: la fila i reparte a los hijos de los padres del quintil i
+rigido <- matrix(c(.55, .25, .12, .06, .02,
+                   .25, .35, .22, .12, .06,
+                   .12, .22, .32, .22, .12,
+                   .06, .12, .22, .35, .25,
+                   .02, .06, .12, .25, .55), nrow = 5, byrow = TRUE)
+fluido <- matrix(c(.28, .24, .20, .16, .12,
+                   .24, .23, .20, .18, .15,
+                   .20, .20, .20, .20, .20,
+                   .16, .18, .20, .23, .23,
+                   .12, .15, .20, .23, .30), nrow = 5, byrow = TRUE)
+
+# 1. Generaciones hasta olvidar el origen; NA si no lo olvida en 100
+generaciones <- function(P, desde = 1, tolerancia = 0.05) {
+  x <- replace(numeric(nrow(P)), desde, 1)  # empieza en el quintil desde
+  for (t in 1:100) {
+    x <- ______
+    if (sum(abs(x - 1 / nrow(P))) / 2 < tolerancia) return(t)
+  }
+  NA
+}
+
+# 2. El segundo autovalor y lo que les pasa a los hijos y a los nietos de Q1
+resumen <- function(P) {
+  c(lambda2 = ______,
+    generaciones_Q1 = generaciones(P, 1),
+    generaciones_Q3 = generaciones(P, 3),
+    hijo_Q1_a_Q5 = P[1, 5],
+    nieto_Q1_a_Q5 = (P %*% P)[1, 5])
+}
+
+# La probabilidad de estar en Q5, generación a generación, partiendo de Q1
+en_Q5 <- function(P, n = 8) {
+  x <- c(1, 0, 0, 0, 0)
+  sapply(1:n, function(t) (x <<- x %*% P)[5])
+}
+plot(1:8, en_Q5(rigido), type = "b", pch = 19, ylim = c(0, 0.25), col = "#c0392b",
+     xlab = "Generación", ylab = "Probabilidad de estar en Q5")
+lines(1:8, en_Q5(fluido), type = "b", pch = 19, col = "#2980b9")
+abline(h = 0.2, lty = 2)
+legend("bottomright", c("Rígido", "Fluido"), col = c("#c0392b", "#2980b9"), pch = 19, bty = "n")
+
+round(rbind(rigido = resumen(rigido), fluido = resumen(fluido)), 3)
+```
+
+```{webr}
+#| exercise: markov
+#| solution: true
+rigido <- matrix(c(.55, .25, .12, .06, .02,
+                   .25, .35, .22, .12, .06,
+                   .12, .22, .32, .22, .12,
+                   .06, .12, .22, .35, .25,
+                   .02, .06, .12, .25, .55), nrow = 5, byrow = TRUE)
+fluido <- matrix(c(.28, .24, .20, .16, .12,
+                   .24, .23, .20, .18, .15,
+                   .20, .20, .20, .20, .20,
+                   .16, .18, .20, .23, .23,
+                   .12, .15, .20, .23, .30), nrow = 5, byrow = TRUE)
+
+generaciones <- function(P, desde = 1, tolerancia = 0.05) {
+  x <- replace(numeric(nrow(P)), desde, 1)
+  for (t in 1:100) {
+    x <- x %*% P
+    if (sum(abs(x - 1 / nrow(P))) / 2 < tolerancia) return(t)
+  }
+  NA
+}
+
+resumen <- function(P) {
+  c(lambda2 = Mod(eigen(P)$values[2]),
+    generaciones_Q1 = generaciones(P, 1),
+    generaciones_Q3 = generaciones(P, 3),
+    hijo_Q1_a_Q5 = P[1, 5],
+    nieto_Q1_a_Q5 = (P %*% P)[1, 5])
+}
+
+en_Q5 <- function(P, n = 8) {
+  x <- c(1, 0, 0, 0, 0)
+  sapply(1:n, function(t) (x <<- x %*% P)[5])
+}
+plot(1:8, en_Q5(rigido), type = "b", pch = 19, ylim = c(0, 0.25), col = "#c0392b",
+     xlab = "Generación", ylab = "Probabilidad de estar en Q5")
+lines(1:8, en_Q5(fluido), type = "b", pch = 19, col = "#2980b9")
+abline(h = 0.2, lty = 2)
+legend("bottomright", c("Rígido", "Fluido"), col = c("#c0392b", "#2980b9"), pch = 19, bty = "n")
+
+round(rbind(rigido = resumen(rigido), fluido = resumen(fluido)), 3)
+```
+
+```{webr}
+#| exercise: markov
+#| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
+# Se comprueban las funciones con matrices propias: una que no es simétrica y otra de autovalores complejos.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+dos <- matrix(c(0.9, 0.1, 0.1, 0.9), 2)                   # sale de cada estado con probabilidad 0,1
+asimetrica <- matrix(c(.6, .4, 0, .1, .5, .4, .3, .1, .6), 3, byrow = TRUE)
+giro <- 0.5 * diag(5) + 0.5 * diag(5)[c(2:5, 1), ]          # autovalores complejos; el segundo, de módulo 0,809
+mezcla <- 0.8 * diag(5) + 0.04                             # el segundo autovalor es 0,8
+if (!is.function(e$generaciones) || !is.function(e$resumen)) {
+  list(correct = FALSE, message = "No encuentro generaciones() o resumen().")
+} else if (!identical(as.numeric(e$generaciones(dos)), 11)) {
+  list(correct = FALSE, message = paste0(
+    "Con la matriz de dos estados que se abandonan con probabilidad 0,1, generaciones() debería dar 11, y da ",
+    e$generaciones(dos), ". Un paso de la cadena multiplica el vector fila x por la matriz P."))
+} else if (!identical(as.numeric(e$generaciones(asimetrica)), 4)) {
+  list(correct = FALSE, message = paste0(
+    "Con una matriz que no es simétrica, generaciones() da ", e$generaciones(asimetrica), " en lugar de 4. ",
+    "¿Multiplicas en el orden bueno? x es un vector fila: x %*% P, no P %*% x."))
+} else if (!is.na(e$generaciones(diag(5)))) {
+  list(correct = FALSE, message = "En una sociedad de castas nadie olvida su origen: generaciones(diag(5)) debería dar NA.")
+} else if (!isTRUE(all.equal(unname(e$resumen(mezcla)["lambda2"]), 0.8))) {
+  list(correct = FALSE, message = paste0(
+    "lambda2 falla: con 0.8 * diag(5) + 0.04 debería dar 0,8, y da ", coma(e$resumen(mezcla)["lambda2"], 3), ". ",
+    "Es el segundo de los autovalores de eigen(P)."))
+} else if (!isTRUE(all.equal(unname(e$resumen(giro)["lambda2"]), cos(pi / 5)))) {
+  list(correct = FALSE, message = paste0(
+    "lambda2 falla con una matriz de autovalores complejos: debería dar 0,809, y da ", coma(e$resumen(giro)["lambda2"], 3), ". ",
+    "Hay que tomar el módulo del autovalor, Mod(), no su parte real."))
+} else if (!isTRUE(all.equal(.result, .solution))) {
+  list(correct = FALSE, message = "Las funciones están bien, pero la tabla no coincide. ¿Has cambiado las matrices?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! En el país rígido, λ₂ = ", coma(.result["rigido", "lambda2"]), " y la familia de Q1 tarda ",
+    .result["rigido", "generaciones_Q1"], " generaciones en olvidar su origen; en el fluido, λ₂ = ",
+    coma(.result["fluido", "lambda2"]), " y bastan ", .result["fluido", "generaciones_Q1"], ". ",
+    "El nieto de Q1 llega a Q5 con un ", coma(100 * .result["rigido", "nieto_Q1_a_Q5"], 1), " % frente a un ",
+    coma(100 * .result["fluido", "nieto_Q1_a_Q5"], 1), " %."))
+}
+```
+
+::: {.hint exercise="markov"}
+`%*%` es el producto de matrices en R, y el orden importa: con `x` como vector fila, la distribución de la generación siguiente es `x %*% P`. Para el autovalor, `eigen(P)$values[2]` es el segundo, y `Mod()` da su módulo aunque sea complejo.
+:::
+
+::: {.solution exercise="markov"}
+`x <- x %*% P` en `generaciones()`, y `lambda2 = Mod(eigen(P)$values[2])` en `resumen()`.
+:::
+:::
+
+::::

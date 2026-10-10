@@ -1,0 +1,165 @@
+---
+title: "La ley de Lanchester"
+numero: 36
+nivel: 1
+duracion: "25 min"
+lectura: "Epstein (1997)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Iniciación"
+categories: [equilibrios y dinámica]
+description: "Con armas de fuego, el doble de soldados no vale el doble: vale el cuádruple. Por eso conviene dividir al enemigo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1916, en plena Primera Guerra Mundial, el ingeniero británico Frederick Lanchester publicó un libro sobre la aviación militar con un par de ecuaciones que todavía se enseñan en las academias. Si cada combatiente puede disparar contra cualquiera del bando contrario, las bajas de cada bando son proporcionales al número de enemigos que le disparan:
+
+$$\frac{dR}{dt} = -b\,B, \qquad \frac{dB}{dt} = -r\,R,$$
+
+donde $R$ y $B$ son los rojos y los azules que siguen en pie, y $r$ y $b$, las bajas que causa cada rojo y cada azul por unidad de tiempo. Lanchester las comparó con el combate antiguo, de espada y escudo, en el que cada soldado solo puede enfrentarse a uno: ahí las bajas no dependen de cuántos enemigos haya, porque solo luchan los de primera línea, y cada bando pierde a un ritmo constante.
+
+El código de la derecha libra cada batalla paso a paso, con pasos de tiempo muy cortos, hasta que uno de los bandos desaparece.
+
+**Tu tarea.**
+
+1. Completa las bajas de la ley cuadrática en `combate()`. 100 rojos contra 120 azules igual de eficaces: ¿cuántos azules quedan en pie? Compáralo con $\sqrt{120^2 - 100^2}$.
+2. Completa `por_partes()`: los 100 rojos se enfrentan primero a 60 azules y, con los que sobrevivan, a los otros 60. ¿Quién gana ahora?
+3. Mira las dos filas de la ley lineal. ¿Sirve de algo dividir al enemigo?
+4. ¿Cuánto más eficaz tiene que ser cada rojo para resistir a un ejército tres veces mayor? Prueba en la fila `calidad` con `r = 8`, `r = 9` y `r = 10`, y compáralo con la ley lineal.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Si se divide una ecuación entre la otra y se integra, sale que $r\,(R_0^2 - R^2) = b\,(B_0^2 - B^2)$ durante toda la batalla. La fuerza de un ejército es su eficacia multiplicada por el *cuadrado* de su número: es la *ley cuadrática de Lanchester*. Con 100 rojos contra 120 azules, los azules ganan y les quedan $\sqrt{120^2 - 100^2} \approx 66{,}3$. Con 20 soldados de ventaja conservan 66.
+
+La tarea 2 da la vuelta al resultado con los mismos soldados. Contra 60 azules, los rojos ganan con $\sqrt{100^2 - 60^2} = 80$ supervivientes; contra los otros 60, con $\sqrt{80^2 - 60^2} \approx 52{,}9$. Los rojos, que eran menos, ganan las dos batallas y conservan más de la mitad del ejército. Es el principio de la concentración de fuerzas, el «divide y vencerás» de los manuales: si los combatientes valen al cuadrado, juntarlos multiplica su fuerza, y separarlos la divide. Lanchester lo ilustró con el memorando de Nelson antes de Trafalgar, que buscaba enfrentarse a una parte de la flota enemiga con casi toda la propia.
+
+Con la ley lineal, la cuenta es $r\,(R_0 - R) = b\,(B_0 - B)$: cada soldado vale lo que vale, y a los azules les quedan 20 en los dos casos. Dividir no sirve de nada.
+
+La tarea 4 es la consecuencia más incómoda. Para resistir a un ejército tres veces mayor, con la ley lineal basta con ser tres veces más eficaz; con la cuadrática, hay que serlo *nueve* veces. Con `r = 9` las dos fuerzas se aniquilan a la vez; con `r = 10` quedan 31,6 rojos. Epstein (1997), en su segunda lección, cuenta que esta ventaja enorme de los números estaba incrustada en los modelos del Pentágono durante la Guerra Fría, y que sostenía las previsiones más sombrías sobre el balance de fuerzas en Europa central. Y la critica: las ecuaciones de Lanchester son un caso particular de las de Lotka y Volterra, las de [los peces del Adriático](../17-lotka-volterra/index.qmd), pero olvidan que cada ejército es a la vez depredador y presa. Si el campo de batalla está abarrotado de rojos, a los azules les resulta más fácil acertar, y las bajas rojas tienen que crecer también con el número de rojos. Con ese término la fuerza vuelve a crecer en proporción al número y no a su cuadrado. Epstein recuerda además que el ejército más pequeño ganó en Austerlitz, en la caída de Francia en 1940 o en las Malvinas: la ley dice cuánto valen los números si todo lo demás es igual, y en la guerra casi nunca lo es. En una emboscada, en la que solo un bando puede concentrar el fuego, cien hombres pueden contener a diez mil: es las Termópilas.
+
+En la [biblioteca](https://nuevasomosaguas.github.io/biblioteca.html#strogatz2015nonlinear), el libro de Epstein cuelga de Strogatz como especialización aplicada.
+
+Lanchester, F. W. (1916). *Aircraft in Warfare: The Dawn of the Fourth Arm*. Constable.
+
+Epstein, J. M. (1997). *Nonlinear Dynamics, Mathematical Biology, and Social Science*. Addison-Wesley.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: lanchester
+#| caption: "Tu código"
+# Una batalla hasta que a un bando le queda menos de una centésima de soldado;
+# devuelve los supervivientes.
+# r y b: las bajas que causa cada rojo y cada azul por unidad de tiempo.
+combate <- function(rojos, azules, r = 1, b = 1, ley = "cuadrática", h = 1e-4) {
+  while (rojos > 0.01 && azules > 0.01) {
+    if (ley == "cuadrática") {
+      bajas_rojas <- ______
+      bajas_azules <- ______
+    } else {
+      bajas_rojas <- b
+      bajas_azules <- r
+    }
+    rojos <- rojos - h * bajas_rojas
+    azules <- azules - h * bajas_azules
+  }
+  c(rojos = max(rojos, 0), azules = max(azules, 0))
+}
+
+# Los rojos contra un grupo de azules y, con los que les queden, contra el otro.
+# Los ... pasan r, b y ley a combate().
+por_partes <- function(rojos, azules1, azules2, ...) {
+  primera <- combate(rojos, azules1, ...)
+  ______
+}
+
+round(rbind(
+  juntos = combate(100, 120),
+  por_partes = por_partes(100, 60, 60),
+  juntos_lineal = combate(100, 120, ley = "lineal"),
+  por_partes_lineal = por_partes(100, 60, 60, ley = "lineal"),
+  calidad = combate(100, 300, r = 10),
+  calidad_lineal = combate(100, 300, r = 4, ley = "lineal")
+), 1)
+```
+
+```{webr}
+#| exercise: lanchester
+#| solution: true
+combate <- function(rojos, azules, r = 1, b = 1, ley = "cuadrática", h = 1e-4) {
+  while (rojos > 0.01 && azules > 0.01) {
+    if (ley == "cuadrática") {
+      bajas_rojas <- b * azules
+      bajas_azules <- r * rojos
+    } else {
+      bajas_rojas <- b
+      bajas_azules <- r
+    }
+    rojos <- rojos - h * bajas_rojas
+    azules <- azules - h * bajas_azules
+  }
+  c(rojos = max(rojos, 0), azules = max(azules, 0))
+}
+
+por_partes <- function(rojos, azules1, azules2, ...) {
+  primera <- combate(rojos, azules1, ...)
+  combate(primera[["rojos"]], azules2, ...)
+}
+
+round(rbind(
+  juntos = combate(100, 120),
+  por_partes = por_partes(100, 60, 60),
+  juntos_lineal = combate(100, 120, ley = "lineal"),
+  por_partes_lineal = por_partes(100, 60, 60, ley = "lineal"),
+  calidad = combate(100, 300, r = 10),
+  calidad_lineal = combate(100, 300, r = 4, ley = "lineal")
+), 1)
+```
+
+```{webr}
+#| exercise: lanchester
+#| check: true
+# Batallas propias, con su resultado exacto por la ley cuadrática o la lineal.
+e <- .envir_result
+coma <- function(x) format(round(x, 1), nsmall = 1, decimal.mark = ",")
+cerca <- function(obtenido, esperado) isTRUE(all.equal(unname(obtenido), esperado, tolerance = 0.02, scale = 1))
+if (!is.function(e$combate) || !is.function(e$por_partes)) {
+  list(correct = FALSE, message = "No encuentro las funciones combate() o por_partes().")
+} else if (!cerca(e$combate(50, 40), c(30, 0))) {
+  list(correct = FALSE, message = paste0(
+    "50 rojos contra 40 azules igual de eficaces deberían acabar con √(50² − 40²) = 30 rojos en pie, y combate() da ",
+    coma(e$combate(50, 40)[["rojos"]]), " rojos y ", coma(e$combate(50, 40)[["azules"]]), " azules."))
+} else if (!cerca(e$combate(10, 10, r = 4), c(sqrt(75), 0))) {
+  list(correct = FALSE, message = paste0(
+    "Con 10 contra 10 y rojos cuatro veces más eficaces deberían quedar 8,7 rojos, y quedan ",
+    coma(e$combate(10, 10, r = 4)[["rojos"]]), ". Las bajas de los rojos dependen de los azules y de su eficacia, b; las de los azules, de los rojos y de r."))
+} else if (!cerca(e$por_partes(100, 50, 70), c(sqrt(100^2 - 50^2 - 70^2), 0))) {
+  list(correct = FALSE, message = paste0(
+    "100 rojos contra 50 azules y luego contra 70 deberían acabar con 51 rojos en pie, y por_partes() da ",
+    coma(e$por_partes(100, 50, 70)[["rojos"]]), ". En la segunda batalla luchan los rojos que sobreviven a la primera, contra el segundo grupo."))
+} else if (!cerca(e$por_partes(40, 10, 20, ley = "lineal"), c(10, 0))) {
+  list(correct = FALSE, message = "Con la ley lineal, por_partes(40, 10, 20, ley = \"lineal\") debería dejar 10 rojos. ¿Pasas los ... a las dos llamadas a combate()?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Juntos, los 120 azules ganan y conservan ", coma(.result["juntos", "azules"]),
+    "; por partes, los 100 rojos ganan las dos batallas y conservan ", coma(.result["por_partes", "rojos"]),
+    ". Con la ley lineal, a los azules les quedan ", coma(.result["juntos_lineal", "azules"]), " en los dos casos."))
+}
+```
+
+::: {.hint exercise="lanchester"}
+Cada bando pierde soldados en proporción a los enemigos que le disparan: los rojos, según cuántos azules hay y lo eficaz que es cada uno, `b`. En `por_partes()`, la segunda batalla la libran los rojos que quedan, `primera[["rojos"]]`, contra `azules2`, y hay que pasarle también los `...`.
+:::
+
+::: {.solution exercise="lanchester"}
+`bajas_rojas <- b * azules` y `bajas_azules <- r * rojos`; y en `por_partes()`, `combate(primera[["rojos"]], azules2, ...)`.
+:::
+:::
+
+::::

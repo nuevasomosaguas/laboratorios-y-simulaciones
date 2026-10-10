@@ -1,0 +1,153 @@
+---
+title: "El municipio más enfermo de España siempre es pequeño"
+numero: 33
+nivel: 2
+duracion: "35 min"
+lectura: "[Efron y Hastie (2016)](https://nuevasomosaguas.github.io/biblioteca.html#efron2016computer)"
+dificultad: "Intermedio"
+categories: [estadística]
+description: "Los peores y los mejores municipios del mapa son casi siempre los más pequeños, y no por nada que pase en ellos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Cada cierto tiempo aparece un mapa de España con la incidencia de una enfermedad por municipios, y una noticia sobre el pueblo que encabeza la lista. Casi siempre es un pueblo de pocos cientos de habitantes. Lo curioso es que el que cierra la lista, el más sano, también suele serlo.
+
+En un municipio de 200 habitantes, un solo caso más sube la tasa en 5 por mil. Las tasas de los municipios pequeños bailan mucho por puro azar, y los extremos del mapa se llenan de ellos. Howard Wainer llamó a la fórmula del error típico de una media, $\sigma/\sqrt{n}$, «la ecuación más peligrosa»: quien la ignora acaba buscando causas donde solo hay ruido.
+
+Los datos son inventados: 500 municipios, de 100 a 200 000 habitantes, cada uno con su tasa real, de media 5 por mil. Como los inventamos, sabemos la tasa real de cada uno, y podemos ver quién acierta.
+
+La solución es la de Efron y Hastie con los bateadores de béisbol: *contraer* cada tasa hacia la media $m$, tanto más cuanto menos fiable sea. La tasa suavizada es $m + B\,(\text{tasa} - m)$, con
+
+$$B = \frac{\tau^2}{\tau^2 + 1000\,m/n},$$
+
+donde $\tau^2$ es la varianza de las tasas reales entre municipios y $1000\,m/n$, la del azar en un municipio de $n$ habitantes. $B$ dice cuánto creerse a cada municipio. Y $\tau^2$ se estima de los datos: la varianza observada de las tasas, $s^2$, ponderada por la población, es la real más la del azar, que de media es $1000\,m/\bar n$.
+
+**Tu tarea.**
+
+1. Mira el gráfico: las tasas brutas frente a la población, en escala logarítmica. ¿Dónde están los extremos?
+2. Completa `tau2`, la varianza de las tasas reales: la observada menos la del azar. Si saliera negativa, toma 0.
+3. Completa `B`, cuánto se cree a cada municipio.
+4. Compara la población y la tasa real de los diez municipios más enfermos según cada tasa, y el error cuadrático medio de las dos.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Los diez municipios más enfermos según la tasa bruta tienen una mediana de 270 habitantes, y su tasa real media es 5,4 por mil, como la de cualquiera: el primero de la lista, con 245 habitantes y una tasa de 20,4, tiene en realidad 5,9. Con la tasa suavizada, la mediana de los diez primeros sube a 46 110 habitantes, y su tasa real media, a 7,2: ahora sí son los enfermos de verdad.
+
+La varianza estimada de las tasas reales es 0,81, cerca del 1 con el que se generaron los datos. Con ella, el error cuadrático medio baja de 5,50 a 0,49: once veces menos. Es el resultado de Stein, y por eso sorprende: para estimar cada municipio conviene mirar a todos los demás. Ningún municipio aislado da información sobre otro, y sin embargo juntos se estiman mejor que por separado.
+
+La tasa suavizada se equivoca con los municipios pequeños de verdad extremos: un pueblo de 300 habitantes que realmente tuviera el doble de enfermos se quedaría cerca de la media. Es el precio. Pero con tan pocos datos, nadie podría distinguirlo del azar.
+
+Wainer, H. (2007). The most dangerous equation. *American Scientist*, 95(3), 249–256.
+
+Efron, B. y Morris, C. (1975). Data analysis using Stein's estimator and its generalizations. *Journal of the American Statistical Association*, 70(350), 311–319.
+
+Marshall, R. J. (1991). Mapping disease and mortality rates using empirical Bayes estimators. *Journal of the Royal Statistical Society. Series C (Applied Statistics)*, 40(2), 283–294.
+
+Efron, B. y Hastie, T. (2016). *Computer Age Statistical Inference: Algorithms, Evidence, and Data Science*. Cambridge University Press. Capítulo 7.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: municipios
+#| caption: "Tu código"
+set.seed(2016)
+poblacion <- round(10^runif(500, 2, 5.3))           # de 100 a 200 000 habitantes
+real <- rgamma(500, shape = 25, rate = 5)           # tasa real por mil: media 5, varianza 1
+casos <- rpois(500, poblacion * real / 1000)
+tasa <- 1000 * casos / poblacion
+
+# La media y la varianza observada, ponderadas por la población
+m <- 1000 * sum(casos) / sum(poblacion)
+s2 <- sum(poblacion * (tasa - m)^2) / sum(poblacion)
+
+tau2 <- ______  # la varianza de las tasas reales
+B <- ______     # cuánto se cree a cada municipio
+suavizada <- m + B * (tasa - m)
+
+plot(poblacion, tasa, log = "x", pch = 19, col = "#c0392b80", xlab = "Habitantes", ylab = "Casos por mil")
+points(poblacion, suavizada, pch = 19, col = "#2980b980")
+abline(h = m, lty = 2)
+
+diez_bruta <- order(tasa, decreasing = TRUE)[1:10]
+diez_suavizada <- order(suavizada, decreasing = TRUE)[1:10]
+c(tau2 = tau2,
+  habitantes_bruta = median(poblacion[diez_bruta]),
+  habitantes_suavizada = median(poblacion[diez_suavizada]),
+  real_bruta = mean(real[diez_bruta]),
+  real_suavizada = mean(real[diez_suavizada]),
+  error_bruta = mean((tasa - real)^2),
+  error_suavizada = mean((suavizada - real)^2))
+```
+
+```{webr}
+#| exercise: municipios
+#| solution: true
+set.seed(2016)
+poblacion <- round(10^runif(500, 2, 5.3))
+real <- rgamma(500, shape = 25, rate = 5)
+casos <- rpois(500, poblacion * real / 1000)
+tasa <- 1000 * casos / poblacion
+
+m <- 1000 * sum(casos) / sum(poblacion)
+s2 <- sum(poblacion * (tasa - m)^2) / sum(poblacion)
+
+tau2 <- max(0, s2 - 1000 * m / mean(poblacion))
+B <- tau2 / (tau2 + 1000 * m / poblacion)
+suavizada <- m + B * (tasa - m)
+
+plot(poblacion, tasa, log = "x", pch = 19, col = "#c0392b80", xlab = "Habitantes", ylab = "Casos por mil")
+points(poblacion, suavizada, pch = 19, col = "#2980b980")
+abline(h = m, lty = 2)
+
+diez_bruta <- order(tasa, decreasing = TRUE)[1:10]
+diez_suavizada <- order(suavizada, decreasing = TRUE)[1:10]
+c(tau2 = tau2,
+  habitantes_bruta = median(poblacion[diez_bruta]),
+  habitantes_suavizada = median(poblacion[diez_suavizada]),
+  real_bruta = mean(real[diez_bruta]),
+  real_suavizada = mean(real[diez_suavizada]),
+  error_bruta = mean((tasa - real)^2),
+  error_suavizada = mean((suavizada - real)^2))
+```
+
+```{webr}
+#| exercise: municipios
+#| check: true
+# Se comprueban tau2 y B con los datos del alumno, que puede cambiar la semilla o los parámetros.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+tau2 <- max(0, e$s2 - 1000 * e$m / mean(e$poblacion))
+if (!is.numeric(e$tau2) || length(e$tau2) != 1) {
+  list(correct = FALSE, message = "tau2 tiene que ser un solo número: la varianza de las tasas reales entre municipios.")
+} else if (!isTRUE(all.equal(e$tau2, tau2))) {
+  list(correct = FALSE, message = paste0(
+    "tau2 debería valer ", coma(tau2), ", y vale ", coma(e$tau2),
+    ". Es la varianza observada, s2, menos la del azar en un municipio de tamaño medio, 1000·m entre la población media."))
+} else if (length(e$B) != length(e$poblacion) || !isTRUE(all.equal(e$B, tau2 / (tau2 + 1000 * e$m / e$poblacion)))) {
+  list(correct = FALSE, message = "tau2 está bien. B tiene que ser un número por municipio: tau2 entre tau2 más la varianza del azar en ese municipio, 1000·m/n.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Los diez más enfermos según la tasa bruta tienen una mediana de ", round(.result[["habitantes_bruta"]]),
+    " habitantes y una tasa real de ", coma(.result[["real_bruta"]], 1), "; según la suavizada, ",
+    format(round(.result[["habitantes_suavizada"]]), big.mark = " "), " habitantes y ", coma(.result[["real_suavizada"]], 1),
+    ". El error cuadrático medio baja de ", coma(.result[["error_bruta"]]), " a ", coma(.result[["error_suavizada"]]), "."))
+}
+```
+
+::: {.hint exercise="municipios"}
+La varianza del azar depende del tamaño: en un municipio de `n` habitantes es `1000 * m / n`. Para `tau2`, réstale a `s2` la de un municipio de tamaño medio, `mean(poblacion)`, y usa `max(0, ...)`. Para `B`, la de cada municipio: `poblacion` es un vector, y `B` también lo será.
+:::
+
+::: {.solution exercise="municipios"}
+`tau2 <- max(0, s2 - 1000 * m / mean(poblacion))` y `B <- tau2 / (tau2 + 1000 * m / poblacion)`.
+:::
+:::
+
+::::

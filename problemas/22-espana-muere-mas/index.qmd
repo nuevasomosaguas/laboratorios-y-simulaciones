@@ -1,0 +1,149 @@
+---
+title: "España muere más que México"
+numero: 22
+nivel: 1
+duracion: "20 min"
+lectura: "[Preston, Heuveline y Guillot (2001)](https://nuevasomosaguas.github.io/biblioteca.html#preston2001demography)"
+semana: "[Semana 9](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-09/)"
+dificultad: "Iniciación"
+categories: [demografía, paradojas de agregación]
+description: "En España muere cada año una proporción mayor de la población que en México, y sin embargo a cualquier edad se muere menos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Cada año muere en España cerca del 9 por mil de la población; en México, en torno al 6. Dicho así, parece que en México se vive mejor, o al menos más tiempo. Pero la esperanza de vida española le saca a la mexicana más de ocho años.
+
+Las dos cosas son ciertas a la vez. La *tasa bruta de mortalidad*, las defunciones entre la población, es una media de las tasas de cada edad ponderada por la estructura por edades: si $c_x$ es la proporción de la población en el grupo de edad $x$ y $m_x$ su tasa de mortalidad,
+
+$$\text{TBM} = \sum_x c_x \, m_x.$$
+
+Y la población española es mucho más vieja que la mexicana. Es [la paradoja de Simpson de Berkeley](../01-berkeley/index.qmd) llevada a la demografía: la edad hace el papel del departamento.
+
+Evelyn Kitagawa propuso en 1955 una forma de repartir la diferencia entre dos tasas brutas en dos partes que suman exactamente la diferencia:
+
+- un **efecto composición**, $\sum_x (c^1_x - c^2_x) \, \frac{m^1_x + m^2_x}{2}$: lo que se debe a que las estructuras por edad son distintas, valorado con las tasas medias;
+- un **efecto tasas**, $\sum_x (m^1_x - m^2_x) \, \frac{c^1_x + c^2_x}{2}$: lo que se debe a que se muere más o menos a cada edad, valorado con la estructura media.
+
+Los datos del código son cifras redondeadas e ilustrativas, del orden de las de ambos países antes de la pandemia: la estructura por edades en proporciones y las tasas por cada mil habitantes de cada grupo.
+
+**Tu tarea.** Completa `kitagawa()`. Antes de ejecutar, compara las dos columnas de tasas: ¿en qué grupo de edad muere más gente en España que en México? Después, mira cuánto de la diferencia de tasas brutas se debe a la composición y cuánto a las tasas, y compáralo con las *tasas estandarizadas*, las de cada país aplicadas a una misma estructura por edades.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+España tiene una tasa bruta de 9,3 por mil y México de 6,8: España muere 2,5 por mil más. Pero en ningún grupo de edad muere más gente en España; en los más jóvenes, México multiplica por más de tres las tasas españolas.
+
+La descomposición lo aclara: la estructura por edades suma 5,7 puntos a la mortalidad española y las tasas le restan 3,2. Si los dos países tuvieran la misma población, la media de las dos, España moriría al 6,8 por mil y México al 10,0. El efecto tasas es exactamente esa diferencia entre tasas estandarizadas.
+
+Por eso los demógrafos no comparan nunca tasas brutas entre poblaciones con estructuras distintas, sino tasas estandarizadas o medidas que no dependen de la estructura, como la esperanza de vida: la tabla de vida aplica las tasas de cada edad a una cohorte ficticia, la misma para los dos países. La descomposición de Arriaga de la semana 9 hace con la esperanza de vida lo que Kitagawa hace con las tasas brutas: repartir una diferencia, exactamente, entre sus causas.
+
+Kitagawa, E. M. (1955). Components of a difference between two rates. *Journal of the American Statistical Association*, 50(272), 1168–1194.
+
+Preston, S. H., Heuveline, P. y Guillot, M. (2001). *Demography: Measuring and Modeling Population Processes*. Blackwell, cap. 2.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: kitagawa
+#| caption: "Tu código"
+edad <- c("0-14", "15-44", "45-64", "65-79", "80+")
+c_es <- c(15, 37, 29, 13, 6) / 100  # estructura por edades de España
+c_mx <- c(26, 46, 19, 7, 2) / 100   # y de México
+m_es <- c(0.3, 0.6, 4, 17, 95)      # defunciones por mil habitantes de cada grupo, España
+m_mx <- c(1, 2, 8, 30, 100)         # y México
+data.frame(edad, c_es, c_mx, m_es, m_mx)
+
+bruta <- function(c, m) sum(c * m)
+
+# La diferencia de tasas brutas entre el país 1 y el país 2, en dos efectos
+kitagawa <- function(c1, m1, c2, m2) {
+  c(composicion = ______,
+    tasas = ______)
+}
+
+estandar <- (c_es + c_mx) / 2
+c(bruta_es = bruta(c_es, m_es),
+  bruta_mx = bruta(c_mx, m_mx),
+  diferencia = bruta(c_es, m_es) - bruta(c_mx, m_mx),
+  kitagawa(c_es, m_es, c_mx, m_mx),
+  estandarizada_es = bruta(estandar, m_es),
+  estandarizada_mx = bruta(estandar, m_mx))
+```
+
+```{webr}
+#| exercise: kitagawa
+#| solution: true
+edad <- c("0-14", "15-44", "45-64", "65-79", "80+")
+c_es <- c(15, 37, 29, 13, 6) / 100
+c_mx <- c(26, 46, 19, 7, 2) / 100
+m_es <- c(0.3, 0.6, 4, 17, 95)
+m_mx <- c(1, 2, 8, 30, 100)
+data.frame(edad, c_es, c_mx, m_es, m_mx)
+
+bruta <- function(c, m) sum(c * m)
+
+kitagawa <- function(c1, m1, c2, m2) {
+  c(composicion = sum((c1 - c2) * (m1 + m2) / 2),
+    tasas = sum((m1 - m2) * (c1 + c2) / 2))
+}
+
+estandar <- (c_es + c_mx) / 2
+c(bruta_es = bruta(c_es, m_es),
+  bruta_mx = bruta(c_mx, m_mx),
+  diferencia = bruta(c_es, m_es) - bruta(c_mx, m_mx),
+  kitagawa(c_es, m_es, c_mx, m_mx),
+  estandarizada_es = bruta(estandar, m_es),
+  estandarizada_mx = bruta(estandar, m_mx))
+```
+
+```{webr}
+#| exercise: kitagawa
+#| check: true
+f <- .envir_result$kitagawa
+correcto <- function(c1, m1, c2, m2) c(sum((c1 - c2) * (m1 + m2) / 2), sum((m1 - m2) * (c1 + c2) / 2))
+casos <- list(
+  list(c1 = c(0.5, 0.5), m1 = c(2, 10), c2 = c(0.8, 0.2), m2 = c(4, 20)),
+  list(c1 = c(0.2, 0.3, 0.5), m1 = c(1, 5, 40), c2 = c(0.6, 0.3, 0.1), m2 = c(1, 6, 50))
+)
+coma <- function(x) format(round(x, 2), nsmall = 2, decimal.mark = ",")
+vector <- function(x) paste0("(", paste(format(x, trim = TRUE, decimal.mark = ","), collapse = "; "), ")")
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función kitagawa().")
+} else if (!is.null(fallo <- Find(function(k) !isTRUE(all.equal(unname(do.call(f, k)), do.call(correcto, k))), casos))) {
+  obtenido <- unname(do.call(f, fallo))
+  esperado <- do.call(correcto, fallo)
+  datos <- paste0("Con c1 = ", vector(fallo$c1), ", m1 = ", vector(fallo$m1), ", c2 = ", vector(fallo$c2), " y m2 = ", vector(fallo$m2))
+  diferencia <- do.call(function(c1, m1, c2, m2) sum(c1 * m1) - sum(c2 * m2), fallo)
+  if (length(obtenido) == 2 && isTRUE(all.equal(sum(obtenido), diferencia))) {
+    list(correct = FALSE, message = paste0(
+      "Tus dos efectos suman la diferencia, pero no son los de Kitagawa. ", datos, " deberían dar ", coma(esperado[1]), " y ", coma(esperado[2]), ". Cada diferencia se valora con la media de los dos países, no con uno solo."))
+  } else {
+    list(correct = FALSE, message = paste0(
+      datos, ", kitagawa() debería dar ",
+      coma(esperado[1]), " y ", coma(esperado[2]), ", que suman la diferencia de tasas brutas, ", coma(diferencia), "."))
+  }
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! España muere ", coma(.result[["diferencia"]]), " por mil más que México: la estructura por edades suma ",
+    coma(.result[["composicion"]]), " y las tasas restan ", coma(-.result[["tasas"]]),
+    ". Con la misma población, España moriría al ", coma(.result[["estandarizada_es"]]),
+    " por mil y México al ", coma(.result[["estandarizada_mx"]]), "."))
+}
+```
+
+::: {.hint exercise="kitagawa"}
+Traduce las fórmulas del enunciado tal cual: R opera los vectores elemento a elemento, así que `(c1 - c2) * (m1 + m2) / 2` da un número por grupo de edad, y `sum()` los suma.
+:::
+
+::: {.solution exercise="kitagawa"}
+`composicion = sum((c1 - c2) * (m1 + m2) / 2)` y `tasas = sum((m1 - m2) * (c1 + c2) / 2)`.
+:::
+:::
+
+::::

@@ -1,0 +1,149 @@
+---
+title: "La sabiduría de la multitud, y cuándo falla"
+numero: 26
+nivel: 1
+duracion: "20 min"
+lectura: "[Page (2007)](https://nuevasomosaguas.github.io/biblioteca.html#page2007difference); [Caplan (2007)](https://nuevasomosaguas.github.io/biblioteca.html#caplan2007myth)"
+dificultad: "Iniciación"
+categories: [juegos y votación, estadística]
+description: "Cien personas adivinan cuántos garbanzos hay en un tarro. La media acierta mejor que casi todos, salvo si todos se equivocan hacia el mismo lado."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1906, en una feria de ganado de Plymouth, 787 visitantes pagaron por adivinar cuánto pesaría un buey una vez sacrificado y limpio. Francis Galton recogió las papeletas: la mediana de las estimaciones fue de 1207 libras, y el peso real, de 1198. La multitud, sin saber nada de bueyes, se equivocó en menos del 1 %.
+
+Scott Page explicó por qué con una identidad exacta, el *teorema de predicción por diversidad*. Si cada persona da una estimación $s_i$ de un valor verdadero $\theta$, y la multitud da la media $c = \bar s$, entonces
+
+$$\underbrace{(c - \theta)^2}_{\text{error colectivo}} = \underbrace{\frac{1}{n}\sum_i (s_i - \theta)^2}_{\text{error medio}} - \underbrace{\frac{1}{n}\sum_i (s_i - c)^2}_{\text{diversidad}}.$$
+
+La multitud se equivoca menos que el individuo medio exactamente en lo que se separan unas estimaciones de otras. No es una ley empírica: es álgebra, y se cumple siempre.
+
+Bryan Caplan le puso un límite. Los errores aleatorios se cancelan al promediar; los *sesgos sistemáticos*, no. Si casi todos los votantes se equivocan hacia el mismo lado, la democracia agrega el error en lugar de corregirlo.
+
+En el código, un tarro tiene **1000 garbanzos**, y dos multitudes **inventadas** de 100 personas los estiman. En la primera, cada uno se equivoca al azar, hacia arriba o hacia abajo; en la segunda, con el mismo ruido, todos tienden además a pasarse en unos 200.
+
+**Tu tarea.**
+
+1. Completa `errores()` con el error colectivo y la diversidad. Comprueba en el resultado que en las dos multitudes el error colectivo es el error medio menos la diversidad.
+2. ¿Qué proporción de las personas acierta mejor que la media de su multitud?
+3. Mira el gráfico: el error de la multitud, en garbanzos, según su tamaño. ¿Qué pasa al pasar de 10 a 1000 personas en cada caso?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41 % de sus miembros acierta mejor que ella.
+
+El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
+
+Es la misma lógica del *teorema del jurado* que Condorcet publicó en 1785, en el mismo libro que [su paradoja](../15-condorcet/index.qmd): si cada votante acierta con una probabilidad algo mayor que 1/2 y vota con independencia, la mayoría acierta casi con seguridad cuando son muchos. Pero si la probabilidad es algo menor que 1/2, la mayoría se equivoca casi con seguridad. Caplan sostiene que en economía los votantes tienen sesgos de ese tipo, como desconfiar del mercado y del comercio con extranjeros o creer que la economía siempre va a peor, y que por eso el «milagro de la agregación» no los salva.
+
+La lección del teorema de Page es que la diversidad vale tanto como la precisión: a igualdad de error medio, una multitud cuyos errores no se parecen se equivoca menos. La de Caplan, que la diversidad solo cancela lo que es independiente.
+
+Galton, F. (1907). Vox populi. *Nature*, 75, 450–451.
+
+Page, S. E. (2007). *The Difference: How the Power of Diversity Creates Better Groups, Firms, Schools, and Societies*. Princeton University Press.
+
+Caplan, B. (2007). *The Myth of the Rational Voter: Why Democracies Choose Bad Policies*. Princeton University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: multitud
+#| caption: "Tu código"
+verdad <- 1000  # garbanzos en el tarro
+set.seed(1907)
+n <- 100
+al_azar <- verdad + rnorm(n, 0, 250)         # errores al azar
+sesgados <- verdad + 200 + rnorm(n, 0, 250)  # el mismo ruido, y todos se pasan
+
+# El teorema de predicción por diversidad: error colectivo, error medio y diversidad
+errores <- function(estimaciones, verdad) {
+  multitud <- mean(estimaciones)
+  c(colectivo = ______,  # el error cuadrático de la multitud
+    medio = mean((estimaciones - verdad)^2),
+    diversidad = ______)  # lo que se separan las estimaciones de la media
+}
+
+# Proporción de personas que aciertan mejor que su multitud
+mejor <- function(s) mean(abs(s - verdad) < abs(mean(s) - verdad))
+c(al_azar = mejor(al_azar), sesgados = mejor(sesgados))
+
+# El error de la multitud según su tamaño, en garbanzos
+tamanos <- c(1, 3, 10, 30, 100, 300, 1000)
+curva <- sapply(tamanos, function(n) sqrt(c(
+  al_azar = mean(replicate(200, errores(verdad + rnorm(n, 0, 250), verdad)[["colectivo"]])),
+  sesgados = mean(replicate(200, errores(verdad + 200 + rnorm(n, 0, 250), verdad)[["colectivo"]])))))
+matplot(tamanos, t(curva), type = "b", pch = 19, lty = 1, log = "x", col = c("#2980b9", "#c0392b"),
+        xlab = "Personas en la multitud", ylab = "Error de la multitud (garbanzos)")
+legend("topright", c("Errores al azar", "Sesgados"), col = c("#2980b9", "#c0392b"), pch = 19, bty = "n")
+
+rbind(al_azar = errores(al_azar, verdad), sesgados = errores(sesgados, verdad))
+```
+
+```{webr}
+#| exercise: multitud
+#| solution: true
+verdad <- 1000
+set.seed(1907)
+n <- 100
+al_azar <- verdad + rnorm(n, 0, 250)
+sesgados <- verdad + 200 + rnorm(n, 0, 250)
+
+errores <- function(estimaciones, verdad) {
+  multitud <- mean(estimaciones)
+  c(colectivo = (multitud - verdad)^2,
+    medio = mean((estimaciones - verdad)^2),
+    diversidad = mean((estimaciones - multitud)^2))
+}
+
+mejor <- function(s) mean(abs(s - verdad) < abs(mean(s) - verdad))
+c(al_azar = mejor(al_azar), sesgados = mejor(sesgados))
+
+tamanos <- c(1, 3, 10, 30, 100, 300, 1000)
+curva <- sapply(tamanos, function(n) sqrt(c(
+  al_azar = mean(replicate(200, errores(verdad + rnorm(n, 0, 250), verdad)[["colectivo"]])),
+  sesgados = mean(replicate(200, errores(verdad + 200 + rnorm(n, 0, 250), verdad)[["colectivo"]])))))
+matplot(tamanos, t(curva), type = "b", pch = 19, lty = 1, log = "x", col = c("#2980b9", "#c0392b"),
+        xlab = "Personas en la multitud", ylab = "Error de la multitud (garbanzos)")
+legend("topright", c("Errores al azar", "Sesgados"), col = c("#2980b9", "#c0392b"), pch = 19, bty = "n")
+
+rbind(al_azar = errores(al_azar, verdad), sesgados = errores(sesgados, verdad))
+```
+
+```{webr}
+#| exercise: multitud
+#| check: true
+f <- .envir_result$errores
+coma <- function(v, d = 0) format(round(v, d), nsmall = d, big.mark = " ", decimal.mark = ",")
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función errores().")
+} else if (!isTRUE(all.equal(unname(f(c(1, 2, 9), 6)[c("colectivo", "medio", "diversidad")]), c(4, 50/3, 38/3)))) {
+  r <- f(c(1, 2, 9), 6)
+  list(correct = FALSE, message = paste0(
+    "Con las estimaciones 1, 2 y 9 de un valor verdadero 6, la multitud dice 4: el error colectivo es 4, ",
+    "el medio 50/3 y la diversidad 38/3. errores() da ", paste(format(round(r, 3), decimal.mark = ","), collapse = ", "),
+    ". La diversidad es la media de los cuadrados de las distancias a la media de la multitud, dividiendo entre n."))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La multitud con errores al azar se equivoca en ", coma(sqrt(.result["al_azar", "colectivo"]), 1),
+    " garbanzos; la sesgada, en ", coma(sqrt(.result["sesgados", "colectivo"])),
+    ". En las dos, el error colectivo es exactamente el error medio menos la diversidad."))
+}
+```
+
+::: {.hint exercise="multitud"}
+El error colectivo compara la media de la multitud, `multitud`, con `verdad`. La diversidad compara cada estimación con `multitud`. Las dos se elevan al cuadrado, y la diversidad se promedia con `mean()`, no con `var()`, que divide entre n − 1.
+:::
+
+::: {.solution exercise="multitud"}
+`colectivo = (multitud - verdad)^2` y `diversidad = mean((estimaciones - multitud)^2)`.
+:::
+:::
+
+::::

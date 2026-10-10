@@ -1,0 +1,188 @@
+---
+title: "Inercia demográfica"
+numero: 28
+nivel: 2
+duracion: "30 min"
+lectura: "[Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential)"
+semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Un país joven baja de golpe al nivel de reemplazo, una hija por mujer, y su población sigue creciendo sesenta años."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Imagina un país joven donde cada mujer tiene 4,5 hijos y la población crece casi un 3 % al año. Un buen día, de golpe, la fecundidad cae al *nivel de reemplazo*: cada mujer tiene, de media, justo una hija que llega a sustituirla. ¿Cuándo deja de crecer la población?
+
+La respuesta intuitiva es «enseguida», y es falsa. Para verlo hace falta proyectar la población por edades, con la *matriz de Leslie*: se divide a las mujeres en grupos de cinco años de edad, y cada paso de cinco años la matriz dice cuántas sobreviven al grupo siguiente y cuántas hijas tienen. Como es habitual en demografía, solo se cuentan las mujeres.
+
+El código de partida trae una tabla de vida inventada, con una esperanza de vida de 74 años: `lx` son las supervivientes a cada edad exacta, de cada nacida, y `L` los años que vive cada una, de media, dentro de cada grupo. `m` son las hijas que tiene cada mujer al año en cada grupo de edad. El país parte de su *población estable*, la que da el primer autovector de la matriz, como en la [semana 11 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/).
+
+**Tu tarea.**
+
+1. Completa `nrr()`, la *tasa neta de reproducción*: las hijas que tiene de media cada nacida a lo largo de su vida, contando con que no todas llegan a las edades fértiles. Son las hijas al año de cada grupo de edad por los años que se vive en él, sumadas. El reemplazo es `nrr = 1`, y el código lo consigue dividiendo `m` por `nrr(m)`.
+2. Completa la proyección: un paso de cinco años es multiplicar la matriz por la población.
+3. Mira el gráfico y la tabla: cuánto crece la población desde que la fecundidad cae al reemplazo, y cuántos años tarda en dejar de crecer.
+4. Cuando la comprobación te dé por bueno el código, baja la fecundidad de partida a `tgf <- 3` y vuelve a ejecutar. ¿Cambia la inercia?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con 4,5 hijos por mujer, cada nacida tiene de media 2,14 hijas que llegan a la edad de su madre, y la población crece un 2,7 % al año. El reemplazo está en 2,11 hijos por mujer, no en 2: algunas niñas mueren antes de ser madres y nacen algo más de niños que de niñas. Cuando la fecundidad cae ahí de golpe, la población todavía crece un 61 % y tarda 65 años en dejar de hacerlo.
+
+La razón está en la estructura por edades. Un país que ha crecido deprisa es joven: el 64 % de sus mujeres tiene menos de 30 años. Aunque cada una tenga solo una hija, hay muchas más madres que abuelas, y los nacimientos superan a las muertes hasta que las generaciones grandes envejecen y la pirámide se convierte en la de una *población estacionaria*, con la forma de la propia tabla de vida. Es la *inercia demográfica*, que Nathan Keyfitz midió en 1971. Con `tgf <- 3` la población es menos joven y la inercia, menor, un 29 % en lugar de un 61 %, pero sigue ahí.
+
+Es lo que ha pasado en buena parte del mundo: muchos países llegaron al reemplazo en los años noventa y su población ha seguido creciendo. Y funciona igual al revés: un país con la fecundidad por debajo del reemplazo durante décadas, como España, seguiría perdiendo población durante años aunque la fecundidad subiera mañana al reemplazo, porque le faltan madres.
+
+Leslie, P. H. (1945). On the use of matrices in certain population mathematics. *Biometrika*, 33(3), 183–212.
+
+Keyfitz, N. (1971). On the momentum of population growth. *Demography*, 8(1), 71–80.
+
+Wachter, K. W. (2014). *Essential Demographic Methods*. Harvard University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: inercia
+#| caption: "Tu código"
+# Tabla de vida inventada: supervivientes de cada nacida a las edades 0, 5, ..., 100
+edad <- seq(0, 95, 5)
+lx <- c(1.000, 0.980, 0.979, 0.979, 0.978, 0.977, 0.974, 0.971, 0.964, 0.954, 0.938,
+        0.911, 0.869, 0.803, 0.705, 0.570, 0.401, 0.224, 0.086, 0.018, 0.001)
+L <- 5 * (lx[-21] + lx[-1]) / 2  # años vividos en cada grupo de edad, de cada nacida
+
+# Hijas por mujer y año en cada grupo de edad, con 4,5 hijos por mujer
+tgf <- 4.5
+forma <- c(0, 0, 0, 0.08, 0.22, 0.27, 0.22, 0.14, 0.06, 0.01, rep(0, 10))
+m <- tgf * forma / 5 * 0.488  # 0,488: la proporción de niñas al nacer
+
+# 1. Hijas que tiene de media cada nacida a lo largo de su vida
+nrr <- function(m) {
+  ______
+}
+
+# La matriz de Leslie: supervivencia bajo la diagonal, hijas en la primera fila
+leslie <- function(m) {
+  P <- L[-1] / L[-20]
+  A <- matrix(0, 20, 20)
+  A[cbind(2:20, 1:19)] <- P
+  A[1, ] <- L[1] / 2 * (m + c(P, 0) * c(m[-1], 0))
+  A
+}
+
+# La población estable de antes, en miles de mujeres
+estable <- Re(eigen(leslie(m))$vectors[, 1])
+N <- 1000 * estable / sum(estable)
+
+# La fecundidad cae de golpe al reemplazo: cada nacida, una hija
+A_reemplazo <- leslie(m / nrr(m))
+
+# 2. Cien años, de cinco en cinco
+total <- sum(N)
+for (paso in 1:20) {
+  N <- ______
+  total <- c(total, sum(N))
+}
+
+plot(seq(0, 100, 5), total, type = "b", pch = 19, col = "#2980b9",
+     xlab = "Años desde la caída al reemplazo", ylab = "Mujeres (miles)")
+round(c(nrr = nrr(m),
+        tgf_reemplazo = tgf / nrr(m),
+        crecimiento = max(total) / total[1],
+        anos_hasta_el_maximo = 5 * (which.max(total) - 1)), 2)
+```
+
+```{webr}
+#| exercise: inercia
+#| solution: true
+edad <- seq(0, 95, 5)
+lx <- c(1.000, 0.980, 0.979, 0.979, 0.978, 0.977, 0.974, 0.971, 0.964, 0.954, 0.938,
+        0.911, 0.869, 0.803, 0.705, 0.570, 0.401, 0.224, 0.086, 0.018, 0.001)
+L <- 5 * (lx[-21] + lx[-1]) / 2
+
+tgf <- 4.5
+forma <- c(0, 0, 0, 0.08, 0.22, 0.27, 0.22, 0.14, 0.06, 0.01, rep(0, 10))
+m <- tgf * forma / 5 * 0.488
+
+nrr <- function(m) {
+  sum(m * L)
+}
+
+leslie <- function(m) {
+  P <- L[-1] / L[-20]
+  A <- matrix(0, 20, 20)
+  A[cbind(2:20, 1:19)] <- P
+  A[1, ] <- L[1] / 2 * (m + c(P, 0) * c(m[-1], 0))
+  A
+}
+
+estable <- Re(eigen(leslie(m))$vectors[, 1])
+N <- 1000 * estable / sum(estable)
+
+A_reemplazo <- leslie(m / nrr(m))
+
+total <- sum(N)
+for (paso in 1:20) {
+  N <- A_reemplazo %*% N
+  total <- c(total, sum(N))
+}
+
+plot(seq(0, 100, 5), total, type = "b", pch = 19, col = "#2980b9",
+     xlab = "Años desde la caída al reemplazo", ylab = "Mujeres (miles)")
+round(c(nrr = nrr(m),
+        tgf_reemplazo = tgf / nrr(m),
+        crecimiento = max(total) / total[1],
+        anos_hasta_el_maximo = 5 * (which.max(total) - 1)), 2)
+```
+
+```{webr}
+#| exercise: inercia
+#| check: true
+# Se comprueban la fórmula y la proyección con la fecundidad del alumno: la tarea 4 la cambia.
+e <- .envir_result
+coma <- function(x) format(round(x, 2), nsmall = 2, decimal.mark = ",")
+prueba <- c(rep(0, 4), 0.1, 0.2, rep(0, 14))
+if (!is.function(e$nrr)) {
+  list(correct = FALSE, message = "No encuentro la función nrr().")
+} else if (isTRUE(all.equal(e$nrr(prueba), sum(prueba)))) {
+  list(correct = FALSE, message = "nrr() suma las hijas al año, pero cada grupo de edad dura años, y no todas las nacidas llegan a él. Multiplica por L.")
+} else if (!isTRUE(all.equal(e$nrr(prueba), sum(prueba * e$L)))) {
+  list(correct = FALSE, message = "nrr() no da las hijas de cada nacida. Son las hijas al año de cada grupo por los años vividos en él, L, sumadas.")
+} else {
+  # La proyección que debería salir con la fecundidad del alumno
+  A <- e$leslie(e$m / sum(e$m * e$L))
+  N <- 1000 * e$estable / sum(e$estable)
+  esperado <- sum(N)
+  for (paso in 1:20) {
+    N <- A %*% N
+    esperado <- c(esperado, sum(N))
+  }
+  if (!isTRUE(all.equal(c(e$total), esperado))) {
+    if (max(e$total) > 3 * e$total[1])
+      list(correct = FALSE, message = "La población se dispara: ¿proyectas con la fecundidad de antes? Tras la caída, la matriz es A_reemplazo.")
+    else
+      list(correct = FALSE, message = "nrr() está bien, pero la proyección no. Un paso es la matriz por la población, A_reemplazo %*% N, en ese orden.")
+  } else {
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! Con ", format(e$tgf, decimal.mark = ","), " hijos por mujer, cada nacida tiene ", coma(e$nrr(e$m)),
+      " hijas. Tras caer al reemplazo, la población todavía crece un ", round(100 * (max(e$total) / e$total[1] - 1)),
+      " % durante ", 5 * (which.max(e$total) - 1), " años."))
+  }
+}
+```
+
+::: {.hint exercise="inercia"}
+Una nacida pasa `L[i]` años en el grupo de edad `i` y tiene `m[i]` hijas en cada uno: suma `m * L`. Y `%*%` es el producto de matrices: la matriz va delante.
+:::
+
+::: {.solution exercise="inercia"}
+`sum(m * L)` en `nrr()`, y `N <- A_reemplazo %*% N`.
+:::
+:::
+
+::::

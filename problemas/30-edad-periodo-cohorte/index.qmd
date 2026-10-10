@@ -1,0 +1,141 @@
+---
+title: "Edad, periodo y cohorte"
+numero: 30
+nivel: 2
+duracion: "30 min"
+lectura: "[O'Brien (2014)](https://nuevasomosaguas.github.io/biblioteca.html#obrien2014age)"
+dificultad: "Intermedio"
+categories: [demografía, estadística, inferencia causal]
+description: "Envejecer, vivir en una época o haber nacido en otra: tres historias que encajan igual de bien con los mismos datos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El profesor de [¿Ha bajado el nivel?](../14-bachillerato/index.qmd) vuelve a la carga, ahora con datos. Una encuesta mide la comprensión lectora de los adultos cada cinco años, de 1990 a 2020, con una prueba en la escala de 0 a 500. Los datos son inventados. Si las notas cambian, puede ser por tres razones:
+
+- la **edad**: con los años se lee peor, o mejor;
+- el **periodo**: la época en que se hace la prueba, que afecta a todos por igual, como la llegada de los móviles;
+- la **cohorte**: el año de nacimiento, que marca la escuela que se tuvo.
+
+El problema es que la cohorte es el periodo menos la edad. Quien tiene 40 años en 2010 nació en 1970, sin remedio. Y si una variable es una combinación exacta de otras dos, la regresión no puede separar sus efectos.
+
+**Tu tarea.**
+
+1. Completa `cohorte`, el año de nacimiento, y mira qué hace `lm()` con el modelo que tiene las tres variables.
+2. Completa `nulo`, un vector de coeficientes para la constante, la edad, el periodo y la cohorte, en ese orden, que multiplicado por la matriz del modelo `X` dé cero en todas las filas. Si existe, puedes sumar ese vector a los coeficientes, o cualquier múltiplo suyo, y las predicciones no cambian: hay infinitas soluciones.
+3. Mira la tabla: tres modelos, cada uno sin una de las tres variables, que cuentan tres historias. ¿Cuál se ajusta mejor a los datos?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+`lm()` da un `NA` en la cohorte: como la cohorte es una combinación exacta de la edad y el periodo, la descarta. Y el vector `c(0, 1, -1, 1)` lo explica: edad − periodo + cohorte es cero para todo el mundo, así que se puede sumar a los coeficientes de la edad, el periodo y la cohorte cualquier múltiplo de (1, −1, 1) sin cambiar ni una predicción.
+
+Las tres historias se ajustan exactamente igual, con la misma suma de cuadrados de los residuos, 11,588, y no pueden ser más distintas:
+
+- **Sin periodo**: la nota baja 0,21 puntos por cada año de edad y cada cohorte sale 0,29 puntos mejor que la anterior. Es como se inventaron los datos: −0,2 y +0,3, más ruido.
+- **Sin cohorte**: envejecer cuesta 0,50 puntos al año, pero los tiempos mejoran 0,29 al año.
+- **Sin edad**: el nivel baja 0,21 puntos cada año que pasa, aunque cada cohorte llegue 0,50 puntos mejor. Es la historia del profesor.
+
+Cada fila es la anterior más un múltiplo de (1, −1, 1), y hay infinitas más. Si alguien asegura que el periodo baja la nota 0,1 puntos al año, los datos le dan la razón con una edad de −0,11 y una cohorte de +0,39. Los datos no eligen entre las historias: lo hace el supuesto con que se rompe la identidad, y ese supuesto tiene que venir de fuera, de la teoría o de otros datos.
+
+El problema no desaparece con modelos más flexibles, con una variable ficticia por cada edad, periodo y cohorte: lo que no se puede separar es exactamente una tendencia lineal común, y las curvaturas sí se identifican. Por eso las conclusiones sobre «generaciones» que salen de una sola tabla de edades y años merecen cautela.
+
+Mason, K. O., Mason, W. M., Winsborough, H. H. y Poole, W. K. (1973). Some methodological issues in cohort analysis of archival data. *American Sociological Review*, 38(2), 242–258.
+
+O'Brien, R. M. (2014). *Age-Period-Cohort Models: Approaches and Analyses with Aggregate Data*. CRC Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: apc
+#| caption: "Tu código"
+# Comprensión lectora por edad y año de la encuesta (datos inventados)
+datos <- expand.grid(edad = seq(20, 60, 5), periodo = seq(1990, 2020, 5))
+set.seed(2014)
+datos$nota <- with(datos, 250 - 0.2 * (edad - 20) + 0.3 * (periodo - edad - 1930) +
+                   rnorm(nrow(datos), 0, 0.5))
+
+# 1. El año de nacimiento
+datos$cohorte <- ______
+completo <- lm(nota ~ edad + periodo + cohorte, data = datos)
+coef(completo)
+
+# 2. Unos coeficientes que no cambian ninguna predicción
+X <- model.matrix(completo)  # columnas: constante, edad, periodo, cohorte
+nulo <- c(______)
+max(abs(X %*% nulo))
+
+# 3. Tres historias, cada una sin una variable
+historia <- function(formula) {
+  modelo <- lm(formula, data = datos)
+  b <- coef(modelo)
+  c(edad = unname(b["edad"]), periodo = unname(b["periodo"]), cohorte = unname(b["cohorte"]),
+    residuos = sum(resid(modelo)^2))
+}
+round(rbind(sin_periodo = historia(nota ~ edad + cohorte),
+            sin_cohorte = historia(nota ~ edad + periodo),
+            sin_edad = historia(nota ~ periodo + cohorte)), 3)
+```
+
+```{webr}
+#| exercise: apc
+#| solution: true
+datos <- expand.grid(edad = seq(20, 60, 5), periodo = seq(1990, 2020, 5))
+set.seed(2014)
+datos$nota <- with(datos, 250 - 0.2 * (edad - 20) + 0.3 * (periodo - edad - 1930) +
+                   rnorm(nrow(datos), 0, 0.5))
+
+datos$cohorte <- datos$periodo - datos$edad
+completo <- lm(nota ~ edad + periodo + cohorte, data = datos)
+coef(completo)
+
+X <- model.matrix(completo)
+nulo <- c(0, 1, -1, 1)
+max(abs(X %*% nulo))
+
+historia <- function(formula) {
+  modelo <- lm(formula, data = datos)
+  b <- coef(modelo)
+  c(edad = unname(b["edad"]), periodo = unname(b["periodo"]), cohorte = unname(b["cohorte"]),
+    residuos = sum(resid(modelo)^2))
+}
+round(rbind(sin_periodo = historia(nota ~ edad + cohorte),
+            sin_cohorte = historia(nota ~ edad + periodo),
+            sin_edad = historia(nota ~ periodo + cohorte)), 3)
+```
+
+```{webr}
+#| exercise: apc
+#| check: true
+e <- .envir_result
+d <- e$datos
+if (is.null(d$cohorte) || length(d$cohorte) != nrow(d)) {
+  list(correct = FALSE, message = "No encuentro datos$cohorte, con un año de nacimiento por fila.")
+} else if (isTRUE(all.equal(d$cohorte, d$edad - d$periodo))) {
+  list(correct = FALSE, message = "Esa cohorte va al revés: quien tiene 40 años en 2010 nació en 1970, no en −1970.")
+} else if (!isTRUE(all.equal(d$cohorte, d$periodo - d$edad))) {
+  list(correct = FALSE, message = "datos$cohorte no es el año de nacimiento. Quien tiene 40 años en 2010 nació en 1970.")
+} else if (length(e$nulo) != 4 || !is.numeric(e$nulo) || all(e$nulo == 0)) {
+  list(correct = FALSE, message = "nulo tiene que tener cuatro números, no todos cero: constante, edad, periodo y cohorte.")
+} else if (max(abs(e$X %*% e$nulo)) > 1e-8) {
+  list(correct = FALSE, message = "X %*% nulo no da cero en todas las filas. Busca qué combinación de edad, periodo y cohorte se anula siempre, sabiendo que cohorte = periodo − edad.")
+} else {
+  list(correct = TRUE, message = "¡Correcto! lm() descarta la cohorte, y las tres historias tienen la misma suma de cuadrados de los residuos: los datos no eligen entre ellas.")
+}
+```
+
+::: {.hint exercise="apc"}
+El año de nacimiento es el de la encuesta menos la edad. Para `nulo`, escribe la identidad con todo a un lado: cohorte − periodo + edad = 0. La constante no interviene.
+:::
+
+::: {.solution exercise="apc"}
+`datos$cohorte <- datos$periodo - datos$edad` y `nulo <- c(0, 1, -1, 1)`.
+:::
+:::
+
+::::

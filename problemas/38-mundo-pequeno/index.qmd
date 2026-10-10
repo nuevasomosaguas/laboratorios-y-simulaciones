@@ -1,0 +1,234 @@
+---
+title: "Un mundo pequeño con pocos atajos"
+numero: 38
+nivel: 2
+duracion: "35 min"
+lectura: "[Watts y Strogatz (1998)](https://nuevasomosaguas.github.io/biblioteca.html#watts1998collective)"
+dificultad: "Intermedio"
+categories: [modelos de agentes]
+description: "Basta con recablear un 1 % de los lazos para que la distancia media se reduzca a la mitad, y nadie nota que sus amigos ya no se conocen tanto."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1967, Stanley Milgram pidió a unos vecinos de Nebraska que hicieran llegar una carta a un desconocido de Boston, pasándola solo a conocidos de trato personal. Las cartas que llegaron lo hicieron, de media, en unos seis pasos. Parece una contradicción: nuestros amigos suelen conocerse entre sí, así que las redes sociales están llenas de grupos cerrados, y en una red así las distancias deberían ser largas.
+
+Duncan Watts y Steven Strogatz mostraron en 1998 que no hay contradicción. Parten de un *anillo*: $N$ personas en círculo, cada una unida a sus $k$ vecinos más cercanos, $k/2$ a cada lado. El anillo está muy *agrupado*, porque los vecinos de cada persona se conocen entre sí, pero para ir de una punta a otra hay que dar muchos pasos. Luego recorren cada lazo y, con probabilidad $p$, desconectan uno de sus extremos y lo unen a una persona al azar. Con $p = 0$ queda el anillo; con $p = 1$, una red aleatoria.
+
+Dos números describen la red, y la matriz de adyacencia `A`, con un 1 en `A[i, j]` si $i$ y $j$ están unidos, da los dos:
+
+- El *agrupamiento* $C$: para cada persona, la proporción de parejas de sus vecinos que también están unidas entre sí, y la media de todas. `diag(A %*% A %*% A) / 2` cuenta los triángulos de cada persona.
+- La *distancia media* $L$: el número medio de pasos del camino más corto entre dos personas. La función `distancia_media()` ya la calcula, por capas: primero los vecinos, luego los vecinos de los vecinos, y así.
+
+**Tu tarea.**
+
+1. Completa `agrupamiento()`: los triángulos de cada persona divididos por las parejas de vecinos que podría tener, `choose(grado, 2)`, y la media.
+2. Completa `recablear()`: el nuevo extremo del lazo es una persona al azar de las que están en `libres`, las que no son la propia persona ni ya están unidas a ella.
+3. El código recablea con siete valores de $p$, de 0,001 a 1, y dibuja $C(p)/C(0)$ y $L(p)/L(0)$. Tarda unos segundos. ¿Con qué $p$ se ha reducido la distancia a la mitad? ¿Cuánto agrupamiento queda entonces?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El anillo de 200 personas con 6 vecinos cada una tiene un agrupamiento de 0,6 y una distancia media de 17,1 pasos. Con $p = 0{,}01$, unos seis lazos recableados de 600, la distancia media ya se ha quedado en la mitad, mientras que el agrupamiento conserva el 97 %. Con $p = 0{,}1$, la distancia es poco más de la cuarta parte y el agrupamiento aún conserva el 77 %. Hay todo un intervalo de $p$ en el que la red es a la vez local y pequeña: un *mundo pequeño*.
+
+La razón es que cada atajo acorta muchos caminos a la vez, los de todas las parejas que pasan cerca de sus dos extremos, mientras que solo rompe unos pocos triángulos, los del lazo que desaparece. Por eso la distancia cae mucho antes que el agrupamiento.
+
+Y por eso nadie lo nota desde dentro. El agrupamiento es lo que cada cual ve a su alrededor, y apenas cambia; la distancia media es una propiedad global, que nadie ve. Es la intuición de Granovetter sobre la *fuerza de los lazos débiles*: los conocidos lejanos son pocos, pero son los que conectan los grupos, y por ellos llegan la información, las ofertas de empleo o las epidemias.
+
+**Para ir más allá:** con 200 personas, la distancia de la red aleatoria es de unos 3 pasos; Watts y Strogatz usaron 1000 personas con 10 vecinos, y ahí la caída es aún más brusca, porque $L(0)$ crece con $N$ y $L(1)$ solo con $\log N$. Prueba `N <- 400` si tienes paciencia.
+
+Milgram, S. (1967). The small world problem. *Psychology Today*, 1(1), 61–67.
+
+Granovetter, M. S. (1973). The strength of weak ties. *American Journal of Sociology*, 78(6), 1360–1380.
+
+Watts, D. J. y Strogatz, S. H. (1998). Collective dynamics of 'small-world' networks. *Nature*, 393(6684), 440–442.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: mundo
+#| caption: "Tu código"
+# El anillo: cada persona unida a sus k vecinos más cercanos, k/2 a cada lado
+anillo <- function(N, k) {
+  A <- matrix(0, N, N)
+  for (j in 1:(k / 2)) A[cbind(1:N, (1:N + j - 1) %% N + 1)] <- 1
+  A + t(A)
+}
+
+# 1. La media de la proporción de parejas de vecinos que están unidas entre sí
+agrupamiento <- function(A) {
+  grado <- rowSums(A)
+  triangulos <- diag(A %*% A %*% A) / 2
+  ______
+}
+
+# 2. Cada lazo hacia la derecha se recablea con probabilidad p
+recablear <- function(A, k, p) {
+  N <- nrow(A)
+  for (j in 1:(k / 2)) for (i in 1:N) {
+    vecino <- (i + j - 1) %% N + 1
+    if (A[i, vecino] == 1 && runif(1) < p) {
+      libres <- which(A[i, ] == 0 & 1:N != i)
+      nuevo <- ______
+      A[i, vecino] <- A[vecino, i] <- 0
+      A[i, nuevo] <- A[nuevo, i] <- 1
+    }
+  }
+  A
+}
+
+# La media de los caminos más cortos, por capas: vecinos, vecinos de vecinos...
+distancia_media <- function(A) {
+  N <- nrow(A)
+  D <- matrix(Inf, N, N)
+  diag(D) <- 0
+  alcanzados <- diag(N) == 1
+  pasos <- 0
+  repeat {
+    pasos <- pasos + 1
+    nuevos <- (A %*% alcanzados > 0) & !alcanzados
+    if (!any(nuevos)) break
+    D[nuevos] <- pasos
+    alcanzados <- alcanzados | nuevos
+  }
+  mean(D[upper.tri(D) & is.finite(D)])
+}
+
+# 3. Del anillo a la red aleatoria, con tres redes por cada p
+set.seed(1998)
+N <- 200
+k <- 6
+A0 <- anillo(N, k)
+C0 <- agrupamiento(A0)
+L0 <- distancia_media(A0)
+p <- 10^seq(-3, 0, by = 0.5)
+curvas <- t(sapply(p, function(q) rowMeans(replicate(3, {
+  A <- recablear(A0, k, q)
+  c(C = agrupamiento(A) / C0, L = distancia_media(A) / L0)
+}))))
+
+plot(p, curvas[, "C"], log = "x", type = "b", pch = 19, ylim = c(0, 1), col = "#2980b9",
+     xlab = "Probabilidad de recablear, p", ylab = "Proporción de la red original")
+lines(p, curvas[, "L"], type = "b", pch = 15, col = "#c0392b")
+legend("bottomleft", c("Agrupamiento, C(p) / C(0)", "Distancia media, L(p) / L(0)"),
+       col = c("#2980b9", "#c0392b"), pch = c(19, 15), bty = "n")
+
+round(data.frame(p, curvas), 3)
+```
+
+```{webr}
+#| exercise: mundo
+#| solution: true
+anillo <- function(N, k) {
+  A <- matrix(0, N, N)
+  for (j in 1:(k / 2)) A[cbind(1:N, (1:N + j - 1) %% N + 1)] <- 1
+  A + t(A)
+}
+
+agrupamiento <- function(A) {
+  grado <- rowSums(A)
+  triangulos <- diag(A %*% A %*% A) / 2
+  mean(triangulos / choose(grado, 2))
+}
+
+recablear <- function(A, k, p) {
+  N <- nrow(A)
+  for (j in 1:(k / 2)) for (i in 1:N) {
+    vecino <- (i + j - 1) %% N + 1
+    if (A[i, vecino] == 1 && runif(1) < p) {
+      libres <- which(A[i, ] == 0 & 1:N != i)
+      nuevo <- sample(libres, 1)
+      A[i, vecino] <- A[vecino, i] <- 0
+      A[i, nuevo] <- A[nuevo, i] <- 1
+    }
+  }
+  A
+}
+
+distancia_media <- function(A) {
+  N <- nrow(A)
+  D <- matrix(Inf, N, N)
+  diag(D) <- 0
+  alcanzados <- diag(N) == 1
+  pasos <- 0
+  repeat {
+    pasos <- pasos + 1
+    nuevos <- (A %*% alcanzados > 0) & !alcanzados
+    if (!any(nuevos)) break
+    D[nuevos] <- pasos
+    alcanzados <- alcanzados | nuevos
+  }
+  mean(D[upper.tri(D) & is.finite(D)])
+}
+
+set.seed(1998)
+N <- 200
+k <- 6
+A0 <- anillo(N, k)
+C0 <- agrupamiento(A0)
+L0 <- distancia_media(A0)
+p <- 10^seq(-3, 0, by = 0.5)
+curvas <- t(sapply(p, function(q) rowMeans(replicate(3, {
+  A <- recablear(A0, k, q)
+  c(C = agrupamiento(A) / C0, L = distancia_media(A) / L0)
+}))))
+
+plot(p, curvas[, "C"], log = "x", type = "b", pch = 19, ylim = c(0, 1), col = "#2980b9",
+     xlab = "Probabilidad de recablear, p", ylab = "Proporción de la red original")
+lines(p, curvas[, "L"], type = "b", pch = 15, col = "#c0392b")
+legend("bottomleft", c("Agrupamiento, C(p) / C(0)", "Distancia media, L(p) / L(0)"),
+       col = c("#2980b9", "#c0392b"), pch = c(19, 15), bty = "n")
+
+round(data.frame(p, curvas), 3)
+```
+
+```{webr}
+#| exercise: mundo
+#| check: true
+# Se comprueban las funciones con redes propias; el resultado final depende del azar.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+cometa <- matrix(c(0, 1, 1, 1,  1, 0, 1, 1,  1, 1, 0, 0,  1, 1, 0, 0), 4)  # agrupamiento medio 5/6
+anillo6 <- e$anillo(30, 6)
+if (!is.function(e$agrupamiento) || !is.function(e$recablear)) {
+  list(correct = FALSE, message = "No encuentro agrupamiento() o recablear().")
+} else if (!isTRUE(all.equal(e$agrupamiento(anillo6), 0.6)) ||
+           !isTRUE(all.equal(e$agrupamiento(cometa), 5 / 6))) {
+  list(correct = FALSE, message = paste0(
+    "agrupamiento() falla: en un anillo con 6 vecinos debería dar 0,600, y da ", coma(e$agrupamiento(anillo6), 3),
+    "; en una cometa de cuatro personas, 0,833, y da ", coma(e$agrupamiento(cometa), 3), ". Para cada persona, sus triángulos entre las parejas de vecinos posibles, choose(grado, 2); y luego la media de todas."))
+} else if (!identical(e$recablear(anillo6, 6, 0), anillo6)) {
+  list(correct = FALSE, message = "Con p = 0, recablear() debería devolver el anillo sin tocar.")
+} else if (!is.null(fallo <- {
+  set.seed(1)
+  R <- e$recablear(e$anillo(200, 6), 6, 1)
+  if (any(diag(R) != 0)) "Hay personas unidas a sí mismas: el nuevo extremo tiene que salir de libres."
+  else if (sum(R) != 1200 || !isSymmetric(R)) "Recableando, la red ha perdido o ganado lazos: el nuevo extremo tiene que salir de libres, las personas que aún no están unidas a i."
+  else if (e$agrupamiento(R) > 0.1) "Con p = 1 la red debería parecer aleatoria, con muy poco agrupamiento. ¿Eliges el nuevo extremo al azar?"
+})) {
+  list(correct = FALSE, message = fallo)
+} else {
+  fila <- which.min(abs(.result$p - 0.01))
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con p = ", coma(.result$p[fila], 3), ", la distancia media se queda en el ", round(100 * .result$L[fila]),
+    " % de la del anillo, y el agrupamiento conserva el ", round(100 * .result$C[fila]), " %. ",
+    "Con p = 1, la distancia es el ", round(100 * .result$L[nrow(.result)]), " % y el agrupamiento, el ",
+    round(100 * .result$C[nrow(.result)]), " %."))
+}
+```
+
+::: {.hint exercise="mundo"}
+`choose(grado, 2)` es el número de parejas de vecinos de cada persona, y funciona con un vector entero a la vez: el agrupamiento es `mean()` de la división. Para el nuevo extremo, `sample(x, 1)` elige un elemento de `x` al azar.
+:::
+
+::: {.solution exercise="mundo"}
+`mean(triangulos / choose(grado, 2))` en `agrupamiento()`, y `nuevo <- sample(libres, 1)` en `recablear()`.
+:::
+:::
+
+::::

@@ -1,0 +1,174 @@
+---
+title: "¿Cuántos trabajadores por pensionista?"
+numero: 29
+nivel: 2
+duracion: "30 min"
+lectura: "[Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential)"
+semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Una pensión que hoy cuesta el 7 % del salario costará el 17 %, y la cuenta ya está escrita en la tabla de vida."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Es la continuación de [la inercia demográfica](../28-inercia-demografica/index.qmd): el mismo país joven, con 4,5 hijos por mujer, cuya fecundidad cae de golpe al nivel de reemplazo. Allí mirábamos cuánta gente hay; aquí, de qué edad.
+
+El país funda un sistema de pensiones *de reparto*: los trabajadores de hoy pagan las pensiones de hoy. Si la pensión es el 60 % del salario, y suponemos que trabaja todo el mundo de 20 a 64 años y se jubila todo el mundo a los 65, la cuenta es sencilla. Lo que se paga, `pensionistas × 0,6 × salario`, tiene que ser lo que se cotiza, `trabajadores × cotización × salario`, así que
+
+$$\text{cotización} = 0{,}6 \times \frac{\text{pensionistas}}{\text{trabajadores}}.$$
+
+El cociente es la *tasa de dependencia*. Los políticos prometen la pensión; la demografía decide la cotización.
+
+**Tu tarea.**
+
+1. Completa `dependencia()`: las mujeres de la edad de jubilación en adelante entre las de 20 años hasta la jubilación, sin incluirla. `N` es la población por grupos de cinco años de edad, y `edad`, la edad con la que empieza cada grupo.
+2. Una *población estacionaria*, la que ni crece ni decrece, tiene en cada grupo de edad a tantas personas como años se viven en él según la tabla de vida, `L`. Calcula su tasa de dependencia.
+3. Mira el gráfico y la tabla: cómo cambia la cotización necesaria desde que la fecundidad cae al reemplazo, y adónde llega.
+4. Cuando la comprobación te dé por bueno el código, retrasa la jubilación a `jubilacion <- 70`. Después vuelve a 65 y prueba `tgf <- 3`. ¿Qué cambia la tasa de dependencia final, y qué no?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Al principio, el país tiene 8,8 trabajadoras por cada pensionista, y la pensión del 60 % se paga con una cotización del 6,8 %. Es fácil prometer. Cuando la fecundidad cae al reemplazo, las generaciones grandes envejecen y, 65 años después, quedan 2,9 trabajadoras por pensionista y hace falta cotizar el 20,4 %. Después la tasa baja algo y se asienta en la de la población estacionaria: 3,5 trabajadoras por pensionista y una cotización del 17,1 %.
+
+Lo importante es la tarea 4. Con `tgf <- 3` el camino es otro, pero el destino es el mismo, porque la tasa de dependencia final solo depende de `L`, de cuánto se vive a cada edad. Es contabilidad actuarial: con la fecundidad en el reemplazo y sin migración, la cotización a la que se llega está escrita en la tabla de vida, y ninguna promesa la cambia. Lo que sí la cambia es mover la frontera dentro de esa tabla: jubilarse a los 70 baja la tasa de dependencia final de 0,28 a 0,18 y la cotización, al 10,8 %. Las otras palancas son la pensión, la inmigración y una fecundidad por encima del reemplazo.
+
+El modelo es una caricatura: no todo el mundo trabaja de 20 a 64 años, y con más paro la tasa de dependencia real es mayor. Pero la lógica es la del debate español: la generación del *baby boom* empieza a jubilarse y la esperanza de vida a los 65 sigue subiendo, y las dos cosas suben la cotización necesaria.
+
+Wachter, K. W. (2014). *Essential Demographic Methods*. Harvard University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: pensiones
+#| caption: "Tu código"
+# El país de la inercia demográfica
+edad <- seq(0, 95, 5)
+lx <- c(1.000, 0.980, 0.979, 0.979, 0.978, 0.977, 0.974, 0.971, 0.964, 0.954, 0.938,
+        0.911, 0.869, 0.803, 0.705, 0.570, 0.401, 0.224, 0.086, 0.018, 0.001)
+L <- 5 * (lx[-21] + lx[-1]) / 2
+tgf <- 4.5
+forma <- c(0, 0, 0, 0.08, 0.22, 0.27, 0.22, 0.14, 0.06, 0.01, rep(0, 10))
+m <- tgf * forma / 5 * 0.488
+leslie <- function(m) {
+  P <- L[-1] / L[-20]
+  A <- matrix(0, 20, 20)
+  A[cbind(2:20, 1:19)] <- P
+  A[1, ] <- L[1] / 2 * (m + c(P, 0) * c(m[-1], 0))
+  A
+}
+estable <- Re(eigen(leslie(m))$vectors[, 1])
+A_reemplazo <- leslie(m / sum(m * L))
+
+jubilacion <- 65
+sustitucion <- 0.6  # la pensión, en proporción del salario
+
+# 1. Pensionistas por cada trabajador
+dependencia <- function(N, jubilacion) {
+  ______
+}
+
+# Cien años desde la caída al reemplazo
+N <- estable
+tasa <- dependencia(N, jubilacion)
+for (paso in 1:20) {
+  N <- A_reemplazo %*% N
+  tasa <- c(tasa, dependencia(N, jubilacion))
+}
+
+# 2. La tasa de dependencia de la población estacionaria
+estacionaria <- dependencia(______, jubilacion)
+
+plot(seq(0, 100, 5), sustitucion * tasa, type = "b", pch = 19, col = "#c0392b", ylim = c(0, 0.25),
+     xlab = "Años desde la caída al reemplazo", ylab = "Cotización necesaria")
+abline(h = sustitucion * estacionaria, lty = 2)
+round(rbind(dependencia = c(al_principio = tasa[1], maxima = max(tasa), estacionaria = estacionaria),
+            trabajadoras_por_pensionista = 1 / c(tasa[1], max(tasa), estacionaria),
+            cotizacion = sustitucion * c(tasa[1], max(tasa), estacionaria)), 3)
+```
+
+```{webr}
+#| exercise: pensiones
+#| solution: true
+edad <- seq(0, 95, 5)
+lx <- c(1.000, 0.980, 0.979, 0.979, 0.978, 0.977, 0.974, 0.971, 0.964, 0.954, 0.938,
+        0.911, 0.869, 0.803, 0.705, 0.570, 0.401, 0.224, 0.086, 0.018, 0.001)
+L <- 5 * (lx[-21] + lx[-1]) / 2
+tgf <- 4.5
+forma <- c(0, 0, 0, 0.08, 0.22, 0.27, 0.22, 0.14, 0.06, 0.01, rep(0, 10))
+m <- tgf * forma / 5 * 0.488
+leslie <- function(m) {
+  P <- L[-1] / L[-20]
+  A <- matrix(0, 20, 20)
+  A[cbind(2:20, 1:19)] <- P
+  A[1, ] <- L[1] / 2 * (m + c(P, 0) * c(m[-1], 0))
+  A
+}
+estable <- Re(eigen(leslie(m))$vectors[, 1])
+A_reemplazo <- leslie(m / sum(m * L))
+
+jubilacion <- 65
+sustitucion <- 0.6
+
+dependencia <- function(N, jubilacion) {
+  sum(N[edad >= jubilacion]) / sum(N[edad >= 20 & edad < jubilacion])
+}
+
+N <- estable
+tasa <- dependencia(N, jubilacion)
+for (paso in 1:20) {
+  N <- A_reemplazo %*% N
+  tasa <- c(tasa, dependencia(N, jubilacion))
+}
+
+estacionaria <- dependencia(L, jubilacion)
+
+plot(seq(0, 100, 5), sustitucion * tasa, type = "b", pch = 19, col = "#c0392b", ylim = c(0, 0.25),
+     xlab = "Años desde la caída al reemplazo", ylab = "Cotización necesaria")
+abline(h = sustitucion * estacionaria, lty = 2)
+round(rbind(dependencia = c(al_principio = tasa[1], maxima = max(tasa), estacionaria = estacionaria),
+            trabajadoras_por_pensionista = 1 / c(tasa[1], max(tasa), estacionaria),
+            cotizacion = sustitucion * c(tasa[1], max(tasa), estacionaria)), 3)
+```
+
+```{webr}
+#| exercise: pensiones
+#| check: true
+# Se comprueba con casos propios: la tarea 4 cambia la jubilación y la fecundidad.
+e <- .envir_result
+f <- e$dependencia
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función dependencia().")
+} else if (isTRUE(all.equal(f(rep(1, 20), 65), 7 / 13))) {
+  list(correct = FALSE, message = "dependencia() cuenta a los niños entre los trabajadores. Los trabajadores tienen de 20 años hasta la jubilación.")
+} else if (any(sapply(c(6 / 9, 7 / 8, 7 / 10, 6 / 10), function(x) isTRUE(all.equal(f(rep(1, 20), 65), x))))) {
+  list(correct = FALSE, message = "dependencia() pone mal la frontera de la jubilación: el grupo que empieza a los 65 ya está jubilado, y el de 60 a 64 todavía trabaja.")
+} else if (!isTRUE(all.equal(f(rep(1, 20), 65), 7 / 9)) || !isTRUE(all.equal(f(1:20, 70), sum(15:20) / sum(5:14)))) {
+  list(correct = FALSE, message = "dependencia() no da los pensionistas entre los trabajadores. Con una persona en cada grupo de edad y jubilación a los 65, debería dar 7 / 9.")
+} else if (!isTRUE(all.equal(e$estacionaria, sum(e$L[e$edad >= e$jubilacion]) / sum(e$L[e$edad >= 20 & e$edad < e$jubilacion])))) {
+  list(correct = FALSE, message = "dependencia() está bien, pero estacionaria no. La población estacionaria tiene en cada grupo de edad tantas personas como años se viven en él según la tabla de vida: L.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Se pasa de ", coma(1 / e$tasa[1]), " trabajadoras por pensionista a ", coma(1 / e$estacionaria),
+    ", y la cotización necesaria, del ", coma(100 * e$sustitucion * e$tasa[1]), " % al ",
+    coma(100 * e$sustitucion * e$estacionaria), " %, con una punta del ", coma(100 * e$sustitucion * max(e$tasa)), " %."))
+}
+```
+
+::: {.hint exercise="pensiones"}
+`N[edad >= jubilacion]` son las pensionistas. Para las trabajadoras hacen falta dos condiciones a la vez, unidas con `&`. Y la población estacionaria no hay que proyectarla: ya la tienes en la tabla de vida.
+:::
+
+::: {.solution exercise="pensiones"}
+`sum(N[edad >= jubilacion]) / sum(N[edad >= 20 & edad < jubilacion])` en `dependencia()`, y `dependencia(L, jubilacion)`.
+:::
+:::
+
+::::

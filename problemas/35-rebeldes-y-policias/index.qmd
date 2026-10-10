@@ -1,0 +1,270 @@
+---
+title: "Rebeldes y policías"
+numero: 35
+nivel: 2
+duracion: "40 min"
+lectura: "[Epstein (2006)](https://nuevasomosaguas.github.io/biblioteca.html#epstein2006generative)"
+semana: "[Semana 5](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-05/)"
+dificultad: "Intermedio"
+categories: [modelos de agentes, equilibrios y dinámica]
+description: "La legitimidad de un gobierno cae de 0,9 a 0,5. Si cae de golpe, estalla una revuelta; si cae poco a poco, no pasa casi nada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Con [los umbrales de Granovetter](../02-granovetter/index.qmd) y [la falsificación de preferencias de Kuran](../06-kuran/index.qmd) viste que una revuelta depende de cuántos se han sumado ya. Joshua Epstein añadió en 2002 lo que faltaba en los dos modelos: el espacio y la policía. En su modelo de violencia civil, unos ciudadanos y unos policías se mueven por una cuadrícula, y cada ciudadano solo ve lo que tiene cerca.
+
+Cada ciudadano tiene una *penuria* $H$ y una *aversión al riesgo* $R$, las dos al azar entre 0 y 1. Su *agravio* contra el gobierno es $H\,(1 - L)$, donde $L$ es la legitimidad del gobierno, la misma para todos. Antes de rebelarse, estima la probabilidad de que lo detengan con los policías $C$ y los rebeldes $A$ que ve, contándose a sí mismo como rebelde:
+
+$$P = 1 - e^{-k\,C/A}, \qquad k = 2{,}3.$$
+
+Con un policía y ningún otro rebelde a la vista, $P = 0{,}9$; cuantos más rebeldes lo rodean, menor es el riesgo de que le toque a él. Se rebela si su agravio supera a su riesgo neto, $R \cdot P$, en más de un umbral de 0,1. En cada periodo, todos se mueven a una casilla libre a la vista, los ciudadanos deciden, y cada policía detiene a un rebelde al azar de los que ve, que pasa entre 1 y 30 periodos en la cárcel.
+
+Es una versión simplificada del modelo: la cuadrícula es de 20 × 20, en lugar de 40 × 40, y cada cual ve un cuadrado a su alrededor, no solo en las cuatro direcciones.
+
+**Tu tarea.**
+
+1. Completa `se_rebela()`, que recibe vectores con la penuria, la aversión al riesgo, la legitimidad y lo que ve cada ciudadano, y devuelve `TRUE` para los que se rebelan.
+2. El código simula dos historias con los mismos ciudadanos. Durante 50 periodos, la legitimidad es de 0,9; después baja a 0,5, de golpe en una y poco a poco, a lo largo de 100 periodos, en la otra. Compara los picos de rebeldes. La simulación tarda unos segundos.
+3. Prueba con otras semillas, añadiendo `semilla = 2` a las dos llamadas a `simula()`. ¿Se mantiene la diferencia?
+4. Vuelve a la semilla 1 y cambia el número de policías a `n_policias <- 8` y luego a `n_policias <- 24`.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con una legitimidad de 0,9, el agravio no pasa de 0,1, y nadie puede superar el umbral: no hay ni un rebelde. Cuando la legitimidad cae de golpe a 0,5, todos los ciudadanos con mucha penuria quedan agraviados a la vez, y en tres periodos hay 77 rebeldes. Cuando cae poco a poco hasta el mismo 0,5, el pico es de 36. Con las semillas de la 2 a la 6, la caída brusca da picos de entre 61 y 85 rebeldes, y la gradual, de entre 19 y 30.
+
+La diferencia está en $C/A$. Si muchos se rebelan a la vez, cada uno ve a muchos otros rebeldes, su riesgo baja y se suman los que estaban dudando: es el umbral de Granovetter, que aquí depende de lo que cada cual ve a su alrededor. Si la legitimidad cae despacio, los primeros en rebelarse son pocos y están dispersos; la policía los detiene uno a uno, antes de que arrastren a nadie, y quedan en la cárcel. Epstein lo resume así: lo que importa no es el nivel de la legitimidad, sino su derivada, la velocidad a la que cae. Un gobierno puede perder mucha más legitimidad a pequeños pasos que de un solo golpe sin provocar una revuelta.
+
+Es la lección de Kuran desde otro ángulo: al final, las dos sociedades tienen la misma legitimidad, y una ha estallado y la otra no. Mirar solo el nivel de descontento no basta para saber qué va a pasar.
+
+La tarea 4 muestra el papel de la represión. Con 8 policías, los picos suben a 167 y 65 rebeldes; con 24, bajan a 29 y 13. Epstein también encontró que reducir la policía de golpe provoca estallidos, y que los ciudadanos agraviados se comportan como si fueran leales mientras tienen un policía cerca, y se rebelan en cuanto se aleja.
+
+Epstein, J. M. (2002). Modeling civil violence: An agent-based computational approach. *Proceedings of the National Academy of Sciences*, 99(suppl. 3), 7243–7250.
+
+Epstein, J. M. (2006). *Generative Social Science: Studies in Agent-Based Computational Modeling*. Princeton University Press. El capítulo 11 reproduce el artículo de 2002.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: rebeldes
+#| caption: "Tu código"
+lado <- 20          # una cuadrícula de 20 × 20 casillas, cerrada sobre sí misma
+vision <- 4         # cada cual ve hasta 4 casillas en cada dirección
+n_ciudadanos <- 280 # el 70 % de las casillas
+n_policias <- 16    # el 4 %
+k <- 2.3            # con un policía y un rebelde a la vista, P = 0,9
+umbral <- 0.1
+max_carcel <- 30    # la condena, entre 1 y 30 periodos
+
+# H: penuria; R: aversión al riesgo; L: legitimidad del gobierno;
+# C: policías a la vista; A: rebeldes a la vista, contándose a sí mismo
+se_rebela <- function(H, R, L, C, A) {
+  agravio <- H * (1 - L)
+  P <- ______    # la probabilidad que estima de que lo detengan
+  ______         # TRUE si el agravio supera al riesgo neto, R · P, en más del umbral
+}
+
+# a_la_vista[i, j] es 1 si desde la casilla i se ve la casilla j
+casilla <- seq_len(lado^2)
+x <- (casilla - 1) %% lado
+y <- (casilla - 1) %/% lado
+distancia <- function(a, b) pmin(abs(a - b), lado - abs(a - b))
+a_la_vista <- (outer(x, x, distancia) <= vision & outer(y, y, distancia) <= vision) * 1
+
+# legitimidad: un valor por periodo. Devuelve cuántos rebeldes hay en cada periodo.
+simula <- function(legitimidad, semilla = 1) {
+  set.seed(semilla)
+  H <- runif(n_ciudadanos)
+  R <- runif(n_ciudadanos)
+  sitios <- sample(lado^2, n_ciudadanos + n_policias)
+  pos <- sitios[1:n_ciudadanos]                  # NA si está en la cárcel
+  pos_policia <- sitios[-(1:n_ciudadanos)]
+  ocupado <- casilla %in% sitios
+  carcel <- rep(0, n_ciudadanos)                 # periodos de condena que le quedan
+  activo <- rep(FALSE, n_ciudadanos)
+  rebeldes <- numeric(length(legitimidad))
+  for (t in seq_along(legitimidad)) {
+    # Todos se mueven, en orden aleatorio, a una casilla libre a la vista
+    for (i in sample(c(which(carcel == 0), -seq_len(n_policias)))) {
+      desde <- if (i > 0) pos[i] else pos_policia[-i]
+      libres <- which(a_la_vista[, desde] == 1 & !ocupado)
+      if (length(libres) == 0) next
+      hasta <- libres[sample.int(length(libres), 1)]
+      ocupado[c(desde, hasta)] <- c(FALSE, TRUE)
+      if (i > 0) pos[i] <- hasta else pos_policia[-i] <- hasta
+    }
+    # Los ciudadanos libres deciden, a la vista de lo que hacían los demás
+    libre <- carcel == 0
+    C <- (a_la_vista %*% tabulate(pos_policia, lado^2))[pos[libre]]
+    A <- 1 + (a_la_vista %*% tabulate(pos[libre & activo], lado^2))[pos[libre]] - activo[libre]
+    activo <- rep(FALSE, n_ciudadanos)
+    activo[libre] <- se_rebela(H[libre], R[libre], legitimidad[t], C, A)
+    # Cada policía detiene a un rebelde al azar de los que ve
+    for (p in sample(pos_policia)) {
+      a_su_vista <- which(activo & a_la_vista[pos, p] == 1)
+      if (length(a_su_vista) == 0) next
+      j <- a_su_vista[sample.int(length(a_su_vista), 1)]
+      activo[j] <- FALSE
+      carcel[j] <- sample(max_carcel, 1)
+      ocupado[pos[j]] <- FALSE
+      pos[j] <- NA
+    }
+    rebeldes[t] <- sum(activo)
+    # Pasa un periodo de condena; quien la cumple sale a una casilla libre al azar
+    sale <- which(carcel == 1)
+    carcel[carcel > 0] <- carcel[carcel > 0] - 1
+    for (j in sale) {
+      pos[j] <- which(!ocupado)[sample.int(sum(!ocupado), 1)]
+      ocupado[pos[j]] <- TRUE
+    }
+  }
+  rebeldes
+}
+
+brusca <- simula(c(rep(0.9, 50), rep(0.5, 150)))
+gradual <- simula(c(rep(0.9, 50), seq(0.9, 0.5, length.out = 100), rep(0.5, 50)))
+
+matplot(cbind(brusca, gradual), type = "l", lty = 1, lwd = 2,
+        col = c("#c0392b", "#2980b9"), xlab = "Periodo", ylab = "Rebeldes")
+legend("topright", c("Caída brusca", "Caída gradual"), col = c("#c0392b", "#2980b9"), lwd = 2, bty = "n")
+
+c(antes = max(brusca[1:50]), pico_brusca = max(brusca), pico_gradual = max(gradual))
+```
+
+```{webr}
+#| exercise: rebeldes
+#| solution: true
+lado <- 20          # una cuadrícula de 20 × 20 casillas, cerrada sobre sí misma
+vision <- 4         # cada cual ve hasta 4 casillas en cada dirección
+n_ciudadanos <- 280 # el 70 % de las casillas
+n_policias <- 16    # el 4 %
+k <- 2.3            # con un policía y un rebelde a la vista, P = 0,9
+umbral <- 0.1
+max_carcel <- 30    # la condena, entre 1 y 30 periodos
+
+# H: penuria; R: aversión al riesgo; L: legitimidad del gobierno;
+# C: policías a la vista; A: rebeldes a la vista, contándose a sí mismo
+se_rebela <- function(H, R, L, C, A) {
+  agravio <- H * (1 - L)
+  P <- 1 - exp(-k * C / A)
+  agravio - R * P > umbral
+}
+
+# a_la_vista[i, j] es 1 si desde la casilla i se ve la casilla j
+casilla <- seq_len(lado^2)
+x <- (casilla - 1) %% lado
+y <- (casilla - 1) %/% lado
+distancia <- function(a, b) pmin(abs(a - b), lado - abs(a - b))
+a_la_vista <- (outer(x, x, distancia) <= vision & outer(y, y, distancia) <= vision) * 1
+
+# legitimidad: un valor por periodo. Devuelve cuántos rebeldes hay en cada periodo.
+simula <- function(legitimidad, semilla = 1) {
+  set.seed(semilla)
+  H <- runif(n_ciudadanos)
+  R <- runif(n_ciudadanos)
+  sitios <- sample(lado^2, n_ciudadanos + n_policias)
+  pos <- sitios[1:n_ciudadanos]                  # NA si está en la cárcel
+  pos_policia <- sitios[-(1:n_ciudadanos)]
+  ocupado <- casilla %in% sitios
+  carcel <- rep(0, n_ciudadanos)                 # periodos de condena que le quedan
+  activo <- rep(FALSE, n_ciudadanos)
+  rebeldes <- numeric(length(legitimidad))
+  for (t in seq_along(legitimidad)) {
+    # Todos se mueven, en orden aleatorio, a una casilla libre a la vista
+    for (i in sample(c(which(carcel == 0), -seq_len(n_policias)))) {
+      desde <- if (i > 0) pos[i] else pos_policia[-i]
+      libres <- which(a_la_vista[, desde] == 1 & !ocupado)
+      if (length(libres) == 0) next
+      hasta <- libres[sample.int(length(libres), 1)]
+      ocupado[c(desde, hasta)] <- c(FALSE, TRUE)
+      if (i > 0) pos[i] <- hasta else pos_policia[-i] <- hasta
+    }
+    # Los ciudadanos libres deciden, a la vista de lo que hacían los demás
+    libre <- carcel == 0
+    C <- (a_la_vista %*% tabulate(pos_policia, lado^2))[pos[libre]]
+    A <- 1 + (a_la_vista %*% tabulate(pos[libre & activo], lado^2))[pos[libre]] - activo[libre]
+    activo <- rep(FALSE, n_ciudadanos)
+    activo[libre] <- se_rebela(H[libre], R[libre], legitimidad[t], C, A)
+    # Cada policía detiene a un rebelde al azar de los que ve
+    for (p in sample(pos_policia)) {
+      a_su_vista <- which(activo & a_la_vista[pos, p] == 1)
+      if (length(a_su_vista) == 0) next
+      j <- a_su_vista[sample.int(length(a_su_vista), 1)]
+      activo[j] <- FALSE
+      carcel[j] <- sample(max_carcel, 1)
+      ocupado[pos[j]] <- FALSE
+      pos[j] <- NA
+    }
+    rebeldes[t] <- sum(activo)
+    # Pasa un periodo de condena; quien la cumple sale a una casilla libre al azar
+    sale <- which(carcel == 1)
+    carcel[carcel > 0] <- carcel[carcel > 0] - 1
+    for (j in sale) {
+      pos[j] <- which(!ocupado)[sample.int(sum(!ocupado), 1)]
+      ocupado[pos[j]] <- TRUE
+    }
+  }
+  rebeldes
+}
+
+brusca <- simula(c(rep(0.9, 50), rep(0.5, 150)))
+gradual <- simula(c(rep(0.9, 50), seq(0.9, 0.5, length.out = 100), rep(0.5, 50)))
+
+matplot(cbind(brusca, gradual), type = "l", lty = 1, lwd = 2,
+        col = c("#c0392b", "#2980b9"), xlab = "Periodo", ylab = "Rebeldes")
+legend("topright", c("Caída brusca", "Caída gradual"), col = c("#c0392b", "#2980b9"), lwd = 2, bty = "n")
+
+c(antes = max(brusca[1:50]), pico_brusca = max(brusca), pico_gradual = max(gradual))
+```
+
+```{webr}
+#| exercise: rebeldes
+#| check: true
+# Casos propios de se_rebela(), uno por fila: H, R, L, C, A y lo que debería devolver
+e <- .envir_result
+casos <- data.frame(
+  H = c(1,   1,   1,   1,   1,   0.2, 1),
+  R = c(0.5, 0.5, 0.5, 0.5, 0.2, 0,   0),
+  L = c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.9),
+  C = c(0,   1,   1,   10,  1,   1,   0),
+  A = c(1,   1,   10,  1,   1,   1,   1),
+  esperado = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE))
+coma <- function(x) format(x, decimal.mark = ",")
+if (!is.function(e$se_rebela)) {
+  list(correct = FALSE, message = "No encuentro la función se_rebela().")
+} else {
+  obtenido <- with(casos, e$se_rebela(H, R, L, C, A))
+  fallo <- which(!(length(obtenido) == nrow(casos) & is.logical(obtenido) & obtenido %in% TRUE == casos$esperado))[1]
+  if (!is.na(fallo)) {
+    caso <- casos[fallo, ]
+    list(correct = FALSE, message = paste0(
+      "Con H = ", coma(caso$H), ", R = ", coma(caso$R), ", L = ", coma(caso$L), ", C = ", caso$C, " y A = ", caso$A,
+      ", se_rebela() debería dar ", caso$esperado,
+      if (fallo == 6) ". El agravio es exactamente 0,1: tiene que superar el umbral, no basta con igualarlo."
+      else if (fallo == 3) ". Con diez rebeldes alrededor y un policía, el riesgo de cada uno es pequeño: ¿has escrito C / A?"
+      else if (fallo == 7) ". Con una legitimidad de 0,9, el agravio es pequeño: es la penuria por lo que le falta al gobierno de legitimidad, 1 − L."
+      else ". Repasa P = 1 − exp(−k · C / A) y la regla: agravio − R · P > umbral."))
+  } else {
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! Antes de la caída hay ", .result[["antes"]], " rebeldes. Si la legitimidad cae de golpe, el pico es de ",
+      .result[["pico_brusca"]], "; si cae poco a poco hasta el mismo nivel, de ", .result[["pico_gradual"]], "."))
+  }
+}
+```
+
+::: {.hint exercise="rebeldes"}
+La exponencial es `exp()`, y `k` ya está definida arriba. La última línea de la función es la comparación: el agravio menos el riesgo neto, `R * P`, mayor que `umbral`.
+:::
+
+::: {.solution exercise="rebeldes"}
+`P <- 1 - exp(-k * C / A)` y `agravio - R * P > umbral`.
+:::
+:::
+
+::::

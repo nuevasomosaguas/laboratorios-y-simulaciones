@@ -1,0 +1,182 @@
+---
+title: "El efecto que encoge"
+numero: 34
+nivel: 2
+duracion: "30 min"
+lectura: "[Harrer, Cuijpers, Furukawa y Ebert (2021)](https://nuevasomosaguas.github.io/biblioteca.html#harrer2021doing)"
+semana: "[Semana 6](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-06/)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Un metaanálisis de lo publicado suma mil estudios y aun así se equivoca: si solo se publica lo significativo, el embudo se tuerce."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En [¿Grande o significativo?](../07-cohen/index.qmd) viste que, si solo se publican los estudios que salen significativos, la d publicada se infla. Un *metaanálisis* parece el remedio: en lugar de fiarse de un estudio, se combinan todos los que hay sobre una pregunta, y el ruido de cada uno se cancela con el de los demás.
+
+La forma más sencilla de combinarlos es una media ponderada por la precisión de cada estudio. Si el estudio $i$ estima un efecto $d_i$ con un error típico $e_i$, su peso es la inversa de su varianza, $w_i = 1/e_i^2$, y el efecto combinado es
+
+$$\hat{d} = \frac{\sum_i w_i\, d_i}{\sum_i w_i}.$$
+
+Los estudios grandes, con errores pequeños, pesan mucho; los pequeños, poco.
+
+El código simula mil estudios de un efecto real de d = 0,2, con entre 10 y 200 personas por grupo. Cada uno estima la d con un error típico de $\sqrt{2/n}$, y solo se publica si sale significativo y a favor.
+
+**Tu tarea.**
+
+1. Completa los pesos de `metaanalisis()`. Compara el efecto combinado de todos los estudios con el de los publicados.
+2. Mira el *gráfico de embudo*: cada punto es un estudio, con su d en horizontal y su error típico en vertical, los más precisos arriba. Sin sesgo, los puntos forman un embudo simétrico alrededor del efecto real. ¿Qué forma tienen los publicados, en rojo? La línea negra es $d = 1{,}96\,e$, la frontera de la significación.
+3. El *test de Egger* mide esa asimetría: regresa $z_i = d_i/e_i$ sobre la precisión $1/e_i$. Si no hay sesgo, la recta pasa por el origen; el término independiente mide cuánto se aparta. Completa `egger()` y compara todos los estudios con los publicados.
+4. Compara la d media publicada de los estudios pequeños, de menos de 50 personas por grupo, con la de los grandes, de 150 o más.
+5. Cambia el efecto real a `efecto <- 0` y vuelve a ejecutar. ¿Qué dice ahora la literatura publicada?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con los mil estudios, el metaanálisis da 0,197: el efecto real. Con los 290 que se publican, 0,318, un 60 % más. Sumar estudios no corrige el sesgo de selección, porque todos los publicados están sesgados en la misma dirección: el metaanálisis solo lo hace más preciso, y por eso más convincente.
+
+El embudo lo delata. Los estudios precisos, arriba, se publican casi todos, porque con ellos un efecto de 0,2 sale significativo. Los imprecisos, abajo, solo se publican si han tenido la suerte de estimar un efecto grande, y quedan todos a la derecha de la línea negra: falta el lado izquierdo del embudo. El término independiente de Egger es −0,02 con todos los estudios y 2,10 con los publicados.
+
+De ahí el título. La d media publicada de los estudios pequeños es 0,579, y la de los grandes, 0,286: cuanto más grande es el estudio, más pequeño es el efecto. Es lo que se ve cuando un efecto llamativo se replica con muestras grandes, y no significa que el efecto haya cambiado: los primeros estudios eran pequeños y solo se publicaron los que exageraban. Con un efecto real de cero, se publica el 1,5 % de los estudios, que son justo los falsos positivos a favor, y el metaanálisis de lo publicado encuentra un efecto de 0,322 donde no hay nada.
+
+Harrer y sus colegas dedican el capítulo 9 de su libro al sesgo de publicación: el gráfico de embudo, el test de Egger y los métodos que intentan corregirlo, como el *trim-and-fill*, PET-PEESE o los modelos de selección. Ninguno lo arregla del todo, y la solución de fondo no es estadística: registrar los estudios antes de hacerlos, como los *registered reports*, y publicar los resultados salgan como salgan.
+
+**Para ir más allá:** la regresión de PET, `lm(d ~ ee, weights = 1 / ee^2)`, estima el efecto de un estudio infinitamente preciso con el término independiente. Pruébala con los publicados, con efecto 0,2 y con efecto 0: verás por qué se combina con PEESE, que usa `ee^2` en lugar de `ee`.
+
+Egger, M., Davey Smith, G., Schneider, M. y Minder, C. (1997). Bias in meta-analysis detected by a simple, graphical test. *BMJ*, 315(7109), 629–634.
+
+Harrer, M., Cuijpers, P., Furukawa, T. A. y Ebert, D. D. (2021). *Doing Meta-Analysis with R: A Hands-On Guide*. Chapman & Hall/CRC.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: encoge
+#| caption: "Tu código"
+efecto <- 0.2  # el efecto real, en unidades de d
+K <- 1000      # estudios que se hacen
+
+set.seed(34)
+n <- sample(10:200, K, replace = TRUE)  # personas por grupo
+ee <- sqrt(2 / n)                       # error típico de la d de cada estudio
+d <- rnorm(K, efecto, ee)               # la d que estima cada estudio
+p <- 2 * pnorm(-abs(d / ee))
+publicado <- p < 0.05 & d > 0
+
+# 1. El efecto combinado, ponderado por la inversa de la varianza
+metaanalisis <- function(d, ee) {
+  w <- ______
+  sum(w * d) / sum(w)
+}
+
+# 3. El test de Egger: el término independiente de z sobre la precisión
+egger <- function(d, ee) {
+  z <- d / ee
+  precision <- 1 / ee
+  coef(lm(______))[["(Intercept)"]]
+}
+
+# 2. El gráfico de embudo
+plot(d[publicado], ee[publicado], pch = 19, col = "#c0392b", ylim = rev(range(ee)), xlim = range(d),
+     xlab = "d estimada", ylab = "Error típico")
+points(d[!publicado], ee[!publicado], col = "grey70")
+abline(v = efecto, lty = 2)
+lines(1.96 * sort(ee), sort(ee))
+
+c(publicados = mean(publicado),
+  todos = metaanalisis(d, ee),
+  solo_publicados = metaanalisis(d[publicado], ee[publicado]),
+  egger_todos = egger(d, ee),
+  egger_publicados = egger(d[publicado], ee[publicado]),
+  d_pequenos = mean(d[publicado & n < 50]),
+  d_grandes = mean(d[publicado & n >= 150]))
+```
+
+```{webr}
+#| exercise: encoge
+#| solution: true
+efecto <- 0.2
+K <- 1000
+
+set.seed(34)
+n <- sample(10:200, K, replace = TRUE)
+ee <- sqrt(2 / n)
+d <- rnorm(K, efecto, ee)
+p <- 2 * pnorm(-abs(d / ee))
+publicado <- p < 0.05 & d > 0
+
+metaanalisis <- function(d, ee) {
+  w <- 1 / ee^2
+  sum(w * d) / sum(w)
+}
+
+egger <- function(d, ee) {
+  z <- d / ee
+  precision <- 1 / ee
+  coef(lm(z ~ precision))[["(Intercept)"]]
+}
+
+plot(d[publicado], ee[publicado], pch = 19, col = "#c0392b", ylim = rev(range(ee)), xlim = range(d),
+     xlab = "d estimada", ylab = "Error típico")
+points(d[!publicado], ee[!publicado], col = "grey70")
+abline(v = efecto, lty = 2)
+lines(1.96 * sort(ee), sort(ee))
+
+c(publicados = mean(publicado),
+  todos = metaanalisis(d, ee),
+  solo_publicados = metaanalisis(d[publicado], ee[publicado]),
+  egger_todos = egger(d, ee),
+  egger_publicados = egger(d[publicado], ee[publicado]),
+  d_pequenos = mean(d[publicado & n < 50]),
+  d_grandes = mean(d[publicado & n >= 150]))
+```
+
+```{webr}
+#| exercise: encoge
+#| check: true
+# Se comprueban las funciones con estudios propios, no el resultado: la tarea 5 cambia el efecto.
+e <- .envir_result
+coma <- function(x, digitos = 3) format(round(x, digitos), nsmall = digitos, decimal.mark = ",")
+d1 <- c(0.1, 0.5, 0.3)
+e1 <- c(0.1, 0.2, 0.4)
+combinado <- sum(d1 / e1^2) / sum(1 / e1^2)
+# Cinco estudios en los que z = 1 + 2 · precisión: el término independiente es 1
+e2 <- c(0.1, 0.2, 0.25, 0.5, 1)
+d2 <- e2 * (1 + 2 / e2)
+if (!is.function(e$metaanalisis) || !is.function(e$egger)) {
+  list(correct = FALSE, message = "No encuentro las funciones metaanalisis() o egger().")
+} else if (isTRUE(all.equal(e$metaanalisis(d1, e1), mean(d1)))) {
+  list(correct = FALSE, message = "metaanalisis() da la media simple. Los estudios más precisos tienen que pesar más.")
+} else if (isTRUE(all.equal(e$metaanalisis(d1, e1), sum(d1 / e1) / sum(1 / e1)))) {
+  list(correct = FALSE, message = "metaanalisis() pondera por 1 / ee. El peso es la inversa de la varianza, y la varianza es el cuadrado del error típico.")
+} else if (!isTRUE(all.equal(e$metaanalisis(d1, e1), combinado))) {
+  list(correct = FALSE, message = paste0(
+    "Con d = 0,1, 0,5 y 0,3 y errores típicos 0,1, 0,2 y 0,4, metaanalisis() debería dar ", coma(combinado),
+    ", y da ", coma(e$metaanalisis(d1, e1)), "."))
+} else if (!isTRUE(all.equal(e$egger(d2, e2), 1))) {
+  list(correct = FALSE, message = paste0(
+    "Con unos estudios en los que z = 1 + 2 · precisión, egger() debería dar 1, y da ", coma(e$egger(d2, e2)),
+    ". La variable dependiente es z, y la explicativa, la precisión."))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Se publica el ", format(round(100 * .result[["publicados"]], 1), decimal.mark = ","),
+    " % de los estudios. El metaanálisis de todos da ", coma(.result[["todos"]]),
+    ", y el de los publicados, ", coma(.result[["solo_publicados"]]),
+    ". Egger pasa de ", coma(.result[["egger_todos"]], 2), " a ", coma(.result[["egger_publicados"]], 2), "."))
+}
+```
+
+::: {.hint exercise="encoge"}
+La varianza de un estudio es el cuadrado de su error típico, `ee^2`, y su peso es la inversa. En `lm()`, la fórmula va con la variable dependiente a la izquierda de `~` y la explicativa a la derecha.
+:::
+
+::: {.solution exercise="encoge"}
+`w <- 1 / ee^2` en `metaanalisis()`, y `lm(z ~ precision)` en `egger()`.
+:::
+:::
+
+::::
