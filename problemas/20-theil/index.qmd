@@ -96,6 +96,7 @@ c(total = total, dentro = dentro, entre = entre, suma = dentro + entre, parte_en
 ```{webr}
 #| exercise: theil
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 e <- .envir_result
 f <- e$theil
 if (!is.function(f)) {

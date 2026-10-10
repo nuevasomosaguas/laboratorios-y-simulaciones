@@ -73,6 +73,7 @@ coef(modelo)["clases"]
 ```{webr}
 #| exercise: clases
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 estimado <- unname(as.numeric(.result))
 con_mediador <- coef(lm(nota ~ clases + horas + ingresos, data = .envir_result$datos))["clases"]
 if (length(estimado) != 1) {

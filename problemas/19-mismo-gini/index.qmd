@@ -102,6 +102,7 @@ round(rbind(A = medidas(L_A), B = medidas(L_B)), 3)
 ```{webr}
 #| exercise: mismo-gini
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 f <- .envir_result$gini_de_lorenz
 q <- seq(0, 1, length.out = 501)
 if (!is.function(f)) {

@@ -68,6 +68,7 @@ cor(talento, esfuerzo)
 ```{webr}
 #| exercise: berkson
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 if (isTRUE(all.equal(.result, .solution))) {
   list(correct = TRUE, message = paste0(
     "¡Correcto! En la población la correlación es ", format(round(.solution, 3), decimal.mark = ","),

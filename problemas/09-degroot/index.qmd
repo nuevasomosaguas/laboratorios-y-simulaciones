@@ -122,6 +122,7 @@ rbind(
 ```{webr}
 #| exercise: degroot
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 e <- .envir_result
 coma <- function(x) format(round(x, 3), nsmall = 3, decimal.mark = ",")
 if (!is.function(e$consenso)) {

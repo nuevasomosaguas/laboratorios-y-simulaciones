@@ -103,6 +103,7 @@ c(inicial = gini(renta),
 ```{webr}
 #| exercise: renta-basica
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 e <- .envir_result
 if (!is.function(e$renta_basica) || !is.function(e$transferencia)) {
   list(correct = FALSE, message = "No encuentro renta_basica() o transferencia().")

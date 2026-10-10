@@ -182,6 +182,7 @@ c(V_inicio = V(inicio),
 ```{webr}
 #| exercise: lotka
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 e <- .envir_result
 coma <- function(v, d = 4) format(round(v, d), nsmall = d, decimal.mark = ",")
 if (!is.function(e$equilibrio) || !is.function(e$paso_rk4)) {

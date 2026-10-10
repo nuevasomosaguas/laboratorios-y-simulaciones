@@ -58,7 +58,8 @@ mi_funcion(1:10)
 ```{webr}
 #| exercise: nombre
 #| check: true
-# .result es el último valor del alumno; .solution, el de la solución; .envir_result, sus variables.
+# .result es el último valor del alumno, y .envir_result, sus variables. quarto-live no define
+# .solution: si hace falta el valor de la solución, .solution <- list(...)$solution.
 # Mejor comprobar las funciones con casos propios que solo el resultado final: así se puede
 # explicar qué falla, y el alumno puede cambiar los parámetros sin que deje de valer.
 f <- .envir_result$mi_funcion

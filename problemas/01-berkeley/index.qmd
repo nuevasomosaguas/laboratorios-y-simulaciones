@@ -60,6 +60,7 @@ round(por_departamento["Admitted", , ], 3)
 ```{webr}
 #| exercise: berkeley
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 if (isTRUE(all.equal(unclass(.result), unclass(.solution)))) {
   list(correct = TRUE, message = "¡Correcto! Las mujeres salen por delante en cuatro de los seis departamentos.")
 } else if (isTRUE(all.equal(dim(.result), c(2L, 6L)))) {

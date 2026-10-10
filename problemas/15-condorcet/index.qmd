@@ -96,6 +96,7 @@ c(al_azar = al_azar, teoria = 1/4 - 3 / (2 * pi) * asin(1/3), unimodales = con_e
 ```{webr}
 #| exercise: condorcet
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 f <- .envir_result$gana
 eleccion <- c(ABC = 40, ACB = 5, BAC = 10, BCA = 20, CAB = 15, CBA = 11)  # 101 votantes
 # A antes que B: ABC, ACB, CAB = 60; B antes que C: ABC, BAC, BCA = 70; C antes que A: BCA, CAB, CBA = 46

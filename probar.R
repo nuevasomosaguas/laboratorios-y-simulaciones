@@ -25,16 +25,19 @@ ejecutar <- function(codigo, entorno = new.env(parent = globalenv())) {
   list(valor = valor, entorno = entorno)
 }
 
-# La comprobación de quarto-live, con .result, .solution y .envir_result
+# El comprobador por defecto de quarto-live (webr.exercise.checker): define .result y
+# .envir_result, pero no .solution; la solución solo llega en los ..., como list(...)$solution.
+comprobador <- function(check_code, envir_result, last_value, ...) {
+  .envir_result <- envir_result
+  .result <- last_value
+  eval(parse(text = check_code))
+}
+
 comprobar <- function(b, codigo) {
   tryCatch({
     solucion <- ejecutar(b$solucion)
     alumno <- ejecutar(codigo)
-    entorno <- new.env(parent = globalenv())
-    entorno$.result <- alumno$valor
-    entorno$.solution <- solucion$valor
-    entorno$.envir_result <- alumno$entorno
-    ejecutar(b$comprobacion, entorno)$valor
+    comprobador(b$comprobacion, alumno$entorno, alumno$valor, solution = solucion$valor)
   }, error = function(e) list(correct = FALSE, message = paste("Error de R:", conditionMessage(e))))
 }
 

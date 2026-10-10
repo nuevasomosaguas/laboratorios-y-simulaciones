@@ -92,6 +92,7 @@ rbind(norte = resumen(aldeas["norte", ]), sur = resumen(aldeas["sur", ]), juntas
 ```{webr}
 #| exercise: hardy
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 e <- .envir_result
 prueba <- c(MM = 50, MN = 30, NN = 20)  # p = 0,65
 if (!is.function(e$hw_esperados) || !is.function(e$chi2)) {

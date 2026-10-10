@@ -95,6 +95,7 @@ cbind(
 ```{webr}
 #| exercise: dbo
 #| check: true
+.solution <- list(...)$solution  # quarto-live no define .solution: la pasa en los ...
 f <- .envir_result$se_apunta
 esperado_f <- c(TRUE, FALSE, FALSE, FALSE)
 if (!is.function(f)) {
