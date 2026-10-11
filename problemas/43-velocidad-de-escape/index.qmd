@@ -1,0 +1,196 @@
+---
+title: "La velocidad de escape"
+numero: 43
+nivel: 2
+duracion: "30 min"
+lectura: "[Kernighan (2018)](https://nuevasomosaguas.github.io/biblioteca.html#kernighan2018millions); [Simon y Blume (1994)](https://nuevasomosaguas.github.io/biblioteca.html#simon1994mathematics)"
+dificultad: "Intermedio"
+categories: [equilibrios y dinámica, desigualdad]
+description: "Ahorrar para la entrada de un piso cuando el piso sube más deprisa que el ahorro: por debajo de cierta tasa, la meta se acerca sin llegar nunca."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Entre 2021 y 2025, la vivienda subió en España un 7,2% al año de media, según el Índice de Precios de Vivienda del INE. En 2025 subió un 12,7%, la mayor subida desde que empieza la serie, en 2007, y en el segundo trimestre de 2026 seguía al 12,2%. En ese mismo trimestre, el coste salarial subió un 4%. Quien ahorra para la entrada de un piso persigue una meta que se aleja más deprisa de lo que él avanza.
+
+En física, la velocidad de escape es la mínima para no volver a caer. Aquí el problema tiene la misma forma: por debajo de cierta tasa de ahorro, el ahorro se acerca a la meta sin alcanzarla nunca.
+
+El agente del modelo gana 20 000 euros netos al año y quiere un piso de 180 000, nueve años de renta. Para comprarlo necesita reunir una fracción $k = 0{,}3$ del precio: el 20% de entrada y un 10% de impuestos y gastos. Gasta el 55% de la renta en todo lo que no es vivienda, y vive en uno de tres sitios: con sus padres, en una habitación de 400 euros al mes o en un piso de 600. Cada año, el ahorro acumulado rinde un $r$, y se le suma lo que sobra de la renta tras el consumo y el alquiler. Después suben la renta, el precio y el alquiler, cada uno a su ritmo.
+
+Si el ahorro se mide como fracción de la meta, $x = S / (k P)$, cada año $x_{t+1} = a\,x_t + c_t$, con $a = (1 + r)/(1 + g_P)$, donde $g_P$ es lo que sube la vivienda. Si los sueldos y el alquiler suben al mismo ritmo que la vivienda, $c$ es constante y $x$ se acerca al punto fijo
+
+$$x^* = \frac{s}{k \, (P/Y) \, (g_P - r)},$$
+
+donde $s$ es la tasa de ahorro, lo que sobra de la renta $Y$ tras el consumo y el alquiler. El agente escapa si $x^* > 1$.
+
+**Tu tarea.**
+
+1. Completa en `ahorrar()` la línea del ahorro de cada año.
+2. Completa `tasa_critica`: la tasa de ahorro por encima de la cual $x^* > 1$.
+3. Haz que los sueldos y el alquiler suban como la vivienda, con `gy <- 0.07` y `ga <- 0.07`. ¿Escapan justo los agentes cuya tasa de ahorro supera la crítica?
+4. Vuelve a 0,04 y pon `gp <- 0.12`, el ritmo de 2025 y 2026. ¿Qué forma tienen ahora las curvas?
+5. Vuelve a `gp <- 0.07` y pon `ga <- 0.088`, lo que subieron en 2024 los alquileres de los contratos nuevos. ¿A quién afecta más?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con la vivienda al 7% y los sueldos y el alquiler al 4%, solo escapa quien vive con sus padres, en el año 9. El de la habitación ahorra el 21% de su renta, por encima de la tasa crítica del 13,5%, y aun así no llega nunca: alcanza el 74% de la entrada en el año 27 y desde ahí retrocede. La tasa crítica solo vale si los sueldos siguen a la vivienda. Cuando la renta crece menos que el precio, lo que entra cada año pesa cada vez menos frente a la meta, $c_t$ tiende a cero y $x$ sube, toca un máximo y vuelve a caer: es una ventana que se cierra. En la tarea 3, con todo al 7%, la tasa crítica decide: escapan el de los padres, en el año 8, y el de la habitación, en el 22, y el del piso, que ahorra un 9%, se queda por debajo para siempre.
+
+Al ritmo de 2025 y 2026, la ventana se cierra antes y más abajo para todos: las tres curvas tocan techo en el año 12, y ni el que vive con sus padres pasa del 71% de la entrada. Y con el alquiler de los contratos nuevos, al 8,8%, aparece un tercer reloj: el año en que el alquiler se come todo lo que sobra y el agente empieza a tirar de lo ahorrado. En el piso llega en el año 6; en la habitación, en el 15. Al que vive con sus padres no le afecta. El modelo predice la emancipación tardía como respuesta racional: quedarse en casa es la única forma de escapar.
+
+Qué índice de alquiler usar es parte del problema. En 2024, según el INE, los contratos vigentes subieron un 2,8%, porque se actualizan con límites, y los nuevos, un 8,8%. Quien no se mueve vive en el primer índice, y quien busca piso, en el segundo.
+
+La condición de escape depende de $g_P - r$, y ahí está la desigualdad. Quien ya tiene casa y quiere cambiarse ahorra, en la práctica, en vivienda: su $r$ es $g_P$. Con `r <- gp`, el de la habitación escapa en el año 18. Es la misma álgebra que la de la deuda pública, que se estabiliza o se dispara según la diferencia entre el tipo de interés y el crecimiento.
+
+Una última pregunta desmonta el propio modelo: ¿cuántos años de renta cuesta el piso tras 20 años con la vivienda al 12% y los sueldos al 4%? $9 \times (1{,}12/1{,}04)^{20} = 39{,}6$. Eso no puede durar: o bajan los precios, o suben los sueldos, o las casas se hacen más pequeñas. La ventana que se cierra es una lente de corto plazo, no una profecía.
+
+Instituto Nacional de Estadística (2026). *Índice de Precios de Vivienda (IPV). Base 2025. Segundo trimestre 2026*. Nota de prensa. <https://www.ine.es/dyngs/Prensa/IPV2T26.htm>
+
+Instituto Nacional de Estadística (2026). *Encuesta Trimestral de Coste Laboral (ETCL). Segundo trimestre 2026*. Nota de prensa. <https://www.ine.es/dyngs/Prensa/ETCL2T26.htm>
+
+Instituto Nacional de Estadística (2026). *Índice de Precios de Vivienda en Alquiler (IPVA). Base 2015. Año 2024*. Nota de prensa. <https://ine.es/dyngs/Prensa/IPVA2024.htm>
+
+Kernighan, B. W. (2018). *Millions, Billions, Zillions: Defending Yourself in a World of Too Many Numbers*. Princeton University Press.
+
+Simon, C. P. y Blume, L. (1994). *Mathematics for Economists*. W. W. Norton.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: escape
+#| caption: "Tu código"
+renta <- 20000    # renta neta del primer año, en euros
+precio <- 180000  # nueve años de renta
+consumo <- 0.55   # lo que se va en todo lo que no es vivienda
+k <- 0.3          # la entrada, el 20%, más un 10% de impuestos y gastos
+gp <- 0.07        # subida anual de la vivienda: la media de 2021 a 2025 en el IPV del INE
+gy <- 0.04        # subida anual de los sueldos
+ga <- 0.04        # subida anual del alquiler
+r <- 0.02         # rentabilidad del ahorro, en un depósito
+
+# La fracción de la meta, ahorro / (k * precio), que el agente ha reunido cada año
+ahorrar <- function(alquiler, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    ahorro <- ______  # lo de antes con su interés, más lo que sobra este año
+    renta <- renta * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+
+# Por encima de esta tasa de ahorro, x* > 1: el agente escapa si todo sube a la vez
+tasa_critica <- ______
+
+alquileres <- c(padres = 0, habitacion = 4800, piso = 7200)  # 0, 400 y 600 euros al mes
+x <- sapply(alquileres, ahorrar)
+
+matplot(x, type = "l", lty = 1, lwd = 2, col = c("#27ae60", "#2980b9", "#c0392b"),
+        xlab = "Año", ylab = "Fracción de la entrada reunida")
+abline(h = 1, lty = 2)
+legend("topleft", names(alquileres), col = c("#27ae60", "#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+data.frame(tasa_ahorro = 1 - consumo - alquileres / renta,
+           tasa_critica = tasa_critica,
+           maximo = apply(x, 2, max),
+           anio_del_maximo = apply(x, 2, which.max),
+           escapa_en = apply(x, 2, function(v) which(v >= 1)[1]))
+```
+
+```{webr}
+#| exercise: escape
+#| solution: true
+renta <- 20000
+precio <- 180000
+consumo <- 0.55
+k <- 0.3
+gp <- 0.07
+gy <- 0.04
+ga <- 0.04
+r <- 0.02
+
+ahorrar <- function(alquiler, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    ahorro <- ahorro * (1 + r) + (1 - consumo) * renta - alquiler
+    renta <- renta * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+
+tasa_critica <- k * (precio / renta) * (gp - r)
+
+alquileres <- c(padres = 0, habitacion = 4800, piso = 7200)
+x <- sapply(alquileres, ahorrar)
+
+matplot(x, type = "l", lty = 1, lwd = 2, col = c("#27ae60", "#2980b9", "#c0392b"),
+        xlab = "Año", ylab = "Fracción de la entrada reunida")
+abline(h = 1, lty = 2)
+legend("topleft", names(alquileres), col = c("#27ae60", "#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+data.frame(tasa_ahorro = 1 - consumo - alquileres / renta,
+           tasa_critica = tasa_critica,
+           maximo = apply(x, 2, max),
+           anio_del_maximo = apply(x, 2, which.max),
+           escapa_en = apply(x, 2, function(v) which(v >= 1)[1]))
+```
+
+```{webr}
+#| exercise: escape
+#| check: true
+# Se comprueban ahorrar() y tasa_critica con los parámetros del alumno: las tareas 3 a 5 los cambian.
+e <- .envir_result
+referencia <- function(alquiler, anios = 40) {
+  renta <- e$renta; precio <- e$precio; ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    ahorro <- ahorro * (1 + e$r) + (1 - e$consumo) * renta - alquiler
+    renta <- renta * (1 + e$gy); precio <- precio * (1 + e$gp); alquiler <- alquiler * (1 + e$ga)
+    x[t] <- ahorro / (e$k * precio)
+  }
+  x
+}
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+bien <- function(alquiler) isTRUE(all.equal(e$ahorrar(alquiler), referencia(alquiler), tolerance = 1e-6))
+if (!is.function(e$ahorrar)) {
+  list(correct = FALSE, message = "No encuentro la función ahorrar().")
+} else if (!bien(0) || !bien(4800)) {
+  list(correct = FALSE, message = paste0(
+    "ahorrar() no da el ahorro bueno: en una habitación, el décimo año el agente debería haber reunido el ",
+    coma(100 * referencia(4800)[10]), "% de la entrada, y ha reunido el ", coma(100 * e$ahorrar(4800)[10]),
+    "%. El ahorro de antes rinde un r, y el de este año es la renta que no se va en consumo, menos el alquiler; empieza a rendir el año que viene."))
+} else if (!is.numeric(e$tasa_critica) ||
+           !isTRUE(all.equal(e$tasa_critica, e$k * e$precio / e$renta * (e$gp - e$r)))) {
+  list(correct = FALSE, message = "ahorrar() está bien. Falta tasa_critica: despeja s en x* > 1. Entran k, la relación entre precio y renta, y lo que sube la vivienda menos lo que rinde el ahorro.")
+} else {
+  destino <- ifelse(is.na(.result$escapa_en),
+                    paste0("no escapa, se queda como mucho en el ", round(100 * .result$maximo), "% de la entrada"),
+                    paste0("escapa en el año ", .result$escapa_en))
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con una tasa crítica del ", coma(100 * e$tasa_critica), "%. ",
+    paste0(rownames(.result), ": ", destino, collapse = "; "), "."))
+}
+```
+
+::: {.hint exercise="escape"}
+El ahorro de este año es el del año pasado multiplicado por `1 + r`, más lo que sobra: `(1 - consumo) * renta`, menos el `alquiler`. Para la tasa crítica, iguala $x^*$ a 1 y despeja $s$.
+:::
+
+::: {.solution exercise="escape"}
+`ahorro <- ahorro * (1 + r) + (1 - consumo) * renta - alquiler` en `ahorrar()`, y `tasa_critica <- k * (precio / renta) * (gp - r)`.
+:::
+:::
+
+::::
