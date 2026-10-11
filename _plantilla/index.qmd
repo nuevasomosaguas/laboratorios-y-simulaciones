@@ -10,7 +10,7 @@ lectura: "Autor (año)"  # si la obra está en la biblioteca, enlázala a su fic
 # Una a tres de las etiquetas que ya existen; una nueva solo si la van a compartir varios problemas:
 # paradojas de agregación, inferencia causal, sesgo de selección, estadística, modelos de agentes,
 # equilibrios y dinámica, DBO, biología, demografía, juegos y votación, desigualdad,
-# efectos de segundo orden
+# efectos de segundo orden, teoría de la información
 categories: [paradojas de agregación, estadística]
 description: "Una frase que dé ganas de abrirlo."
 page-layout: full

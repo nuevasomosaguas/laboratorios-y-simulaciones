@@ -1,0 +1,283 @@
+---
+title: "¿Cuántos bits te delatan?"
+numero: 59
+nivel: 2
+duracion: "30 min"
+lectura: "[Salganik (2018)](https://nuevasomosaguas.github.io/biblioteca.html#salganik2018bit); Sweeney (2000)"
+dificultad: "Intermedio"
+categories: [teoría de la información, estadística]
+description: "Municipio, fecha de nacimiento y sexo suman más bits de los que hacen falta para señalar a cualquiera en España, y aun así más de la mitad no queda señalada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: municipios.csv (SHA-256 f78d1a75ed3a693b4ab1644c4269cf86559c82c202517280a7dac03d7b00ea6b) y
+edades.csv (SHA-256 8ef275eb5010abe6323db13914de4472a0253bc4c4db46702300dcb0a1de544e), en esta carpeta,
+copiados tal cual en el código del ejercicio. Salen de dos fuentes del INE:
+
+- Cifras oficiales de población de los municipios españoles, revisión del padrón municipal a 1 de enero de 2025,
+  https://www.ine.es/pob_xls/pobmun.zip (SHA-256 b4251c99ecb1319ddc8e49da12d00e3b0a2343ca4c8ac43ff3382532a221ffb4),
+  archivo pobmun25.xlsx (SHA-256 34d62a036d16dddac811e98b3edf341e3f9abe1fbf51f646c06f42947c5352da): 8.132 municipios
+  y 49.114.494 personas. Los municipios se agrupan por su población en clases de 0,1 en log10, y cada clase se resume en
+  su población media («tamano») y su número de municipios («cuantos»). Con las clases, la entropía del municipio sale
+  9,614 bits, frente a 9,612 con los 8.132 municipios, y los únicos, un 42,27%, frente a un 42,25%.
+- Estadística continua de población, población residente a 1 de enero de 2025 por sexo y edad, tabla 56934,
+  https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/56934?nult=1&tip=A
+  (descargada el 11 de octubre de 2026, SHA-256 45cf74696c6d7a8d43735c6618a74cd68f8ad8590e163ee991fbcfee8691bcf7).
+
+Los dos CSV se hicieron con R, readxl y jsonlite, en la carpeta de pobmun25.xlsx y de la tabla, guardada como t56934.json:
+
+library(readxl); library(jsonlite)
+mun <- as.data.frame(read_excel("pobmun25.xlsx", skip = 1))
+clase <- round(log10(mun$POB25) / 0.1)
+municipios <- data.frame(tamano = round(tapply(mun$POB25, clase, mean)), cuantos = as.vector(table(clase)))
+write.csv(municipios, "municipios.csv", row.names = FALSE, quote = FALSE)
+x <- fromJSON("t56934.json")
+valor <- sapply(x$Data, function(d) d$Valor)
+edad <- function(sexo) valor[grepl(paste0("^Total Nacional\\. (\\d+ años?|105 y más años)\\. ", sexo, "\\. "), x$Nombre)]
+write.csv(data.frame(edad = 0:105, hombres = edad("Hombres"), mujeres = edad("Mujeres")), "edades.csv", row.names = FALSE, quote = FALSE)
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1997, Latanya Sweeney compró por 20 dólares el censo electoral de Cambridge, en Massachusetts, y lo cruzó con los historiales médicos de los funcionarios del estado, que su aseguradora había cedido sin nombres, «anonimizados». Encontró el del gobernador, William Weld: en Cambridge, seis personas compartían su fecha de nacimiento, tres eran hombres y solo él vivía en su código postal. Tres años después calculó que el 87% de los estadounidenses quedaban señalados por esos tres datos.
+
+La teoría de la información permite hacer la cuenta antes de cruzar nada. Para señalar a una persona entre $N$ hacen falta $\log_2 N$ bits, el número de preguntas de sí o no que parten la población por la mitad hasta dejar a una sola. Cada dato aporta, de media, su **entropía**:
+
+$$H(p) = -\sum_i p_i \log_2 p_i,$$
+
+donde $p_i$ es la proporción de personas con el valor $i$. Si los $k$ valores son igual de frecuentes, $H = \log_2 k$; si unos son mucho más frecuentes que otros, menos. En España viven unos 49 millones de personas, así que hacen falta 25,5 bits. Con tres datos que piden tantos formularios y guardan tantos registros, el municipio, la fecha de nacimiento y el sexo, ¿cuántos hay?
+
+Los datos son del INE, a 1 de enero de 2025: los 8.132 municipios, agrupados por tamaño, y la población por sexo y por edad, de 0 a 105 años o más. El modelo supone que la fecha de nacimiento cae al azar dentro de cada año y que todos los municipios tienen la estructura por edad y sexo de España.
+
+Que la suma de bits supere los 25,5 no basta para saber cuántos quedan señalados. En un municipio de $n$ personas, cada combinación de fecha y sexo es una celda, con probabilidad $q_c$. Una persona cae en la celda $c$ con probabilidad $q_c$, y es **única** si ninguna de las otras $n - 1$ cae en la misma, cosa que pasa con probabilidad $(1 - q_c)^{n-1}$.
+
+**Tu tarea.**
+
+1. Completa `H()`: la entropía en bits de una distribución `p`. Las proporciones nulas no cuentan, porque $0 \log 0$ vale 0, pero R da `NaN`.
+2. Mira la tabla `bits`: lo que aporta cada dato si sus valores fueran igual de frecuentes (`uniforme`) y con las proporciones reales (`real`). ¿Cuántos bits sobran en cada caso?
+3. Completa `unicos()`: la proporción esperada de personas únicas en un municipio de `n` personas, con las celdas de probabilidad `q`. El código la compara con una simulación de un pueblo de 5.000 habitantes.
+4. Compara `uniforme`, el porcentaje de únicos si los 8.132 municipios fueran iguales y las fechas también, con la tabla `por_tamano`. ¿Dónde están los que quedan señalados?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Si todos los valores fueran igual de frecuentes, el municipio aportaría $\log_2 8.132 = 12{,}99$ bits y la fecha de nacimiento y el sexo, 16,24: 29,23 bits, casi cuatro más de los 25,55 que hacen falta. Con ese mundo uniforme, el 92,5% de los residentes en España sería único. Pero los municipios no son iguales: Madrid tiene 3,5 millones de habitantes, y el municipio real aporta solo 9,61 bits, más de tres menos. Las edades tampoco son iguales, y la fecha y el sexo bajan a 15,98. La suma real es 25,60 bits, apenas 0,05 por encima de lo necesario, y los únicos son el 42,3%: 20,8 millones de personas.
+
+La entropía es una media, y la media esconde dónde está la información. Vivir en Madrid aporta $\log_2(49{,}1 \text{ millones} / 3{,}5 \text{ millones}) = 3{,}81$ bits; vivir en uno de los municipios de siete habitantes, 22,74, casi todos los que hacen falta. Por eso en los municipios de menos de 1.000 habitantes es único el 99,3%, y en los de más de 100.000, el 3,5%. El anonimato de una base de datos no es el mismo para todos: protege a quien se parece a mucha gente y deja al descubierto a quien vive donde vive poca. La simulación del pueblo de 5.000 habitantes, con un 91,7% de únicos frente al 92,2% de la fórmula, muestra que no hace falta un municipio diminuto.
+
+La solución clásica es quitar bits: con el año de nacimiento en lugar de la fecha, los únicos bajan al 0,5%. Es lo que hacen los institutos de estadística cuando publican microdatos, con la edad en grupos y el municipio por tamaño y no por nombre, y lo que Sweeney formalizó como *k*-anonimato: que cada combinación de datos la compartan al menos $k$ personas. El modelo, en cambio, se queda corto en lo otro: supone que todos los municipios tienen la misma pirámide de edades, cuando los pequeños son mucho más viejos, y no cruza ningún dato más. Con quince atributos corrientes, Rocher, Hendrickx y de Montjoye estimaron en 2019 que el 99,98% de los estadounidenses se puede reidentificar. Philippe Golle repitió en 2006 la cuenta de Sweeney con el censo de 2000 y le salió un 63%, no un 87%: la cifra depende de los datos, pero el orden de magnitud no.
+
+Aquí los bits son información en el sentido de Shannon: preguntas de sí o no para señalar a una persona. Pero la entropía media no basta, como se ha visto; para saber quién queda al descubierto hace falta la distribución entera. Salganik dedica a este problema el capítulo de ética de *Bit by Bit*: los datos «anonimizados» casi nunca lo son.
+
+Golle, P. (2006). Revisiting the uniqueness of simple demographics in the US population. En *Proceedings of the 5th ACM Workshop on Privacy in Electronic Society* (pp. 77–80). ACM.
+
+Rocher, L., Hendrickx, J. M. y de Montjoye, Y.-A. (2019). Estimating the success of re-identifications in incomplete datasets using generative models. *Nature Communications*, 10, 3069.
+
+Salganik, M. J. (2018). *Bit by Bit: Social Research in the Digital Age*. Princeton University Press. Capítulo 6, «Ethics».
+
+Sweeney, L. (2000). *Simple Demographics Often Identify People Uniquely*. Data Privacy Working Paper 3, Carnegie Mellon University.
+
+Sweeney, L. (2002). *k*-anonymity: A model for protecting privacy. *International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems*, 10(5), 557–570.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: bits
+#| caption: "Tu código"
+# 1. La entropía en bits de una distribución p
+H <- function(p) {
+  ______
+}
+
+# Los municipios, a 1 de enero de 2025, agrupados por tamaño: cuántos hay de cada tamaño
+municipios <- data.frame(
+  tamano = c(7, 8, 10, 13, 16, 20, 26, 32, 40, 51, 63, 80, 101, 127, 160, 199, 253, 315, 399, 499, 630, 796,
+    1006, 1253, 1592, 1997, 2513, 3158, 3990, 5011, 6307, 7939, 9994, 12603, 15956, 19938, 25025,
+    31377, 39147, 50586, 62856, 79953, 98932, 125535, 156606, 202626, 241757, 312200, 394292,
+    479405, 660526, 840792, 1731649, 3506730),
+  cuantos = c(5, 7, 9, 23, 22, 69, 87, 116, 160, 216, 248, 292, 358, 334, 384, 367, 384, 365, 348, 358, 350,
+    323, 338, 279, 282, 257, 267, 239, 211, 216, 178, 173, 160, 121, 99, 109, 82, 74, 55, 31, 23,
+    31, 25, 7, 14, 12, 9, 5, 3, 1, 3, 1, 1, 1)
+)
+# Hombres y mujeres de cada edad, de 0 a 105 años o más
+hombres <- c(164055, 168771, 176730, 183572, 186342, 197990, 208082, 222606, 234365, 240803, 245729, 243192,
+    257360, 263431, 268856, 274054, 285192, 277237, 281081, 278792, 281012, 278747, 274271, 275246,
+    281504, 276534, 272989, 277608, 276154, 278755, 282602, 289448, 295847, 294169, 296446, 298939,
+    302641, 304664, 309115, 317434, 327321, 336686, 354257, 368226, 384491, 392991, 409827, 415611,
+    420017, 416365, 411241, 399462, 395914, 387320, 380076, 372920, 366919, 366465, 355561, 349190,
+    351146, 332152, 317758, 307434, 305689, 294817, 284915, 274776, 253250, 242253, 226870, 224514,
+    220153, 201867, 192302, 193833, 197221, 174994, 161132, 161822, 147583, 138396, 113557, 98625,
+    111124, 66366, 68964, 69677, 66335, 57230, 47789, 39978, 32431, 24363, 18293, 12848, 9200,
+    5878, 3942, 2597, 1376, 821, 422, 227, 116, 108)
+mujeres <- c(154852, 160511, 166796, 172782, 177857, 187713, 197557, 210109, 221703, 227945, 231513, 229740,
+    241964, 247688, 253449, 256785, 266551, 257063, 259967, 260544, 261708, 262264, 256026, 259020,
+    263833, 261794, 257143, 265038, 264802, 267154, 272023, 279572, 287380, 285620, 290579, 295295,
+    300221, 303635, 310760, 319438, 330340, 339108, 355454, 367834, 383164, 392231, 406106, 408715,
+    415425, 409997, 407591, 396586, 394781, 388350, 382660, 378581, 375092, 377261, 367261, 364699,
+    368475, 349489, 338073, 329312, 329289, 319192, 311522, 303401, 282233, 272728, 259397, 256889,
+    253006, 236613, 228980, 235979, 243494, 219683, 207381, 212405, 197649, 189686, 158447, 141637,
+    167449, 106388, 113808, 119348, 121405, 106717, 94632, 84153, 71778, 56354, 46837, 34825,
+    26679, 18572, 13337, 9088, 5592, 3543, 2246, 1177, 708, 702)
+
+N <- sum(municipios$tamano * municipios$cuantos)
+p_municipio <- rep(municipios$tamano, municipios$cuantos) / N
+p_edad_sexo <- c(hombres, mujeres) / sum(hombres, mujeres)
+
+# 2. Los bits de cada dato: con valores igual de frecuentes y con los reales
+bits <- data.frame(
+  uniforme = c(municipio = log2(length(p_municipio)), fecha_y_sexo = log2(106 * 365 * 2)),
+  real = c(H(p_municipio), H(p_edad_sexo) + log2(365))  # la fecha, al azar dentro del año
+)
+bits <- rbind(bits, los_tres = colSums(bits), hacen_falta = log2(N))
+round(bits, 2)
+
+# 3. La proporción esperada de únicos en un municipio de n personas, con celdas de probabilidad q
+unicos <- function(n, q) {
+  ______
+}
+
+celdas <- rep(p_edad_sexo / 365, each = 365)  # 77.380 combinaciones de fecha y sexo
+
+set.seed(1)
+pueblo <- sample(length(celdas), 5000, replace = TRUE, prob = celdas)  # la celda de cada vecino
+c(simulado = mean(table(pueblo)[as.character(pueblo)] == 1), formula = unicos(5000, celdas))
+
+# 4. Los únicos, si todo fuera uniforme y con los datos reales
+uniforme <- round(100 * unicos(N / length(p_municipio), rep(1 / (106 * 365 * 2), 106 * 365 * 2)), 1)
+uniforme
+
+municipios$unicos <- sapply(municipios$tamano, unicos, q = celdas)
+municipios$clase <- cut(municipios$tamano, c(0, 1000, 20000, 100000, Inf), right = FALSE,
+                        labels = c("menos de 1.000", "1.000 a 20.000", "20.000 a 100.000", "más de 100.000"))
+personas <- municipios$tamano * municipios$cuantos
+por_tamano <- data.frame(
+  poblacion = tapply(personas, municipios$clase, sum),
+  unicos = tapply(personas * municipios$unicos, municipios$clase, sum)
+)
+por_tamano["España", ] <- colSums(por_tamano)
+por_tamano$porcentaje <- round(100 * por_tamano$unicos / por_tamano$poblacion, 1)
+por_tamano$unicos <- round(por_tamano$unicos)
+por_tamano
+```
+
+```{webr}
+#| exercise: bits
+#| solution: true
+H <- function(p) {
+  p <- p[p > 0]
+  -sum(p * log2(p))
+}
+
+municipios <- data.frame(
+  tamano = c(7, 8, 10, 13, 16, 20, 26, 32, 40, 51, 63, 80, 101, 127, 160, 199, 253, 315, 399, 499, 630, 796,
+    1006, 1253, 1592, 1997, 2513, 3158, 3990, 5011, 6307, 7939, 9994, 12603, 15956, 19938, 25025,
+    31377, 39147, 50586, 62856, 79953, 98932, 125535, 156606, 202626, 241757, 312200, 394292,
+    479405, 660526, 840792, 1731649, 3506730),
+  cuantos = c(5, 7, 9, 23, 22, 69, 87, 116, 160, 216, 248, 292, 358, 334, 384, 367, 384, 365, 348, 358, 350,
+    323, 338, 279, 282, 257, 267, 239, 211, 216, 178, 173, 160, 121, 99, 109, 82, 74, 55, 31, 23,
+    31, 25, 7, 14, 12, 9, 5, 3, 1, 3, 1, 1, 1)
+)
+# Hombres y mujeres de cada edad, de 0 a 105 años o más
+hombres <- c(164055, 168771, 176730, 183572, 186342, 197990, 208082, 222606, 234365, 240803, 245729, 243192,
+    257360, 263431, 268856, 274054, 285192, 277237, 281081, 278792, 281012, 278747, 274271, 275246,
+    281504, 276534, 272989, 277608, 276154, 278755, 282602, 289448, 295847, 294169, 296446, 298939,
+    302641, 304664, 309115, 317434, 327321, 336686, 354257, 368226, 384491, 392991, 409827, 415611,
+    420017, 416365, 411241, 399462, 395914, 387320, 380076, 372920, 366919, 366465, 355561, 349190,
+    351146, 332152, 317758, 307434, 305689, 294817, 284915, 274776, 253250, 242253, 226870, 224514,
+    220153, 201867, 192302, 193833, 197221, 174994, 161132, 161822, 147583, 138396, 113557, 98625,
+    111124, 66366, 68964, 69677, 66335, 57230, 47789, 39978, 32431, 24363, 18293, 12848, 9200,
+    5878, 3942, 2597, 1376, 821, 422, 227, 116, 108)
+mujeres <- c(154852, 160511, 166796, 172782, 177857, 187713, 197557, 210109, 221703, 227945, 231513, 229740,
+    241964, 247688, 253449, 256785, 266551, 257063, 259967, 260544, 261708, 262264, 256026, 259020,
+    263833, 261794, 257143, 265038, 264802, 267154, 272023, 279572, 287380, 285620, 290579, 295295,
+    300221, 303635, 310760, 319438, 330340, 339108, 355454, 367834, 383164, 392231, 406106, 408715,
+    415425, 409997, 407591, 396586, 394781, 388350, 382660, 378581, 375092, 377261, 367261, 364699,
+    368475, 349489, 338073, 329312, 329289, 319192, 311522, 303401, 282233, 272728, 259397, 256889,
+    253006, 236613, 228980, 235979, 243494, 219683, 207381, 212405, 197649, 189686, 158447, 141637,
+    167449, 106388, 113808, 119348, 121405, 106717, 94632, 84153, 71778, 56354, 46837, 34825,
+    26679, 18572, 13337, 9088, 5592, 3543, 2246, 1177, 708, 702)
+
+N <- sum(municipios$tamano * municipios$cuantos)
+p_municipio <- rep(municipios$tamano, municipios$cuantos) / N
+p_edad_sexo <- c(hombres, mujeres) / sum(hombres, mujeres)
+
+bits <- data.frame(
+  uniforme = c(municipio = log2(length(p_municipio)), fecha_y_sexo = log2(106 * 365 * 2)),
+  real = c(H(p_municipio), H(p_edad_sexo) + log2(365))
+)
+bits <- rbind(bits, los_tres = colSums(bits), hacen_falta = log2(N))
+round(bits, 2)
+
+unicos <- function(n, q) {
+  sum(q * (1 - q)^(n - 1))
+}
+
+celdas <- rep(p_edad_sexo / 365, each = 365)
+
+set.seed(1)
+pueblo <- sample(length(celdas), 5000, replace = TRUE, prob = celdas)
+c(simulado = mean(table(pueblo)[as.character(pueblo)] == 1), formula = unicos(5000, celdas))
+
+uniforme <- round(100 * unicos(N / length(p_municipio), rep(1 / (106 * 365 * 2), 106 * 365 * 2)), 1)
+uniforme
+
+municipios$unicos <- sapply(municipios$tamano, unicos, q = celdas)
+municipios$clase <- cut(municipios$tamano, c(0, 1000, 20000, 100000, Inf), right = FALSE,
+                        labels = c("menos de 1.000", "1.000 a 20.000", "20.000 a 100.000", "más de 100.000"))
+personas <- municipios$tamano * municipios$cuantos
+por_tamano <- data.frame(
+  poblacion = tapply(personas, municipios$clase, sum),
+  unicos = tapply(personas * municipios$unicos, municipios$clase, sum)
+)
+por_tamano["España", ] <- colSums(por_tamano)
+por_tamano$porcentaje <- round(100 * por_tamano$unicos / por_tamano$poblacion, 1)
+por_tamano$unicos <- round(por_tamano$unicos)
+por_tamano
+```
+
+```{webr}
+#| exercise: bits
+#| check: true
+# H() y unicos() se comprueban con distribuciones pequeñas, que se pueden hacer a mano.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+if (!is.function(e$H) || !is.function(e$unicos)) {
+  list(correct = FALSE, message = "No encuentro H() o unicos().")
+} else if (!isTRUE(all.equal(e$H(c(0.5, 0.5)), 1)) || !isTRUE(all.equal(e$H(rep(1 / 8, 8)), 3))) {
+  list(correct = FALSE, message = paste0(
+    "Una moneda tiene 1 bit de entropía y un dado de 8 caras, 3; H(c(0.5, 0.5)) da ", coma(e$H(c(0.5, 0.5))),
+    ". Los bits son logaritmos en base 2, y la suma lleva un signo menos delante."))
+} else if (!isTRUE(all.equal(e$H(c(0.5, 0.25, 0.25, 0)), 1.5))) {
+  list(correct = FALSE, message = paste0(
+    "H(c(0.5, 0.25, 0.25, 0)) debería dar 1,5 bits, y da ", coma(e$H(c(0.5, 0.25, 0.25, 0))),
+    ". Un valor que nadie tiene no aporta nada, pero 0 * log2(0) es NaN en R: quita las proporciones nulas antes de sumar."))
+} else if (!isTRUE(all.equal(e$unicos(2, c(0.5, 0.5)), 0.5)) || !isTRUE(all.equal(e$unicos(3, rep(0.25, 4)), 0.5625)) ||
+           !isTRUE(all.equal(e$unicos(1, c(0.3, 0.7)), 1))) {
+  list(correct = FALSE, message = paste0(
+    "Con dos personas y dos celdas igual de probables, la mitad de las veces caen en celdas distintas: unicos(2, c(0.5, 0.5)) ",
+    "debería dar 0,5, y da ", coma(e$unicos(2, c(0.5, 0.5))), ". Y una persona sola siempre es única. ",
+    "Cada persona compite con las otras n - 1, y la proporción es la media, ponderada por q, de que ninguna caiga en su celda."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con municipios y fechas uniformes sería único el ", coma(e$uniforme, 1), "% de los residentes; con los reales, el ",
+    coma(r["España", "porcentaje"], 1), "%. En los municipios de menos de 1.000 habitantes, el ",
+    coma(r[1, "porcentaje"], 1), "%; en los de más de 100.000, el ", coma(r[4, "porcentaje"], 1), "%."))
+}
+```
+
+::: {.hint exercise="bits"}
+En `H()`, primero `p <- p[p > 0]`, y después la suma de `p * log2(p)`, con su signo. En `unicos()`, la probabilidad de que ninguna de las otras `n - 1` personas caiga en la celda `c` es `(1 - q)^(n - 1)`; pondérala por `q` y suma.
+:::
+
+::: {.solution exercise="bits"}
+`p <- p[p > 0]; -sum(p * log2(p))` en `H()`, y `sum(q * (1 - q)^(n - 1))` en `unicos()`.
+:::
+:::
+
+::::

@@ -1,0 +1,257 @@
+---
+title: "¿Cuántos partidos hay de verdad?"
+numero: 60
+nivel: 2
+duracion: "25 min"
+lectura: "[Taagepera (2007)](https://nuevasomosaguas.github.io/biblioteca.html#taagepera2007predicting); [Alesina et al. (2003)](https://nuevasomosaguas.github.io/biblioteca.html#alesina2003fractionalization)"
+dificultad: "Intermedio"
+categories: [teoría de la información, juegos y votación]
+description: "En 2011 y en 2015 entraron trece partidos en el Congreso, y sin embargo el bipartidismo se rompió: depende de cómo se cuenten."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: congreso.csv, en esta carpeta (SHA-256 21e07fa1d26c105942274ac6c23222e4bd1dd45285a871bcdee74f230611d4cd), con los
+votos y los escaños de las 1.117 candidaturas en el total nacional de las dieciséis elecciones al Congreso de 1977 a 2023.
+En el código del ejercicio están los escaños de las candidaturas que obtuvieron alguno.
+
+Salen de los resultados oficiales del Ministerio del Interior, https://infoelectoral.interior.gob.es/estaticos/docxl/apliextr/02AAAAMM_TOTA.zip,
+con AAAAMM = 197706, 197903, 198210, 198606, 198910, 199306, 199603, 200003, 200403, 200803, 201111, 201512, 201606,
+201904, 201911 y 202307 (descargados el 11 de octubre de 2026). SHA-256 de cada uno, en ese orden:
+ed3e4ac44dfc6b2c4da32f35efde4b6a948771ef5454c41021ab6ae878e18caa, 9f9d46cd0df91012bc96b29df843267bb99cb9242480f966e3d9df6e5cc9d347,
+99ca4f1fe9753364a8570308f7deb96689ad05a40113255a1a7bef7c9f2e6be1, 70cb39647744827b4acaeb6ceedf9944ba3fdeefb001b42ca7b1f175a7f7a017,
+6a3668c7f6262777fabc9197c30bcfc83dbe8e72d7367853af5d6dae9a8a8d41, 17fc8d329c9f5add0f0b7f91145baeec611922f64077abf796f899ed40fbe437,
+598a776ec9ccc4b8153c6dc5ecf4a12f3cde19e7e28876491825ac143bed4900, 72bdc41c6d973da0ecd027cee82fc2f5dc8fe0cbc8666f12ccd44499adcda12d,
+4286b256db8101edb27e935038b8d5fa99e1537c4297a307c8b38470b211dd6c, cde25eb5196b0ace0e370db3e8a7e6201227e5cd2fc9cfbff1817e15f709defb,
+365d2168f89f6eec2a705ad49e7c3b2ca56f73e2818d9e2da389046968b7df42, c27f43247965066cf368cd7341a724f65e6bd9cbb813f0f5d899a54572b5cf1f,
+10b10ee7fffe97c03751dc00181bb6807c63242e8915c05f652fb949e0fe5131, ef63a73a1176ca6c385b82aadbdd9fce7e400cb35cc2f3a2a40363a653a11a54,
+3c0c97250e876560767663a3770d7f7acc52037934dfa312bae020deb7029a2b, 8df0344c9d314d1d36cd837e7ab8962f2d2705224e88fdcc75e77b54e67bece0.
+
+Cada zip trae archivos de texto de ancho fijo, descritos en su FICHEROS.doc: 03xxaamm.DAT, las candidaturas (código en
+las columnas 9-14, siglas en las 15-64), y 08xxaamm.DAT, los votos por candidatura en ámbitos superiores al municipio
+(comunidad en las 10-11, 99 en el total nacional; código de candidatura en las 15-20, votos en las 21-28, escaños en las 29-33).
+El CSV se hizo con R, en la carpeta de los zip:
+
+fechas <- c("197706", "197903", "198210", "198606", "198910", "199306", "199603", "200003", "200403", "200803",
+            "201111", "201512", "201606", "201904", "201911", "202307")
+lee <- function(f) {
+  dir <- tempfile(); unzip(paste0("02", f, "_TOTA.zip"), exdir = dir)
+  dat <- function(n) iconv(readLines(list.files(dir, paste0("^", n, "02", substr(f, 3, 6), "\\.DAT$"),
+                                                full.names = TRUE, ignore.case = TRUE)), "latin1", "UTF-8")
+  l3 <- dat("03"); l8 <- dat("08")
+  v <- data.frame(ca = substr(l8, 10, 11), cod = substr(l8, 15, 20),
+                  votos = as.numeric(substr(l8, 21, 28)), escanos = as.numeric(substr(l8, 29, 33)))
+  v <- v[v$ca == "99", ]
+  v$candidatura <- trimws(substr(l3, 15, 64))[match(v$cod, substr(l3, 9, 14))]
+  v <- v[order(-v$escanos, -v$votos), ]
+  data.frame(eleccion = paste0(substr(f, 1, 4), "-", substr(f, 5, 6)), candidatura = v$candidatura,
+             votos = v$votos, escanos = v$escanos)
+}
+write.csv(do.call(rbind, lapply(fechas, lee)), "congreso.csv", row.names = FALSE)
+
+En cada elección, los escaños suman 350 y los votos de las candidaturas coinciden con el campo «votos a candidaturas»
+del archivo 07, salvo en 2000 y 2008, donde difieren en 16 y en 3 votos. Las cifras en votos de «Qué está pasando» se
+calcularon con todas las candidaturas del CSV.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En las elecciones de 2011 entraron en el Congreso trece candidaturas. En las de 2015, también trece. Y sin embargo todo el mundo sabe que en 2015 se rompió el bipartidismo: el PP y el PSOE, que en 2011 sumaban 296 de los 350 escaños, se quedaron en 213, y Podemos, con sus confluencias, y Ciudadanos entraron con 109. Contar los partidos no sirve si cuenta igual uno con 186 diputados que uno con 1.
+
+La ciencia política tiene una medida para esto, el **número efectivo de partidos** de Markku Laakso y Rein Taagepera (1979): si $p_i$ es la proporción de escaños del partido $i$,
+
+$$N_2 = \frac{1}{\sum_i p_i^2}.$$
+
+Con dos partidos iguales vale 2; con tres iguales, 3; con uno muy grande y muchos diminutos, poco más de 1. La economía del desarrollo usa otra, la **fraccionalización** de Alberto Alesina y sus coautores, $F = 1 - \sum_i p_i^2$: la probabilidad de que dos diputados elegidos al azar sean de partidos distintos. Y la teoría de la información tiene una tercera, la exponencial de la entropía, $2^{H}$ si $H$ está en bits.
+
+Las tres son miembros de una misma familia, la de los **números de Hill**, que el ecólogo Mark Hill propuso en 1973 para medir la diversidad de especies:
+
+$$N_q = \left(\sum_i p_i^q\right)^{1/(1-q)}.$$
+
+El orden $q$ dice cuánto pesan los partidos grandes. Con $q = 0$, $N_0$ es el número de partidos, todos iguales. Con $q = 2$, es el de Laakso y Taagepera. Con $q = 1$ la fórmula no está definida, pero su límite es $2^{H}$, la exponencial de la entropía de Shannon. Y la fraccionalización es $F = 1 - 1/N_2$.
+
+Los datos son los escaños de cada candidatura en las dieciséis elecciones al Congreso desde 1977, según los resultados oficiales del Ministerio del Interior.
+
+**Tu tarea.**
+
+1. Completa `hill()`: el número de Hill de orden `q` de una distribución `p`, con el caso `q == 1` aparte. La función `H()`, en bits, es la de [¿Cuántos bits te delatan?](../59-cuantos-bits-te-delatan/index.qmd).
+2. Mira el gráfico. ¿Qué número ve la ruptura de 2015, y cuál no?
+3. Mira el cambio de 2011 a 2015: el cociente entre los valores de cada medida. ¿Cuál de las cuatro cambia más, y por qué la fraccionalización cambia tan poco?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+De 2011 a 2015 el número de partidos con escaño no se mueve: 13 y 13. El número de Laakso y Taagepera pasa de 2,60 a 4,53, y el de Shannon de 3,67 a 6,20: los dos se multiplican por algo menos de 1,8. La fraccionalización pasa de 0,61 a 0,78, y solo sube un 27%. Desde 1977 hasta 2011 el número efectivo de partidos se movió entre 2,33, en la mayoría absoluta de Felipe González de 1982, y 2,91, en las Cortes constituyentes; en abril de 2019, con Vox, llegó a 4,94.
+
+Las tres medidas no dicen cosas distintas, sino que pesan distinto. $N_0$ cuenta igual al diputado de Teruel Existe que a los 120 del PSOE: en noviembre de 2019 había 19 partidos con escaño, el máximo de la serie, y el número efectivo era más bajo que en abril, 4,68 frente a 4,94. A medida que crece $q$, los partidos pequeños pesan menos, y por eso $N_0 \geq N_1 \geq N_2$ en todas las elecciones. Si $q$ sigue creciendo, $N_q$ tiende a $1/\max p_i$, el inverso de la proporción del mayor partido: 350/120 = 2,92 en noviembre de 2019. Elegir $q$ es decidir cuánto importan los pequeños, y ninguna fórmula lo decide por nosotros.
+
+La fraccionalización cambia poco porque está acotada: $F = 1 - 1/N_2$ no puede pasar de 1. De 2 a 4 partidos efectivos, sube de 0,5 a 0,75; de 4 a 8, solo hasta 0,875. Lou Jost propuso en 2006 que los ecólogos dejaran de comparar índices como la entropía o $F$ y usaran siempre su **número equivalente**, el número de Hill: si una comunidad tiene el doble de especies igual de abundantes que otra, su número equivalente es el doble, y su entropía no. Lo mismo vale para los partidos: 4,53 es un número de partidos, y 0,78 es solo un índice.
+
+Dos decisiones previas pesan tanto como la fórmula. Una, qué se cuenta. En votos, con las 1.117 candidaturas, el número de Laakso y Taagepera de 2015 es 5,75, no 4,53: el sistema electoral, con circunscripciones pequeñas, reduce la fragmentación del Congreso respecto a la del electorado, y Taagepera dedicó buena parte de su obra a predecir cuánto. Otra, qué es un partido. Los datos oficiales separan a Podemos de sus confluencias, En Comú Podem, Compromís-Podemos y En Marea. Juntos sumaban 69 escaños, y entonces el número efectivo de 2015 baja a 4,11, el de Shannon a 5,01, y quedan 10 partidos con escaño.
+
+Aquí la entropía no mide información en el sentido de Shannon: no hay mensaje, ni canal, ni nadie que tenga que adivinar nada. Es un índice de dispersión con buen pedigrí, una manera razonable de pesar los partidos entre otras. Shannon mismo advirtió en 1956, en un editorial de una página, contra el «carro» de aplicar su teoría a todo, de la psicología a la economía, sin preguntarse si los conceptos significaban allí lo mismo. Usar $2^H$ para contar partidos es legítimo, siempre que no se le atribuya más de lo que mide.
+
+Alesina, A., Devleeschauwer, A., Easterly, W., Kurlat, S. y Wacziarg, R. (2003). Fractionalization. *Journal of Economic Growth*, 8(2), 155–194.
+
+Hill, M. O. (1973). Diversity and evenness: A unifying notation and its consequences. *Ecology*, 54(2), 427–432.
+
+Jost, L. (2006). Entropy and diversity. *Oikos*, 113(2), 363–375.
+
+Laakso, M. y Taagepera, R. (1979). «Effective» number of parties: A measure with application to West Europe. *Comparative Political Studies*, 12(1), 3–27.
+
+Shannon, C. E. (1956). The bandwagon. *IRE Transactions on Information Theory*, 2(1), 3.
+
+Taagepera, R. (2007). *Predicting Party Sizes: The Logic of Simple Electoral Systems*. Oxford University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: partidos
+#| caption: "Tu código"
+# La entropía en bits de una distribución p
+H <- function(p) {
+  p <- p[p > 0]
+  -sum(p * log2(p))
+}
+
+# Escaños de cada candidatura que obtuvo alguno, de mayor a menor. Ministerio del Interior.
+escanos <- list(
+  "1977-06" = c(165, 118, 20, 16, 11, 8, 6, 2, 1, 1, 1, 1),
+  "1979-03" = c(168, 121, 23, 9, 8, 7, 5, 3, 1, 1, 1, 1, 1, 1),
+  "1982-10" = c(202, 107, 12, 11, 8, 4, 2, 2, 1, 1),
+  "1986-06" = c(184, 105, 19, 18, 7, 6, 5, 2, 1, 1, 1, 1),
+  "1989-10" = c(175, 107, 18, 17, 14, 5, 4, 2, 2, 2, 2, 1, 1),
+  "1993-06" = c(159, 141, 18, 17, 5, 4, 2, 1, 1, 1, 1),
+  "1996-03" = c(156, 141, 21, 16, 5, 4, 2, 2, 1, 1, 1),
+  "2000-03" = c(183, 125, 15, 8, 7, 4, 3, 1, 1, 1, 1, 1),
+  "2004-03" = c(164, 148, 10, 8, 7, 5, 3, 2, 1, 1, 1),
+  "2008-03" = c(169, 154, 10, 6, 3, 2, 2, 2, 1, 1),
+  "2011-11" = c(186, 110, 16, 11, 7, 5, 5, 3, 2, 2, 1, 1, 1),
+  "2015-12" = c(123, 90, 42, 40, 12, 9, 9, 8, 6, 6, 2, 2, 1),
+  "2016-06" = c(137, 85, 45, 32, 12, 9, 9, 8, 5, 5, 2, 1),
+  "2019-04" = c(123, 66, 57, 33, 24, 15, 7, 7, 6, 4, 2, 2, 2, 1, 1),
+  "2019-11" = c(120, 89, 52, 26, 13, 10, 8, 7, 6, 5, 2, 2, 2, 2, 2, 1, 1, 1, 1),
+  "2023-07" = c(137, 121, 33, 31, 7, 7, 6, 5, 1, 1, 1)
+)
+
+# 1. El número de Hill de orden q
+hill <- function(p, q) {
+  if (q == 1) {
+    ______  # el límite cuando q tiende a 1
+  } else {
+    ______
+  }
+}
+
+numeros <- t(sapply(escanos, function(e) {
+  p <- e / sum(e)
+  c(partidos = hill(p, 0), shannon = hill(p, 1), laakso_taagepera = hill(p, 2),
+    fraccionalizacion = 1 - sum(p^2))
+}))
+
+# 2. Los tres números de Hill, de 1977 a 2023
+fecha <- as.numeric(substr(names(escanos), 1, 4)) + (as.numeric(substr(names(escanos), 6, 7)) - 1) / 12
+matplot(fecha, numeros[, 1:3], type = "b", pch = 20, lty = 1, col = c("grey60", "steelblue", "firebrick"),
+        log = "y", xlab = "Elección", ylab = "Número de partidos (escala logarítmica)")
+legend("topleft", c("q = 0: partidos con escaño", "q = 1: Shannon", "q = 2: Laakso y Taagepera"),
+       col = c("grey60", "steelblue", "firebrick"), pch = 20, lty = 1, bty = "n")
+
+# 3. Cuánto cambia cada medida de 2011 a 2015
+round(numeros["2015-12", ] / numeros["2011-11", ], 2)
+round(numeros, 2)
+```
+
+```{webr}
+#| exercise: partidos
+#| solution: true
+H <- function(p) {
+  p <- p[p > 0]
+  -sum(p * log2(p))
+}
+
+escanos <- list(
+  "1977-06" = c(165, 118, 20, 16, 11, 8, 6, 2, 1, 1, 1, 1),
+  "1979-03" = c(168, 121, 23, 9, 8, 7, 5, 3, 1, 1, 1, 1, 1, 1),
+  "1982-10" = c(202, 107, 12, 11, 8, 4, 2, 2, 1, 1),
+  "1986-06" = c(184, 105, 19, 18, 7, 6, 5, 2, 1, 1, 1, 1),
+  "1989-10" = c(175, 107, 18, 17, 14, 5, 4, 2, 2, 2, 2, 1, 1),
+  "1993-06" = c(159, 141, 18, 17, 5, 4, 2, 1, 1, 1, 1),
+  "1996-03" = c(156, 141, 21, 16, 5, 4, 2, 2, 1, 1, 1),
+  "2000-03" = c(183, 125, 15, 8, 7, 4, 3, 1, 1, 1, 1, 1),
+  "2004-03" = c(164, 148, 10, 8, 7, 5, 3, 2, 1, 1, 1),
+  "2008-03" = c(169, 154, 10, 6, 3, 2, 2, 2, 1, 1),
+  "2011-11" = c(186, 110, 16, 11, 7, 5, 5, 3, 2, 2, 1, 1, 1),
+  "2015-12" = c(123, 90, 42, 40, 12, 9, 9, 8, 6, 6, 2, 2, 1),
+  "2016-06" = c(137, 85, 45, 32, 12, 9, 9, 8, 5, 5, 2, 1),
+  "2019-04" = c(123, 66, 57, 33, 24, 15, 7, 7, 6, 4, 2, 2, 2, 1, 1),
+  "2019-11" = c(120, 89, 52, 26, 13, 10, 8, 7, 6, 5, 2, 2, 2, 2, 2, 1, 1, 1, 1),
+  "2023-07" = c(137, 121, 33, 31, 7, 7, 6, 5, 1, 1, 1)
+)
+
+hill <- function(p, q) {
+  if (q == 1) {
+    2^H(p)
+  } else {
+    sum(p^q)^(1 / (1 - q))
+  }
+}
+
+numeros <- t(sapply(escanos, function(e) {
+  p <- e / sum(e)
+  c(partidos = hill(p, 0), shannon = hill(p, 1), laakso_taagepera = hill(p, 2),
+    fraccionalizacion = 1 - sum(p^2))
+}))
+
+fecha <- as.numeric(substr(names(escanos), 1, 4)) + (as.numeric(substr(names(escanos), 6, 7)) - 1) / 12
+matplot(fecha, numeros[, 1:3], type = "b", pch = 20, lty = 1, col = c("grey60", "steelblue", "firebrick"),
+        log = "y", xlab = "Elección", ylab = "Número de partidos (escala logarítmica)")
+legend("topleft", c("q = 0: partidos con escaño", "q = 1: Shannon", "q = 2: Laakso y Taagepera"),
+       col = c("grey60", "steelblue", "firebrick"), pch = 20, lty = 1, bty = "n")
+
+round(numeros["2015-12", ] / numeros["2011-11", ], 2)
+round(numeros, 2)
+```
+
+```{webr}
+#| exercise: partidos
+#| check: true
+# hill() se comprueba con una distribución pequeña, en la que cada orden da un número distinto.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+p <- c(0.5, 0.25, 0.25)
+if (!is.function(e$hill)) {
+  list(correct = FALSE, message = "No encuentro la función hill().")
+} else if (!isTRUE(all.equal(e$hill(p, 2), 1 / 0.375)) || !isTRUE(all.equal(e$hill(p, 0), 3)) ||
+           !isTRUE(all.equal(e$hill(p, 3), (0.125 + 2 * 0.25^3)^(-1 / 2)))) {
+  list(correct = FALSE, message = paste0(
+    "Con p = c(0.5, 0.25, 0.25), hill(p, 0) debería dar 3, los partidos que hay, y da ", coma(e$hill(p, 0)),
+    "; hill(p, 2), 1 / 0.375 = 2,667, y da ", coma(e$hill(p, 2)), ". La fórmula general es la suma de p^q, ",
+    "elevada a 1 / (1 - q): fíjate en el signo del exponente."))
+} else if (!isTRUE(all.equal(e$hill(p, 1), 2^1.5))) {
+  list(correct = FALSE, message = paste0(
+    "hill(p, 1) debería dar 2^1,5 = 2,828, porque la entropía de c(0.5, 0.25, 0.25) es 1,5 bits, y da ",
+    coma(e$hill(p, 1)), ". H() está en bits: la exponencial de la entropía en bits es 2^H, no exp(H)."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! De 2011 a 2015 los partidos con escaño siguen siendo ", r["2015-12", "partidos"],
+    ", el número de Laakso y Taagepera pasa de ", coma(r["2011-11", "laakso_taagepera"], 2), " a ",
+    coma(r["2015-12", "laakso_taagepera"], 2), ", y la fraccionalización, solo de ",
+    coma(r["2011-11", "fraccionalizacion"], 2), " a ", coma(r["2015-12", "fraccionalizacion"], 2), "."))
+}
+```
+
+::: {.hint exercise="partidos"}
+Escribe la fórmula general tal cual: la suma de `p^q`, elevada a `1 / (1 - q)`. Con `q == 1`, el límite es la exponencial de la entropía: como `H()` está en bits, la base es 2.
+:::
+
+::: {.solution exercise="partidos"}
+`2^H(p)` si `q == 1`, y `sum(p^q)^(1 / (1 - q))` en los demás casos.
+:::
+:::
+
+::::

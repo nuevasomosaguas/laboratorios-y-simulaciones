@@ -1,0 +1,233 @@
+---
+title: "La letra del DNI"
+numero: 58
+nivel: 1
+duracion: "25 min"
+lectura: "[Hamming (1997)](https://nuevasomosaguas.github.io/biblioteca.html#hamming1997art)"
+dificultad: "Iniciación"
+categories: [teoría de la información]
+description: "La letra del DNI no dice nada nuevo de nadie, y por eso caza cualquier cifra mal copiada; tres bits más bastan para corregirla."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+La letra del DNI no es un adorno. Se calcula a partir del número: el resto de dividirlo entre 23, que va de 0 a 22, se traduce a una de 23 letras con la tabla `TRWAGMYFPDXBNJZSQVHLCKE`. El 12345678 da de resto 14, y la letra que ocupa ese lugar, contando desde 0, es la Z. Faltan la I, la Ñ, la O y la U, para evitar confusiones.
+
+Para quien lee el DNI, la letra no añade nada: conocido el número, se sabe la letra. En términos de Claude Shannon, su información es nula. Lo que añade es **redundancia**, y la redundancia es lo que permite darse cuenta de que algo ha llegado mal. Si alguien copia el número con una cifra cambiada, el resto de dividir entre 23 cambia casi siempre, y la letra ya no cuadra.
+
+¿Casi siempre o siempre? Cambiar la cifra que ocupa el lugar $k$ en una cantidad $\delta$, entre −9 y 9, suma al número $\delta \cdot 10^k$, y el resto no cambia solo si 23 divide a esa cantidad. El código lo comprueba a lo bruto: toma un DNI, le aplica todos los errores de cada tipo y cuenta cuántos se le escapan a la letra.
+
+Detectar no es corregir. En 1947 Richard Hamming trabajaba en los Laboratorios Bell con una calculadora de relés que, los fines de semana, abandonaba el trabajo en cuanto detectaba un error. Si la máquina sabía que había un error, se preguntó, ¿por qué no sabía dónde estaba? Su respuesta fue el código de Hamming (7,4): cuatro bits de mensaje y tres de paridad, en las posiciones 1, 2 y 4. Cada bit de paridad vigila las posiciones que en binario tienen un 1 en su lugar, y al recibir el mensaje se calcula el **síndrome**: los tres bits de paridad recalculados, que valen 0 si todo cuadra. La matriz `H` del código lo hace de un golpe, porque su columna $j$ es el número $j$ escrito en binario.
+
+**Tu tarea.**
+
+1. Completa `letra()`: el resto de dividir `n` entre 23, traducido a su letra. Cuidado: en R los vectores empiezan en 1, y el resto, en 0.
+2. Mira la tabla `resumen`. ¿Qué errores de copia se le escapan a la letra, y en qué proporción?
+3. Completa `corrige()`: si el error está en la posición $j$, el síndrome es la columna $j$ de `H`, es decir, $j$ en binario, con el bit de las unidades primero. Lee el síndrome como un número y tendrás la posición del bit que hay que voltear.
+4. Mira `hamming`: la proporción de mensajes que `corrige()` devuelve intactos con un error y con dos.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+A la letra no se le escapa ninguno de los 72 errores de una cifra del 12345678 ni ninguna de las 7 trasposiciones de cifras contiguas. No es suerte: 23 es primo, no divide a ninguna potencia de 10 ni a ningún número entre 1 y 9, así que $\delta \cdot 10^k$ nunca es múltiplo de 23. Intercambiar dos cifras contiguas $a$ y $b$ suma $(a - b) \cdot 9 \cdot 10^k$, y 23 tampoco divide a 9. Y como 10 necesita 22 potencias para volver a dar resto 1 al dividir entre 23, ni siquiera se escapa el intercambio de dos cifras alejadas en un número de ocho. Lo que sí pasa son los errores dobles: de los 2.268 errores de dos cifras, 95, un 4,2%, dan la misma letra, muy cerca de 1 de cada 23, lo que acertaría un número cambiado al azar.
+
+El ISBN de los libros de diez cifras hace lo mismo con 11, con la X para el resto 10, y el IBAN con 97. Ambos son primos, y por la misma razón ninguno deja pasar una cifra mal copiada ni dos cifras intercambiadas; el IBAN, con un resto entre 97 posibles, deja pasar uno de cada 97 errores dobles. Las tarjetas bancarias usan el algoritmo de Luhn, que trabaja con restos de 10, y a él sí se le escapa un intercambio: el de 09 por 90.
+
+`corrige()` devuelve intactos los 112 mensajes con un error, los 16 posibles por cada una de las 7 posiciones: el síndrome nombra al culpable. Con dos errores no acierta ninguno de los 336, y además estropea un tercer bit, porque el síndrome de dos errores señala con toda seguridad a una posición inocente. Un código solo corrige los errores para los que se diseñó.
+
+La cuenta de los bits explica el porqué. Para corregir un error en un mensaje de 7 bits hay que distinguir 8 situaciones: que no haya error o que esté en una de las 7 posiciones. Eso son $\log_2 8 = 3$ bits, justo los de paridad, y por eso el código de Hamming se llama perfecto: no le sobra ninguno. La letra del DNI tiene 23 valores, $\log_2 23 = 4{,}52$ bits, y le bastan para avisar, pero para corregir una cifra tendría que distinguir entre 73 situaciones, los 72 errores posibles y ninguno: $\log_2 73 = 6{,}19$ bits. Con la letra se sabe que hay un error, pero no dónde.
+
+Aquí los bits miden información en el sentido estricto de Shannon: cuántas situaciones distintas hay que poder distinguir al otro lado de un canal con ruido, que en este caso es la persona que copia un DNI. No es una metáfora. En otros problemas del laboratorio la entropía será solo un índice útil, y conviene saber distinguirlo.
+
+Hamming, R. W. (1950). Error detecting and error correcting codes. *The Bell System Technical Journal*, 29(2), 147–160.
+
+Hamming, R. W. (1997). *The Art of Doing Science and Engineering: Learning to Learn*. Gordon and Breach. Capítulo 12, «Error-Correcting Codes».
+
+Shannon, C. E. (1948). A mathematical theory of communication. *The Bell System Technical Journal*, 27(3), 379–423, y 27(4), 623–656.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: dni
+#| caption: "Tu código"
+# 1. La letra: el resto de dividir entre 23, de 0 a 22, traducido con esta tabla
+letras <- strsplit("TRWAGMYFPDXBNJZSQVHLCKE", "")[[1]]
+letra <- function(n) {
+  ______
+}
+letra(12345678)
+
+# Las ocho cifras de un número, y el número de ocho cifras
+cifras <- function(n) n %/% 10^(7:0) %% 10
+numero <- function(d) sum(d * 10^(7:0))
+
+# 2. Todos los errores de cada tipo
+una_cifra <- function(d) {  # cada cifra, cambiada por cada una de las otras nueve
+  errores <- list()
+  for (i in 1:8) for (a in setdiff(0:9, d[i])) {
+    e <- d; e[i] <- a; errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+contiguas <- function(d) {  # dos cifras contiguas distintas, intercambiadas
+  errores <- list()
+  for (i in 1:7) if (d[i] != d[i + 1]) {
+    e <- d; e[c(i, i + 1)] <- d[c(i + 1, i)]; errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+dos_cifras <- function(d) {  # dos cifras distintas, cambiadas a la vez
+  errores <- list()
+  for (i in 1:7) for (j in (i + 1):8) for (a in setdiff(0:9, d[i])) for (b in setdiff(0:9, d[j])) {
+    e <- d; e[c(i, j)] <- c(a, b); errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+escapan <- function(n, errores) sum(unlist(lapply(errores, function(e) letra(numero(e)) == letra(n))))
+
+dni <- 12345678
+tipos <- list(una_cifra = una_cifra, contiguas = contiguas, dos_cifras = dos_cifras)
+resumen <- data.frame(
+  errores = sapply(tipos, function(f) length(f(cifras(dni)))),
+  escapan = sapply(tipos, function(f) escapan(dni, f(cifras(dni))))
+)
+resumen$porcentaje <- round(100 * resumen$escapan / resumen$errores, 2)
+resumen
+
+# 3. Hamming (7,4): la columna j de H es j en binario, con el bit de las unidades primero
+H <- sapply(1:7, function(j) j %/% c(1, 2, 4) %% 2)
+codifica <- function(m) {  # los cuatro bits del mensaje van en las posiciones 3, 5, 6 y 7
+  x <- integer(7)
+  x[c(3, 5, 6, 7)] <- m
+  x[c(1, 2, 4)] <- as.vector(H[, c(3, 5, 6, 7)] %*% m) %% 2  # la paridad, en las 1, 2 y 4
+  x
+}
+corrige <- function(r) {
+  s <- as.vector(H %*% r) %% 2  # el síndrome: tres bits, todos 0 si no hay error
+  posicion <- ______
+  if (posicion > 0) r[posicion] <- 1 - r[posicion]
+  r
+}
+
+# 4. Los 16 mensajes posibles, con cada error de uno y de dos bits
+mensajes <- lapply(0:15, function(k) k %/% c(8, 4, 2, 1) %% 2)
+voltea <- function(x, i) { x[i] <- 1 - x[i]; x }
+intacto <- function(m, i) identical(corrige(voltea(codifica(m), i)), codifica(m))
+hamming <- c(
+  un_error = mean(sapply(mensajes, function(m) sapply(1:7, function(i) intacto(m, i)))),
+  dos_errores = mean(sapply(mensajes, function(m) combn(7, 2, function(i) intacto(m, i))))
+)
+hamming
+```
+
+```{webr}
+#| exercise: dni
+#| solution: true
+letras <- strsplit("TRWAGMYFPDXBNJZSQVHLCKE", "")[[1]]
+letra <- function(n) {
+  letras[n %% 23 + 1]
+}
+letra(12345678)
+
+cifras <- function(n) n %/% 10^(7:0) %% 10
+numero <- function(d) sum(d * 10^(7:0))
+
+una_cifra <- function(d) {
+  errores <- list()
+  for (i in 1:8) for (a in setdiff(0:9, d[i])) {
+    e <- d; e[i] <- a; errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+contiguas <- function(d) {
+  errores <- list()
+  for (i in 1:7) if (d[i] != d[i + 1]) {
+    e <- d; e[c(i, i + 1)] <- d[c(i + 1, i)]; errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+dos_cifras <- function(d) {
+  errores <- list()
+  for (i in 1:7) for (j in (i + 1):8) for (a in setdiff(0:9, d[i])) for (b in setdiff(0:9, d[j])) {
+    e <- d; e[c(i, j)] <- c(a, b); errores[[length(errores) + 1]] <- e
+  }
+  errores
+}
+escapan <- function(n, errores) sum(unlist(lapply(errores, function(e) letra(numero(e)) == letra(n))))
+
+dni <- 12345678
+tipos <- list(una_cifra = una_cifra, contiguas = contiguas, dos_cifras = dos_cifras)
+resumen <- data.frame(
+  errores = sapply(tipos, function(f) length(f(cifras(dni)))),
+  escapan = sapply(tipos, function(f) escapan(dni, f(cifras(dni))))
+)
+resumen$porcentaje <- round(100 * resumen$escapan / resumen$errores, 2)
+resumen
+
+H <- sapply(1:7, function(j) j %/% c(1, 2, 4) %% 2)
+codifica <- function(m) {
+  x <- integer(7)
+  x[c(3, 5, 6, 7)] <- m
+  x[c(1, 2, 4)] <- as.vector(H[, c(3, 5, 6, 7)] %*% m) %% 2
+  x
+}
+corrige <- function(r) {
+  s <- as.vector(H %*% r) %% 2
+  posicion <- sum(s * c(1, 2, 4))
+  if (posicion > 0) r[posicion] <- 1 - r[posicion]
+  r
+}
+
+mensajes <- lapply(0:15, function(k) k %/% c(8, 4, 2, 1) %% 2)
+voltea <- function(x, i) { x[i] <- 1 - x[i]; x }
+intacto <- function(m, i) identical(corrige(voltea(codifica(m), i)), codifica(m))
+hamming <- c(
+  un_error = mean(sapply(mensajes, function(m) sapply(1:7, function(i) intacto(m, i)))),
+  dos_errores = mean(sapply(mensajes, function(m) combn(7, 2, function(i) intacto(m, i))))
+)
+hamming
+```
+
+```{webr}
+#| exercise: dni
+#| check: true
+# letra() se comprueba con números propios, incluidos los restos 0 y 22, los extremos de la tabla;
+# corrige(), con todos los errores de un bit en dos mensajes.
+e <- .envir_result
+if (!is.function(e$letra) || !is.function(e$corrige) || !is.function(e$codifica)) {
+  list(correct = FALSE, message = "No encuentro letra(), codifica() o corrige().")
+} else if (!identical(tryCatch(sapply(c(12345678, 23, 22, 46, 0), e$letra), error = function(x) NULL),
+                      c("Z", "T", "E", "T", "T"))) {
+  list(correct = FALSE, message = paste0(
+    "letra(12345678) debería dar \"Z\", letra(23) y letra(0) \"T\", y letra(22) \"E\". El resto de dividir entre 23 ",
+    "es n %% 23, y va de 0 a 22; la tabla letras se cuenta desde 1."))
+} else if (!all(sapply(list(c(1, 0, 1, 1), c(0, 1, 1, 0)), function(m) {
+             x <- e$codifica(m)
+             all(sapply(1:7, function(i) { r <- x; r[i] <- 1 - r[i]; isTRUE(all(e$corrige(r) == x)) }))
+           }))) {
+  list(correct = FALSE, message = paste0(
+    "corrige() no arregla todos los errores de un bit. Si el error está en la posición 6, el síndrome es c(0, 1, 1): ",
+    "el primer bit vale 1, el segundo 2 y el tercero 4, y 0 + 2 + 4 = 6."))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! A la letra no se le escapa ninguno de los 72 errores de una cifra, pero sí ",
+    format(e$resumen["dos_cifras", "porcentaje"], decimal.mark = ","), "% de los errores dobles. Hamming corrige todos los errores ",
+    "de un bit con tres bits de paridad, y ninguno de dos."))
+}
+```
+
+::: {.hint exercise="dni"}
+El resto de una división en R es `%%`, y `letras[1]` es la T, la del resto 0. En el síndrome `s`, el primer bit vale 1, el segundo 2 y el tercero 4: multiplica y suma.
+:::
+
+::: {.solution exercise="dni"}
+`letras[n %% 23 + 1]` en `letra()`, y `sum(s * c(1, 2, 4))` en `corrige()`.
+:::
+:::
+
+::::
