@@ -1,0 +1,222 @@
+---
+title: "El umbral del 90%"
+numero: 42
+nivel: 1
+duracion: "30 min"
+lectura: "[Herndon, Ash y Pollin (2014)](https://nuevasomosaguas.github.io/biblioteca.html#ioannidis2005why)"
+dificultad: "Iniciación"
+categories: [estadística, sesgo de selección]
+description: "Un artículo sobre deuda pública y crecimiento justificó años de austeridad. Su número clave salía de una hoja de cálculo con cinco filas de menos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 2010, Carmen Reinhart y Kenneth Rogoff publicaron *Growth in a Time of Debt*. Con datos de veinte economías avanzadas desde 1946, encontraron que, cuando la deuda pública supera el 90% del PIB, el crecimiento medio se hunde: −0,1% al año, frente a casi un 3% o más con deudas menores. El umbral del 90% se citó en parlamentos y comisiones de medio mundo como argumento para la austeridad.
+
+En 2013, Thomas Herndon, un estudiante de doctorado de la Universidad de Massachusetts, intentó replicarlo como ejercicio de un curso. No le salía. Los autores le pasaron su hoja de cálculo, y en ella encontró tres cosas. La fórmula de una media dejaba fuera las cinco primeras filas, Australia, Austria, Bélgica, Canadá y Dinamarca, por puro orden alfabético. Faltaban los años de posguerra de Nueva Zelanda, Australia y Canadá, en los que esos países crecieron con deuda alta. Y la media se calculaba país a país: primero la de cada país y después la de esas medias, de modo que el único año de Nueva Zelanda contaba lo mismo que los diecinueve del Reino Unido.
+
+Los datos de la derecha son los 110 años-país con deuda por encima del 90%, tal como los publicaron Herndon, Ash y Pollin.
+
+**Tu tarea.**
+
+1. Completa `cada_pais(d)`: la media de las medias de cada país. `tapply()` calcula una media por grupo.
+2. Completa `seleccion`: un vector lógico que deja fuera a Nueva Zelanda antes de 1950 y a Australia y Canadá antes de 1951.
+3. El resto ya está escrito. Mira cómo cambia el número al corregir cada paso: el publicado, sin los errores de la hoja, con todos los años y con cada año pesando lo mismo.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con la selección, el error de la hoja y la transcripción, la media sale −0,1%, el número publicado. Al recuperar las cinco filas perdidas sube a 0,3%. Con los años de posguerra, a 1,9%. Y si cada año pesa lo mismo, en lugar de cada país, a 2,2%. El hundimiento desaparece: con deuda alta se crece algo menos que con deudas de entre el 30% y el 90%, en torno al 3%, pero no hay ningún umbral a partir del cual el crecimiento se desplome.
+
+Para ser justos con Reinhart y Rogoff: reconocieron el error de la fórmula, pero sostuvieron que no cambiaba lo esencial, que con deuda alta se crece menos. El debate de fondo pasó a la ponderación y a la causalidad. Ninguna de las dos medias es la buena sin más: pesar por país deja que un solo año de Nueva Zelanda arrastre la media, y pesar por año deja que Bélgica, con veinticinco, la domine. Y aunque la asociación fuera fuerte, podría ir al revés: crecer poco hace subir la deuda, porque cae la recaudación y suben los gastos.
+
+La lección va más allá del caso. Un análisis en una hoja de cálculo es opaco: el error estaba en un rango de celdas que nadie veía, y encontrarlo dependió de que los autores pasaran la hoja. Uno en un script, como el de la derecha, se puede auditar línea a línea. Es lo que defiende Jenny Bryan con el control de versiones, en el núcleo de cómputo de la biblioteca: el remedio a errores así no es tener más cuidado, sino trabajar de forma que se puedan ver.
+
+Herndon, T., Ash, M. y Pollin, R. (2014). Does high public debt consistently stifle economic growth? A critique of Reinhart and Rogoff. *Cambridge Journal of Economics*, 38(2), 257–279.
+
+Reinhart, C. M. y Rogoff, K. S. (2010). Growth in a time of debt. *American Economic Review*, 100(2), 573–578.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: umbral
+#| caption: "Tu código"
+# Los 110 años-país con deuda pública por encima del 90% del PIB, 1946-2009:
+# crecimiento real del PIB (%) en cada año. Datos de Herndon, Ash y Pollin (2014).
+deuda <- rbind(
+  data.frame(pais = "Australia",
+             anio = c(1946, 1947, 1948, 1949, 1950),
+             deuda = c(190.4, 177.3, 148.9, 125.8, 109.8),
+             crecimiento = c(-3.6, 2.5, 6.4, 6.6, 6.9)),
+  data.frame(pais = "Belgium",
+             anio = c(1947, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009),
+             deuda = c(98.6, 92.6, 100.1, 105.4, 109.8, 111.3, 109.3, 109.8, 112.5, 114.8, 121.7, 118.7, 117.0, 112.8, 109.9, 105.3, 103.6, 99.7, 99.3, 98.2, 95.7, 93.3, 91.8, 90.4, 96.6),
+             crecimiento = c(15.2, 2.1, 1.8, 1.9, 2.4, 4.6, 3.6, 3.1, 1.8, 1.3, -0.7, 3.3, 4.3, 0.9, 3.7, 1.7, 3.4, 3.8, 0.8, 1.5, 1.0, 2.8, 2.2, 1.0, -3.2)),
+  data.frame(pais = "Canada",
+             anio = c(1946, 1947, 1948, 1949, 1950),
+             deuda = c(135.9, 117.0, 105.2, 124.0, 111.0),
+             crecimiento = c(-1.0, 4.4, 1.8, 2.2, 7.4)),
+  data.frame(pais = "Greece",
+             anio = c(1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009),
+             deuda = c(91.1, 97.6, 97.6, 103.2, 104.8, 108.1, 105.2, 103.7, 103.6, 108.9, 109.7, 109.2, 106.4, 108.3, 109.0, 106.1, 105.0, 107.9, 100.0),
+             crecimiento = c(3.1, 0.7, -1.6, 2.0, 2.1, 2.4, 3.6, 3.4, 3.4, 4.5, 4.2, 3.4, 5.6, 4.9, 2.9, 4.5, 4.0, 2.9, -0.8)),
+  data.frame(pais = "Ireland",
+             anio = c(1983, 1984, 1985, 1986, 1987, 1988, 1989),
+             deuda = c(96.5, 101.6, 103.0, 109.7, 112.4, 108.3, 97.7),
+             crecimiento = c(-0.7, 3.2, 1.9, 0.4, 3.6, 3.0, 5.6)),
+  data.frame(pais = "Italy",
+             anio = c(1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2009),
+             deuda = c(95.1, 104.8, 104.3, 103.8, 101.2, 99.7, 97.8, 95.1, 91.7, 97.1),
+             crecimiento = c(-0.9, 2.2, 2.8, 1.1, 1.9, 1.4, 1.5, 3.7, 1.8, -5.1)),
+  data.frame(pais = "Japan",
+             anio = c(1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009),
+             deuda = c(98.3, 106.5, 122.0, 130.9, 136.7, 150.7, 162.1, 164.0, 162.5, 166.9, 181.5),
+             crecimiento = c(-0.1, 2.9, 0.2, 0.3, 1.4, 2.7, 1.9, 2.0, 2.3, -0.7, -5.4)),
+  data.frame(pais = "New Zealand",
+             anio = c(1946, 1947, 1948, 1949, 1951),
+             deuda = c(134.0, 120.4, 117.2, 111.5, 91.8),
+             crecimiento = c(7.7, 11.9, -9.9, 10.8, -7.6)),
+  data.frame(pais = "UK",
+             anio = c(1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964),
+             deuda = c(247.5, 237.9, 214.0, 197.8, 193.9, 175.3, 162.0, 152.2, 146.7, 138.2, 129.0, 122.2, 118.1, 112.4, 106.8, 103.1, 99.9, 98.2, 91.0),
+             crecimiento = c(-2.5, -1.3, 2.9, 3.3, 3.2, 2.7, 0.1, 3.8, 4.1, 3.5, 0.9, 1.7, 0.3, 4.3, 5.3, 2.3, 1.1, 4.3, 5.5)),
+  data.frame(pais = "US",
+             anio = c(1946, 1947, 1948, 1949),
+             deuda = c(121.3, 105.8, 93.8, 94.6),
+             crecimiento = c(-10.9, -0.9, 4.4, -0.5))
+)
+
+# 1. La media de Reinhart y Rogoff: primero la de cada país, luego la de esas medias
+cada_pais <- function(d) ______  # cada país pesa lo mismo, tenga un año o veinticinco
+
+# 2. La selección de Reinhart y Rogoff: fuera los años de posguerra de tres países
+seleccion <- ______  # todos menos Nueva Zelanda antes de 1950 y Australia y Canadá antes de 1951
+
+# 3. El error de la hoja: la fórmula dejaba fuera las cinco primeras filas, por orden alfabético
+hoja <- c("Australia", "Austria", "Belgium", "Canada", "Denmark")
+rr <- deuda[seleccion & !deuda$pais %in% hoja, ]
+rr$crecimiento[rr$pais == "New Zealand"] <- -7.9  # y un error de transcripción: era -7,6
+
+# 4. Paso a paso, del número publicado al corregido
+cada_anio <- function(d) mean(d$crecimiento)
+pasos <- c(
+  publicado            = cada_pais(rr),
+  sin_errores_de_hoja  = cada_pais(deuda[seleccion, ]),
+  con_todos_los_anios  = cada_pais(deuda),
+  cada_anio_pesa_igual = cada_anio(deuda)
+)
+round(pasos, 1)
+```
+
+```{webr}
+#| exercise: umbral
+#| solution: true
+# Los 110 años-país con deuda pública por encima del 90% del PIB, 1946-2009:
+# crecimiento real del PIB (%) en cada año. Datos de Herndon, Ash y Pollin (2014).
+deuda <- rbind(
+  data.frame(pais = "Australia",
+             anio = c(1946, 1947, 1948, 1949, 1950),
+             deuda = c(190.4, 177.3, 148.9, 125.8, 109.8),
+             crecimiento = c(-3.6, 2.5, 6.4, 6.6, 6.9)),
+  data.frame(pais = "Belgium",
+             anio = c(1947, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009),
+             deuda = c(98.6, 92.6, 100.1, 105.4, 109.8, 111.3, 109.3, 109.8, 112.5, 114.8, 121.7, 118.7, 117.0, 112.8, 109.9, 105.3, 103.6, 99.7, 99.3, 98.2, 95.7, 93.3, 91.8, 90.4, 96.6),
+             crecimiento = c(15.2, 2.1, 1.8, 1.9, 2.4, 4.6, 3.6, 3.1, 1.8, 1.3, -0.7, 3.3, 4.3, 0.9, 3.7, 1.7, 3.4, 3.8, 0.8, 1.5, 1.0, 2.8, 2.2, 1.0, -3.2)),
+  data.frame(pais = "Canada",
+             anio = c(1946, 1947, 1948, 1949, 1950),
+             deuda = c(135.9, 117.0, 105.2, 124.0, 111.0),
+             crecimiento = c(-1.0, 4.4, 1.8, 2.2, 7.4)),
+  data.frame(pais = "Greece",
+             anio = c(1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009),
+             deuda = c(91.1, 97.6, 97.6, 103.2, 104.8, 108.1, 105.2, 103.7, 103.6, 108.9, 109.7, 109.2, 106.4, 108.3, 109.0, 106.1, 105.0, 107.9, 100.0),
+             crecimiento = c(3.1, 0.7, -1.6, 2.0, 2.1, 2.4, 3.6, 3.4, 3.4, 4.5, 4.2, 3.4, 5.6, 4.9, 2.9, 4.5, 4.0, 2.9, -0.8)),
+  data.frame(pais = "Ireland",
+             anio = c(1983, 1984, 1985, 1986, 1987, 1988, 1989),
+             deuda = c(96.5, 101.6, 103.0, 109.7, 112.4, 108.3, 97.7),
+             crecimiento = c(-0.7, 3.2, 1.9, 0.4, 3.6, 3.0, 5.6)),
+  data.frame(pais = "Italy",
+             anio = c(1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2009),
+             deuda = c(95.1, 104.8, 104.3, 103.8, 101.2, 99.7, 97.8, 95.1, 91.7, 97.1),
+             crecimiento = c(-0.9, 2.2, 2.8, 1.1, 1.9, 1.4, 1.5, 3.7, 1.8, -5.1)),
+  data.frame(pais = "Japan",
+             anio = c(1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009),
+             deuda = c(98.3, 106.5, 122.0, 130.9, 136.7, 150.7, 162.1, 164.0, 162.5, 166.9, 181.5),
+             crecimiento = c(-0.1, 2.9, 0.2, 0.3, 1.4, 2.7, 1.9, 2.0, 2.3, -0.7, -5.4)),
+  data.frame(pais = "New Zealand",
+             anio = c(1946, 1947, 1948, 1949, 1951),
+             deuda = c(134.0, 120.4, 117.2, 111.5, 91.8),
+             crecimiento = c(7.7, 11.9, -9.9, 10.8, -7.6)),
+  data.frame(pais = "UK",
+             anio = c(1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964),
+             deuda = c(247.5, 237.9, 214.0, 197.8, 193.9, 175.3, 162.0, 152.2, 146.7, 138.2, 129.0, 122.2, 118.1, 112.4, 106.8, 103.1, 99.9, 98.2, 91.0),
+             crecimiento = c(-2.5, -1.3, 2.9, 3.3, 3.2, 2.7, 0.1, 3.8, 4.1, 3.5, 0.9, 1.7, 0.3, 4.3, 5.3, 2.3, 1.1, 4.3, 5.5)),
+  data.frame(pais = "US",
+             anio = c(1946, 1947, 1948, 1949),
+             deuda = c(121.3, 105.8, 93.8, 94.6),
+             crecimiento = c(-10.9, -0.9, 4.4, -0.5))
+)
+
+# 1. La media de Reinhart y Rogoff: primero la de cada país, luego la de esas medias
+cada_pais <- function(d) mean(tapply(d$crecimiento, d$pais, mean))
+
+# 2. La selección de Reinhart y Rogoff: fuera los años de posguerra de tres países
+seleccion <- !((deuda$pais == "New Zealand" & deuda$anio < 1950) |
+               (deuda$pais %in% c("Australia", "Canada") & deuda$anio < 1951))
+
+# 3. El error de la hoja: la fórmula dejaba fuera las cinco primeras filas, por orden alfabético
+hoja <- c("Australia", "Austria", "Belgium", "Canada", "Denmark")
+rr <- deuda[seleccion & !deuda$pais %in% hoja, ]
+rr$crecimiento[rr$pais == "New Zealand"] <- -7.9  # y un error de transcripción: era -7,6
+
+# 4. Paso a paso, del número publicado al corregido
+cada_anio <- function(d) mean(d$crecimiento)
+pasos <- c(
+  publicado            = cada_pais(rr),
+  sin_errores_de_hoja  = cada_pais(deuda[seleccion, ]),
+  con_todos_los_anios  = cada_pais(deuda),
+  cada_anio_pesa_igual = cada_anio(deuda)
+)
+round(pasos, 1)
+```
+
+```{webr}
+#| exercise: umbral
+#| check: true
+e <- .envir_result
+coma <- function(x) format(round(x, 1), nsmall = 1, decimal.mark = ",")
+prueba <- data.frame(pais = c("A", "A", "A", "B"), crecimiento = c(1, 2, 3, 10))
+if (!all(c("cada_pais", "seleccion", "deuda") %in% ls(e))) {
+  list(correct = FALSE, message = "Faltan cada_pais(), seleccion o los datos.")
+} else if (!isTRUE(all.equal(e$cada_pais(prueba), 6))) {
+  list(correct = FALSE, message = paste0(
+    "Con un país de tres años, 1, 2 y 3, y otro de un solo año, 10, cada_pais() debería dar 6, la media de 2 y 10, y da ",
+    coma(e$cada_pais(prueba)), ". ¿Haces la media de todos los años en lugar de la de cada país?"))
+} else if (!is.logical(e$seleccion) || length(e$seleccion) != nrow(e$deuda)) {
+  list(correct = FALSE, message = "seleccion tiene que ser un vector lógico con un valor por fila de deuda.")
+} else if (sum(!e$seleccion) != 14) {
+  list(correct = FALSE, message = paste0(
+    "seleccion deja fuera ", sum(!e$seleccion), " años-país, y deberían ser 14: cinco de Australia, cinco de Canadá y cuatro de Nueva Zelanda. ¿Has puesto bien los años, antes de 1950 y antes de 1951?"))
+} else if (!all(e$deuda$pais[!e$seleccion] %in% c("Australia", "Canada", "New Zealand"))) {
+  list(correct = FALSE, message = "seleccion deja fuera años de países que Reinhart y Rogoff sí incluían.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Del ", coma(.result[["publicado"]]), "% publicado al ", coma(.result[["cada_anio_pesa_igual"]]),
+    "% corregido: el umbral del 90% se queda en crecer algo menos, no en hundirse."))
+}
+```
+
+::: {.hint exercise="umbral"}
+`tapply(d$crecimiento, d$pais, mean)` da la media de cada país; falta la media de esas medias. Para la selección, combina con `&` y `|` las condiciones sobre `deuda$pais` y `deuda$anio`, y niégalo todo con `!`. `%in%` sirve para dos países a la vez.
+:::
+
+::: {.solution exercise="umbral"}
+`cada_pais <- function(d) mean(tapply(d$crecimiento, d$pais, mean))` y `seleccion <- !((deuda$pais == "New Zealand" & deuda$anio < 1950) | (deuda$pais %in% c("Australia", "Canada") & deuda$anio < 1951))`.
+:::
+:::
+
+::::
