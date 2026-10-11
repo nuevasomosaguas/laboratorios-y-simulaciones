@@ -1,0 +1,208 @@
+---
+title: "El fracaso del éxito"
+numero: 55
+nivel: 2
+duracion: "30 min"
+lectura: "[Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, demografía]
+description: "Un avance médico reduce a la mitad la mortalidad de los más frágiles, y la mortalidad a los 85 años sube: los que llegan ya no son los mismos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1977, el psiquiatra Ernest Gruenberg publicó un artículo con un título incómodo, *The Failures of Success*: los antibióticos y la insulina habían alargado la vida de muchas personas con enfermedades crónicas, y por eso había **más** enfermos crónicos que antes, no menos. La medicina salvaba a los frágiles, y la población que sobrevivía era, en promedio, más frágil.
+
+Dos años después, James Vaupel, Kenneth Manton y Eric Stallard dieron la herramienta para pensarlo. Cada persona tiene una **fragilidad** $z$, que multiplica una mortalidad de base: su riesgo de morir a la edad $x$ es $z\,\mu_0(x)$. La base es la ley de Gompertz, $\mu_0(x) = a\,e^{bx}$, que sube un 10,5% con cada año de edad si $b = 0{,}1$. La fragilidad no se ve, pero varía de una persona a otra: si sigue una distribución gamma de media 1 y varianza $\sigma^2$, la mortalidad de la población es
+
+$$\bar\mu(x) = \frac{\mu_0(x)}{1 + \sigma^2 H_0(x)}, \qquad H_0(x) = \frac{a}{b}\left(e^{bx} - 1\right),$$
+
+donde $H_0$ es la mortalidad de base acumulada hasta la edad $x$. El denominador es la selección: los más frágiles mueren antes, y los que quedan son cada vez más robustos.
+
+Para el avance médico bastan dos grupos: al nacer, un 20% de frágiles, con una mortalidad $z$ veces la de base, y un 80% de robustos, con la de base. De los que nacen en cada grupo, llega a la edad $x$ una fracción $e^{-z H_0(x)}$. La mortalidad de los que tienen $x$ años es la media de la de los dos grupos, ponderada por cuántos de cada uno han llegado.
+
+**Tu tarea.** Primero, completa `mu_poblacion()`, la fórmula de Vaupel, y mira el gráfico de la izquierda: la mortalidad de cada individuo y la de dos poblaciones con distinta heterogeneidad. ¿A qué valor se acerca la mortalidad de la población a edades muy altas?
+
+Después viene el guion de la serie de efectos de segundo orden, en cuatro pasos. Un avance médico reduce a la mitad la mortalidad de los frágiles, que pasa de 3 a 1,5 veces la de base. ¿Qué le pasa a la mortalidad a los 85 años?
+
+1. **La cuenta de la vieja.** Si a los 85 llegan los mismos que antes, la mortalidad baja en proporción a los frágiles que hay a esa edad. En la tabla es la fila `cuenta de la vieja`, y ya está escrita.
+2. **El modelo completo.** Completa `fragiles()`: la fracción de frágiles entre los que llegan a la edad $x$. Con ella, la tabla calcula la mortalidad a los 85 con la composición nueva.
+3. **La diferencia.** Compara la columna `cambio` de las dos filas. ¿Hacia dónde se mueve la mortalidad en cada una?
+4. **El eslabón.** Mira la columna `fragiles` y el gráfico de la derecha, la fracción de frágiles a cada edad antes y después del avance. ¿Ha empeorado alguien?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La mortalidad de cada individuo sigue la recta de Gompertz, en escala logarítmica, sin doblarse nunca: a los 110 años, 1,80 muertes por persona y año. La de la población se dobla. Con $\sigma^2 = 0{,}2$, a los 100 años es 0,29, menos de la mitad que la individual, y a los 110, 0,39. A esa edad ya solo sube un 2,3% por año de edad, frente al 10,5% de cada persona, y se acerca a un techo, $b/\sigma^2 = 0{,}5$; con $\sigma^2 = 0{,}1$, a 1. Nadie envejece más despacio: los que llegan a los 110 son los más robustos de su generación. Es la meseta que Barbi y sus coautores encontraron en 2018 en los italianos de más de 105 años, y Vaupel ya advirtió en 1979 que una curva así no dice nada de cómo envejece cada cual.
+
+El avance médico muestra el mismo mecanismo con el signo cambiado. La cuenta de la vieja dice que, si los frágiles mueren la mitad, la mortalidad a los 85 años baja un 1,9%: a esa edad solo quedan un 1,3% de frágiles, y su riesgo se reduce a la mitad. El modelo completo dice que **sube** un 2,7%. La diferencia, 4,6 puntos, es de signo contrario al efecto directo.
+
+El eslabón es la **composición**. Antes del avance, de cada cien frágiles llegaba a los 85 uno; después, once. Entre los que tienen 85 años, los frágiles pasan del 1,3% al 10,7%, y aunque cada uno muere la mitad que antes, sigue muriendo 1,5 veces más que un robusto. Nadie ha empeorado: la mortalidad de cada persona ha bajado o sigue igual. Lo que ha cambiado es quién llega a los 85. Es el fracaso del éxito de Gruenberg: alargar la vida de los frágiles aumenta la fragilidad, la discapacidad y la mortalidad media de los mayores, y un indicador de población puede empeorar justo porque la política ha funcionado.
+
+La lección vale para cualquier tasa calculada sobre los que quedan: el paro de larga duración, la supervivencia de las empresas o la reincidencia. Vaupel y Yashin lo llamaron los ardides de la heterogeneidad: antes de leer en una tasa agregada un cambio en los individuos, hay que preguntarse si ha cambiado quién está en el denominador.
+
+Barbi, E., Lagona, F., Marsili, M., Vaupel, J. W. y Wachter, K. W. (2018). The plateau of human mortality: Demography of longevity pioneers. *Science*, 360(6396), 1459–1461.
+
+Gruenberg, E. M. (1977). The failures of success. *The Milbank Memorial Fund Quarterly. Health and Society*, 55(1), 3–24.
+
+Vaupel, J. W., Manton, K. G. y Stallard, E. (1979). The impact of heterogeneity in individual frailty on the dynamics of mortality. *Demography*, 16(3), 439–454.
+
+Vaupel, J. W. y Yashin, A. I. (1985). Heterogeneity's ruses: Some surprising effects of selection on population dynamics. *The American Statistician*, 39(3), 176–185.
+
+Wachter, K. W. (2014). *Essential Demographic Methods*. Harvard University Press. Capítulo 8, «Heterogeneous Risks».
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: fragilidad
+#| caption: "Tu código"
+# La mortalidad de base acumulada hasta la edad x (Gompertz: a * exp(b * x))
+H0 <- function(x, a = 3e-5, b = 0.1) a / b * (exp(b * x) - 1)
+
+# 1. La mortalidad de la población, con fragilidad gamma de media 1 y varianza s2
+mu_poblacion <- function(x, s2, a = 3e-5, b = 0.1) {
+  ______
+}
+
+# 2. La fracción de frágiles entre los que llegan a la edad x: al nacer son p0,
+#    y su mortalidad es z veces la de base; la de los robustos, la de base
+fragiles <- function(x, z, p0 = 0.2, a = 3e-5, b = 0.1) {
+  ______
+}
+
+# La mortalidad a la edad x con una fracción p de frágiles de fragilidad z
+mortalidad <- function(x, p, z, a = 3e-5, b = 0.1) (p * z + 1 - p) * a * exp(b * x)
+
+# El avance médico: la mortalidad de los frágiles pasa de 3 a 1,5 veces la de base
+x <- 85
+z_antes <- 3
+z_despues <- 1.5
+p_antes <- fragiles(x, z_antes)
+p_despues <- fragiles(x, z_despues)
+pasos <- data.frame(
+  paso = c("antes del avance", "cuenta de la vieja", "modelo completo"),
+  fragiles = c(p_antes, p_antes, p_despues),  # la cuenta de la vieja no cambia la composición
+  mortalidad = c(mortalidad(x, p_antes, z_antes), mortalidad(x, p_antes, z_despues),
+                 mortalidad(x, p_despues, z_despues))
+)
+pasos$cambio <- pasos$mortalidad / pasos$mortalidad[1] - 1
+
+# Izquierda: la mortalidad individual y la de dos poblaciones. Derecha: los frágiles a cada edad
+edad <- 30:110
+par(mfrow = c(1, 2))
+matplot(edad, cbind(3e-5 * exp(0.1 * edad), mu_poblacion(edad, 0.1), mu_poblacion(edad, 0.2)),
+        type = "l", lty = 1, lwd = 2, col = 1:3, log = "y", xlab = "Edad", ylab = "Mortalidad")
+legend("topleft", c("individuo de fragilidad 1", "población, varianza 0,1", "población, varianza 0,2"),
+       col = 1:3, lwd = 2, bty = "n", cex = 0.8)
+matplot(edad, cbind(fragiles(edad, z_antes), fragiles(edad, z_despues)), type = "l", lty = 1, lwd = 2,
+        col = c("grey40", "red"), xlab = "Edad", ylab = "Fracción de frágiles")
+legend("topright", c("antes del avance", "después"), col = c("grey40", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+pasos$fragiles <- round(100 * pasos$fragiles, 1)   # en %
+pasos$mortalidad <- round(1000 * pasos$mortalidad)  # muertes por mil personas y año
+pasos$cambio <- round(100 * pasos$cambio, 1)        # en %
+pasos
+```
+
+```{webr}
+#| exercise: fragilidad
+#| solution: true
+H0 <- function(x, a = 3e-5, b = 0.1) a / b * (exp(b * x) - 1)
+
+mu_poblacion <- function(x, s2, a = 3e-5, b = 0.1) {
+  a * exp(b * x) / (1 + s2 * H0(x, a, b))
+}
+
+fragiles <- function(x, z, p0 = 0.2, a = 3e-5, b = 0.1) {
+  f <- p0 * exp(-z * H0(x, a, b))
+  r <- (1 - p0) * exp(-H0(x, a, b))
+  f / (f + r)
+}
+
+mortalidad <- function(x, p, z, a = 3e-5, b = 0.1) (p * z + 1 - p) * a * exp(b * x)
+
+x <- 85
+z_antes <- 3
+z_despues <- 1.5
+p_antes <- fragiles(x, z_antes)
+p_despues <- fragiles(x, z_despues)
+pasos <- data.frame(
+  paso = c("antes del avance", "cuenta de la vieja", "modelo completo"),
+  fragiles = c(p_antes, p_antes, p_despues),
+  mortalidad = c(mortalidad(x, p_antes, z_antes), mortalidad(x, p_antes, z_despues),
+                 mortalidad(x, p_despues, z_despues))
+)
+pasos$cambio <- pasos$mortalidad / pasos$mortalidad[1] - 1
+
+edad <- 30:110
+par(mfrow = c(1, 2))
+matplot(edad, cbind(3e-5 * exp(0.1 * edad), mu_poblacion(edad, 0.1), mu_poblacion(edad, 0.2)),
+        type = "l", lty = 1, lwd = 2, col = 1:3, log = "y", xlab = "Edad", ylab = "Mortalidad")
+legend("topleft", c("individuo de fragilidad 1", "población, varianza 0,1", "población, varianza 0,2"),
+       col = 1:3, lwd = 2, bty = "n", cex = 0.8)
+matplot(edad, cbind(fragiles(edad, z_antes), fragiles(edad, z_despues)), type = "l", lty = 1, lwd = 2,
+        col = c("grey40", "red"), xlab = "Edad", ylab = "Fracción de frágiles")
+legend("topright", c("antes del avance", "después"), col = c("grey40", "red"), lwd = 2, bty = "n", cex = 0.8)
+
+pasos$fragiles <- round(100 * pasos$fragiles, 1)
+pasos$mortalidad <- round(1000 * pasos$mortalidad)
+pasos$cambio <- round(100 * pasos$cambio, 1)
+pasos
+```
+
+```{webr}
+#| exercise: fragilidad
+#| check: true
+# Las dos funciones se comprueban con parámetros propios: así el alumno puede cambiar la edad
+# o el avance sin que deje de valer.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+H <- function(x, a, b) a / b * (exp(b * x) - 1)
+vaupel <- function(x, s2, a, b) a * exp(b * x) / (1 + s2 * H(x, a, b))
+frag <- function(x, z, p0, a, b) {
+  f <- p0 * exp(-z * H(x, a, b))
+  f / (f + (1 - p0) * exp(-H(x, a, b)))
+}
+if (!is.function(e$mu_poblacion) || !is.function(e$fragiles)) {
+  list(correct = FALSE, message = "No encuentro mu_poblacion() o fragiles().")
+} else if (!isTRUE(all.equal(e$mu_poblacion(c(40, 90), 0, a = 1e-4, b = 0.08), 1e-4 * exp(0.08 * c(40, 90))))) {
+  list(correct = FALSE, message = paste0(
+    "Sin heterogeneidad (s2 = 0), la mortalidad de la población es la de Gompertz: con a = 0.0001 y b = 0.08, ",
+    "mu_poblacion(90, 0) debería dar ", coma(1e-4 * exp(7.2)), ", y da ", coma(e$mu_poblacion(90, 0, a = 1e-4, b = 0.08)),
+    ". Usa los a y b que recibe la función."))
+} else if (!isTRUE(all.equal(e$mu_poblacion(c(40, 90), 0.5, a = 1e-4, b = 0.08), vaupel(c(40, 90), 0.5, 1e-4, 0.08)))) {
+  list(correct = FALSE, message = paste0(
+    "Con a = 0.0001, b = 0.08 y s2 = 0.5, mu_poblacion(90, 0.5) debería dar ", coma(vaupel(90, 0.5, 1e-4, 0.08)),
+    ", y da ", coma(e$mu_poblacion(90, 0.5, a = 1e-4, b = 0.08)),
+    ". La mortalidad de base se divide entre 1 más la varianza por la mortalidad acumulada, H0(x, a, b)."))
+} else if (!isTRUE(all.equal(e$fragiles(c(60, 95), 2, p0 = 0.5, a = 1e-4, b = 0.08), frag(c(60, 95), 2, 0.5, 1e-4, 0.08)))) {
+  list(correct = FALSE, message = paste0(
+    "Con la mitad de frágiles al nacer (p0 = 0.5), fragilidad 2, a = 0.0001 y b = 0.08, entre los que llegan a los 95 ",
+    "debería quedar un ", coma(100 * frag(95, 2, 0.5, 1e-4, 0.08), 1), "% de frágiles, y fragiles() da un ",
+    coma(100 * e$fragiles(95, 2, p0 = 0.5, a = 1e-4, b = 0.08), 1), "%. Son los frágiles que llegan, p0 * exp(-z * H0), ",
+    "divididos entre todos los que llegan, frágiles y robustos."))
+} else {
+  r <- .result
+  mueve <- function(v) paste0(if (v < 0) "baja" else "sube", " un ", coma(abs(v), 1), "%")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Según la cuenta de la vieja, la mortalidad a los ", e$x, " años ", mueve(r$cambio[2]),
+    "; según el modelo completo, ", mueve(r$cambio[3]), ": los frágiles que llegan a esa edad pasan del ",
+    coma(r$fragiles[1], 1), "% al ", coma(r$fragiles[3], 1), "%."))
+}
+```
+
+::: {.hint exercise="fragilidad"}
+`mu_poblacion()` es la fórmula del enunciado: la mortalidad de base, `a * exp(b * x)`, entre `1 + s2 * H0(x, a, b)`. En `fragiles()`, calcula cuántos llegan a la edad $x$ de cada grupo, `p0 * exp(-z * H0(x, a, b))` los frágiles y `(1 - p0) * exp(-H0(x, a, b))` los robustos, y divide los frágiles entre el total.
+:::
+
+::: {.solution exercise="fragilidad"}
+`a * exp(b * x) / (1 + s2 * H0(x, a, b))` en `mu_poblacion()`, y en `fragiles()`, los frágiles que llegan, `p0 * exp(-z * H0(x, a, b))`, divididos entre ellos más los robustos que llegan, `(1 - p0) * exp(-H0(x, a, b))`.
+:::
+:::
+
+::::
