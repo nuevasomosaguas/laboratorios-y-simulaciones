@@ -1,0 +1,166 @@
+---
+title: "El programa que funciona y no sirve"
+numero: 51
+nivel: 2
+duracion: "30 min"
+lectura: "[Crépon et al. (2013)](https://nuevasomosaguas.github.io/biblioteca.html#imbens2015causal)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, inferencia causal]
+description: "Un ensayo aleatorizado demuestra que la orientación laboral funciona. Y casi no crea empleo: los orientados se quedan con las vacantes que habrían ocupado otros."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Un servicio de empleo prueba un programa de orientación para parados: ayuda con el currículum, entrevistas simuladas, seguimiento semanal. Lo evalúa como se debe, con un ensayo aleatorizado: sortea a quién se le ofrece, y compara cuántos encuentran empleo entre los orientados y entre los demás. Los orientados encuentran empleo bastante más. La conclusión parece segura: si el programa funciona con unos pocos, extenderlo a todos los parados creará tantos empleos como el efecto medido por el número de orientados.
+
+Para que esa cuenta valga, el resultado de cada parado tiene que depender solo de si a él lo orientan, no de si orientan a los demás. Es el supuesto que Imbens y Rubin llaman **SUTVA**, y la competencia lo rompe: si las vacantes de un mercado local son las que son, el orientado que consigue una puede estar quitándosela a otro parado que la habría conseguido sin el programa. Bruno Crépon, Esther Duflo y sus coautores lo midieron en Francia con un diseño en dos etapas: sortearon primero qué fracción de los parados se orientaba en cada ciudad, 0%, 25%, 50%, 75% o 100%, y luego a quién.
+
+Un mercado local tiene $J = 200$ parados y $V = 40$ vacantes. Una fracción $p$ recibe la orientación, que hace su búsqueda un 50% más eficaz. El esfuerzo de búsqueda total es $S = J\,(1 + 0{,}5\,p)$, y las contrataciones, $H = V\,(1 - e^{-S/V})$: más búsqueda llena más vacantes, pero nunca más de $V$. Cada unidad de esfuerzo de búsqueda se lleva la misma parte de las contrataciones, $H/S$, así que un parado sin orientar encuentra empleo con probabilidad $H/S$, y uno orientado, con $1{,}5\,H/S$.
+
+**Tu tarea.**
+
+1. Completa `mercado()`: la probabilidad de encontrar empleo de quien no recibe la orientación.
+2. **La cuenta de la vieja.** El piloto orientó al 5% de un mercado y midió el efecto: la diferencia entre orientados y no orientados. Completa la columna `cuenta`: los empleos que crearía el programa en cada mercado, el efecto del piloto por el número de orientados.
+3. **El modelo.** La columna `neto` son los empleos de más en cada mercado, comparado con un mercado sin programa, y `diferencia`, lo que se equivoca la cuenta de la vieja. Mira también `medido`, el efecto que mediría un ensayo dentro de cada mercado.
+4. **El eslabón.** Compara la columna `control` de los mercados con programa con la del mercado sin programa: ¿de dónde salen los empleos de los orientados? Después prueba con `V <- 100`, un mercado con más vacantes, en el que sin programa muchas se quedan sin cubrir.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El piloto da un efecto claro: con el 5% orientado, encuentra empleo el 29,1% de los orientados y el 19,4% de los demás, 9,7 puntos de diferencia. La cuenta de la vieja lo extiende a todos: 9,7 puntos por 200 parados son 19,4 empleos por mercado. El modelo da 0,25. Y dentro de cada mercado, el ensayo sigue diciendo que el programa funciona: con la mitad orientada, los orientados encuentran empleo el 24,0% de las veces y los demás, el 16,0%. El ensayo no miente, pero no mide lo que la cuenta le pide.
+
+El error está en el eslabón de la **agregación**. La respuesta individual es la prevista: los orientados buscan mejor y encuentran empleo antes. Pero las vacantes son casi las mismas, y la suma de esas respuestas cambia el mercado de todos: en un mercado sin programa, el 19,9% de los parados encuentra empleo; en uno con la mitad orientada, solo el 16,0% de los no orientados. La diferencia entre orientados y no orientados mezcla dos cosas, lo que ganan unos y lo que pierden los otros, y el ensayo no puede separarlas, porque los no orientados de su mismo mercado no son un grupo de control limpio: también han recibido el programa, el de sus competidores.
+
+Por eso el segundo orden es también un problema de identificación. Comparar orientados y no orientados identifica el efecto de que te orienten **a ti**, con lo que hacen los demás fijo; la política pregunta por el efecto de orientar **a todos**. Para medirlo hay que sortear también entre mercados, como hicieron Crépon y sus coautores. Con jóvenes titulados en 235 mercados locales, encontraron que a los ocho meses los orientados tenían un empleo estable más a menudo que los demás, pero que la ganancia era pasajera y en parte a costa de los no orientados, sobre todo en los mercados de trabajo débiles: el beneficio neto del programa fue muy pequeño.
+
+El tamaño del error depende del mercado. Con 100 vacantes, sin programa quedan 13,5 sin cubrir, la búsqueda sí es parte del cuello de botella, y orientar a todos crea 8,6 empleos de verdad, frente a los 42,5 de la cuenta de la vieja. La cuenta estática se equivoca siempre que el resultado de cada uno dependa de lo que hacen los demás, y cuánto solo lo dice un modelo del mercado.
+
+Crépon, B., Duflo, E., Gurgand, M., Rathelot, R. y Zamora, P. (2013). Do labor market policies have displacement effects? Evidence from a clustered randomized experiment. *The Quarterly Journal of Economics*, 128(2), 531–580.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Imbens, G. W. y Rubin, D. B. (2015). *Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction*. Cambridge University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: programa
+#| caption: "Tu código"
+# 1. Un mercado local: J parados, V vacantes y una fracción p orientada
+mercado <- function(p, J = 200, V = 40, efecto = 0.5) {
+  S <- J * (1 + p * efecto)      # esfuerzo de búsqueda total
+  H <- V * (1 - exp(-S / V))     # contrataciones: nunca más que las vacantes
+  control <- ______              # probabilidad de empleo de quien no recibe la orientación
+  c(tratados = (1 + efecto) * control, control = control, empleos = H)
+}
+
+J <- 200
+V <- 40
+
+# El piloto: un ensayo aleatorizado con el 5% del mercado orientado
+piloto <- mercado(0.05, J, V)
+efecto_piloto <- piloto[["tratados"]] - piloto[["control"]]
+
+# El programa, con distintas fracciones orientadas, como en el diseño de Crépon y sus coautores
+p <- c(0, 0.25, 0.5, 0.75, 1)
+tabla <- data.frame(p, t(sapply(p, mercado, J = J, V = V)))
+tabla$medido <- ifelse(p > 0 & p < 1, tabla$tratados - tabla$control, NA)  # lo que mide un ensayo dentro del mercado
+
+# 2. La cuenta de la vieja: el efecto del piloto por el número de orientados
+tabla$cuenta <- ______
+
+# 3. El modelo: los empleos de más, frente al mercado sin programa
+tabla$neto <- tabla$empleos - tabla$empleos[1]
+tabla$diferencia <- tabla$cuenta - tabla$neto
+
+# 4. La cuenta de la vieja y el modelo, según la fracción orientada
+matplot(tabla$p, tabla[, c("cuenta", "neto")], type = "b", pch = 19, lty = 1, col = c("grey50", "black"),
+        xlab = "Fracción orientada", ylab = "Empleos creados por mercado")
+legend("topleft", c("cuenta de la vieja", "modelo"), col = c("grey50", "black"), lwd = 1, pch = 19, bty = "n")
+
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: programa
+#| solution: true
+mercado <- function(p, J = 200, V = 40, efecto = 0.5) {
+  S <- J * (1 + p * efecto)
+  H <- V * (1 - exp(-S / V))
+  control <- H / S
+  c(tratados = (1 + efecto) * control, control = control, empleos = H)
+}
+
+J <- 200
+V <- 40
+
+piloto <- mercado(0.05, J, V)
+efecto_piloto <- piloto[["tratados"]] - piloto[["control"]]
+
+p <- c(0, 0.25, 0.5, 0.75, 1)
+tabla <- data.frame(p, t(sapply(p, mercado, J = J, V = V)))
+tabla$medido <- ifelse(p > 0 & p < 1, tabla$tratados - tabla$control, NA)
+
+tabla$cuenta <- efecto_piloto * p * J
+
+tabla$neto <- tabla$empleos - tabla$empleos[1]
+tabla$diferencia <- tabla$cuenta - tabla$neto
+
+matplot(tabla$p, tabla[, c("cuenta", "neto")], type = "b", pch = 19, lty = 1, col = c("grey50", "black"),
+        xlab = "Fracción orientada", ylab = "Empleos creados por mercado")
+legend("topleft", c("cuenta de la vieja", "modelo"), col = c("grey50", "black"), lwd = 1, pch = 19, bty = "n")
+
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: programa
+#| check: true
+# mercado() se comprueba con un mercado propio, en el que H/J y H/S no coinciden; la cuenta,
+# con la tabla y el piloto del alumno, así que puede cambiar V o el efecto sin que deje de valer.
+e <- .envir_result
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+pct <- function(x) paste0(coma(100 * x), "%")
+esperada <- 100 * (1 - exp(-1.5)) / 150
+if (!is.function(e$mercado) || !is.data.frame(e$tabla)) {
+  list(correct = FALSE, message = "No encuentro mercado() o la tabla.")
+} else if (!isTRUE(all.equal(unname(e$mercado(0.5, J = 100, V = 100, efecto = 1)["control"]), esperada))) {
+  list(correct = FALSE, message = paste0(
+    "En un mercado de 100 parados y 100 vacantes, con la mitad orientada y un efecto de 1 (el doble de eficaces), ",
+    "un parado sin orientar debería encontrar empleo el ", pct(esperada), " de las veces, y con tu mercado() da ",
+    pct(e$mercado(0.5, J = 100, V = 100, efecto = 1)["control"]),
+    ". Las contrataciones H se reparten por esfuerzo de búsqueda, y los orientados buscan más."))
+} else if (!is.numeric(e$tabla$cuenta) || anyNA(e$tabla$cuenta) ||
+           !isTRUE(all.equal(e$tabla$cuenta, e$efecto_piloto * e$tabla$p * e$J))) {
+  bien <- e$efecto_piloto * e$tabla$p * e$J
+  i <- which(is.na(e$tabla$cuenta) | abs(e$tabla$cuenta - bien) > 1e-6)[1]
+  if (is.na(i)) i <- length(bien)
+  list(correct = FALSE, message = paste0(
+    "Con el ", round(100 * e$tabla$p[i]), "% orientado, la cuenta de la vieja debería dar ", coma(bien[i]),
+    " empleos por mercado, y da ", coma(e$tabla$cuenta[i]),
+    ". Es el efecto que midió el piloto, como si valiera igual para todos, por el número de orientados de cada mercado."))
+} else {
+  r <- e$tabla
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El piloto mide ", coma(100 * e$efecto_piloto), " puntos de efecto, y la cuenta de la vieja promete ",
+    coma(tail(r$cuenta, 1)), " empleos por mercado con todos orientados; el modelo da ", coma(tail(r$neto, 1), 2),
+    ". Con la mitad orientada, los no orientados encuentran empleo el ", pct(r$control[3]),
+    " de las veces, frente al ", pct(r$control[1]), " de un mercado sin programa."))
+}
+```
+
+::: {.hint exercise="programa"}
+Cada unidad de esfuerzo de búsqueda se lleva la misma parte de las contrataciones. ¿Cuántas unidades hay en el mercado, $J$ o $S$? Para la cuenta, `efecto_piloto` es un número y `p * J` es el número de orientados de cada mercado.
+:::
+
+::: {.solution exercise="programa"}
+`H / S` en `mercado()`, y `efecto_piloto * p * J` en la cuenta de la vieja.
+:::
+:::
+
+::::

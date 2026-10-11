@@ -1,0 +1,191 @@
+---
+title: "Todos con máster"
+numero: 50
+nivel: 2
+duracion: "30 min"
+lectura: "[Spence (1973)](https://nuevasomosaguas.github.io/biblioteca.html#gibbons1992game)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, juegos y votación]
+description: "Si el título sirve sobre todo para ordenar a los candidatos, cada máster de más le quita valor al de los demás, y aun así a cada uno le sigue compensando hacerlo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Quien tiene un máster gana más que quien no lo tiene. La cuenta parece fácil: si el máster sube el sueldo de una persona, becar a más gente para que lo haga sube los sueldos de todos. Michael Spence le puso una objeción en 1973: un título puede valer en el mercado de trabajo aunque no enseñe nada, solo porque **señala** a quien lo tiene y sirve para ordenar a los candidatos. Y si sirve sobre todo para ordenar, lo que vale el de cada uno depende de cuántos más lo tengan: es un bien **posicional**.
+
+Una cohorte de 100.000 graduados busca empleo. El 30% de los empleos son buenos, con 40.000 euros al año, y el resto, de 25.000 euros. Los empleadores contratan primero a quien tiene máster y, entre iguales, al azar. Si una fracción $m$ de la cohorte tiene máster, la probabilidad de conseguir un empleo bueno es
+
+$$p_{\text{con}} = \min\left(1, \frac{0{,}3}{m}\right), \qquad p_{\text{sin}} = \max\left(0, \frac{0{,}3 - m}{1 - m}\right):$$
+
+mientras los titulados quepan en los empleos buenos, los tienen todos, y los que sobran se sortean entre los demás. Además, el máster puede enseñar algo de verdad, que sube en $h$ euros al año el sueldo de quien lo hace, haga lo que haga el resto. La **prima** del máster es la diferencia entre el sueldo medio con máster y sin él.
+
+Hacer el máster cuesta, en dinero, en años y en esfuerzo, y no lo mismo a todos: repartido a lo largo de la carrera, entre 0 y 30.000 euros al año según la persona. Lo hace quien gana con él más de lo que le cuesta, descontada la beca. La fracción con máster es un **equilibrio**: la $m$ cuya prima convence justo a una fracción $m$ de la cohorte. El gobierno estudia una beca de 6.000 euros al año.
+
+**Tu tarea.**
+
+1. Completa `salarios()`: la probabilidad de un empleo bueno para quien tiene máster.
+2. **La cuenta de la vieja.** Completa `cuenta_de_la_vieja()`: cuántos euros al año ganará la cohorte si cada nuevo titulado cobra la prima de hoy, como si nadie más hiciera el máster.
+3. **El modelo.** `evaluar()` busca la fracción con máster antes y después de la beca, y mide lo que sube de verdad el sueldo medio de la cohorte, en millones de euros al año. La columna `diferencia` es lo que se equivoca la cuenta de la vieja. Mira los dos escenarios: un máster que solo señala ($h = 0$) y uno que además enseña 3.000 euros al año.
+4. **El eslabón.** Compara `prima_antes` y `prima_despues`, y mira el gráfico: ¿qué le pasa a la prima de cada titulado cuando hay más titulados? ¿Dónde se pierde la ganancia que prometía la cuenta de la vieja?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin beca, el 39% de la cohorte hace el máster, y la prima es de 11.619 euros al año. Con la beca, lo hace el 50%. La cuenta de la vieja multiplica: once de cada cien graduados más, por 11.619 euros, son 131 millones de euros al año más en sueldos. El modelo dice que el sueldo medio de la cohorte no sube nada. Los empleos buenos siguen siendo el 30%, y el máster solo decide quién se los queda: los nuevos titulados se los quitan a otros, que ahora cobran menos, y la prima baja a 9.000 euros.
+
+El error está en el eslabón de la **agregación**. La respuesta individual es la que preveía la cuenta: la beca abarata el máster y más gente lo hace. Pero la suma de esas respuestas cambia el entorno de todos: cuantos más titulados, menos vale el título de cada uno, y la cuenta de la vieja suponía que la prima de hoy seguiría valiendo mañana. El gráfico tiene la forma del problema: mientras hay pocos titulados, la prima sube con ellos, porque a los que no lo tienen les quedan menos empleos buenos; en cuanto hay más titulados que empleos buenos, cada uno de más la baja.
+
+Y aun así, a cada uno le compensa. Con la mitad de la cohorte con máster, quien lo hace sigue ganando 9.000 euros al año más que quien no, así que nadie puede dejarlo sin salir perdiendo, aunque entre todos no ganen nada: es una carrera de credenciales con la forma del dilema del prisionero. La beca cuesta 300 millones de euros al año (la mitad de 100.000 graduados, por 6.000 euros) y no sube ningún sueldo. Por eso un título puede pedir el siguiente: cuando todos tienen el grado, el máster ordena; cuando todos tienen el máster, el doctorado.
+
+Si el máster enseña algo de verdad, 3.000 euros al año, la cuenta de la vieja promete 165 millones y el modelo da 37: lo que enseña se suma, lo que ordena se reparte. La cuenta estática se equivoca por no ver que los demás también se mueven, y cuánto depende de qué parte del título es capital humano y qué parte es posición.
+
+Peter Turchin y Sergey Nefedov describen la versión histórica del mismo mecanismo: la **sobreproducción de élites**. Cuando crece el número de aspirantes a las posiciones de élite más que las posiciones, la competencia entre ellos se vuelve más cara y más feroz, y en sus ciclos seculares precede a las épocas de inestabilidad.
+
+Gibbons, R. (1992). *Game Theory for Applied Economists*. Princeton University Press.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Spence, M. (1973). Job market signaling. *The Quarterly Journal of Economics*, 87(3), 355–374.
+
+Turchin, P. y Nefedov, S. A. (2009). *Secular Cycles*. Princeton University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: master
+#| caption: "Tu código"
+# 1. Sueldo medio con máster y sin él, si una fracción m de la cohorte lo tiene
+salarios <- function(m, h = 0, g = 0.3, buen = 40000, mal = 25000) {
+  p_con <- ______                          # los titulados se quedan primero los empleos buenos
+  p_sin <- pmax(0, (g - m) / (1 - m))      # los que sobran se sortean entre los demás
+  c(con = mal + p_con * (buen - mal) + h, sin = mal + p_sin * (buen - mal))
+}
+
+prima <- function(m, h = 0) unname(diff(rev(salarios(m, h))))  # con máster menos sin máster
+media <- function(m, h = 0) sum(c(m, 1 - m) * salarios(m, h))  # sueldo medio de la cohorte
+
+# La fracción con máster: la m cuya prima, más la beca, supera el coste justo a una fracción m
+equilibrio <- function(beca, h = 0) {
+  uniroot(function(m) punif(prima(m, h) + beca, 0, 30000) - m, c(0, 1), tol = 1e-9)$root
+}
+
+N <- 100000  # graduados de la cohorte
+
+# 2. La cuenta de la vieja: cada nuevo titulado cobra la prima de hoy
+cuenta_de_la_vieja <- function(m0, m1, h = 0) {
+  ______
+}
+
+# 3. El modelo: lo que sube de verdad el sueldo medio, con la prima que dejan los nuevos titulados
+evaluar <- function(h, beca = 6000) {
+  m0 <- equilibrio(0, h)
+  m1 <- equilibrio(beca, h)
+  cuenta <- cuenta_de_la_vieja(m0, m1, h)
+  modelo <- N * (media(m1, h) - media(m0, h))
+  data.frame(h, antes = m0, despues = m1, prima_antes = prima(m0, h), prima_despues = prima(m1, h),
+             cuenta = cuenta / 1e6, modelo = modelo / 1e6, diferencia = (cuenta - modelo) / 1e6)
+}
+
+tabla <- rbind(evaluar(0), evaluar(3000))  # solo señal; o además enseña 3.000 euros al año
+
+# 4. La prima según cuántos tienen máster, antes y después de la beca (h = 0)
+m <- seq(0.01, 0.99, by = 0.01)
+plot(m, sapply(m, prima), type = "l", lwd = 2, ylim = c(0, 16000),
+     xlab = "Fracción de la cohorte con máster", ylab = "Prima del máster (euros al año)")
+abline(v = c(tabla$antes[1], tabla$despues[1]), lty = 2, col = "grey")
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: master
+#| solution: true
+salarios <- function(m, h = 0, g = 0.3, buen = 40000, mal = 25000) {
+  p_con <- pmin(1, g / m)
+  p_sin <- pmax(0, (g - m) / (1 - m))
+  c(con = mal + p_con * (buen - mal) + h, sin = mal + p_sin * (buen - mal))
+}
+
+prima <- function(m, h = 0) unname(diff(rev(salarios(m, h))))
+media <- function(m, h = 0) sum(c(m, 1 - m) * salarios(m, h))
+
+equilibrio <- function(beca, h = 0) {
+  uniroot(function(m) punif(prima(m, h) + beca, 0, 30000) - m, c(0, 1), tol = 1e-9)$root
+}
+
+N <- 100000
+
+cuenta_de_la_vieja <- function(m0, m1, h = 0) {
+  N * (m1 - m0) * prima(m0, h)
+}
+
+evaluar <- function(h, beca = 6000) {
+  m0 <- equilibrio(0, h)
+  m1 <- equilibrio(beca, h)
+  cuenta <- cuenta_de_la_vieja(m0, m1, h)
+  modelo <- N * (media(m1, h) - media(m0, h))
+  data.frame(h, antes = m0, despues = m1, prima_antes = prima(m0, h), prima_despues = prima(m1, h),
+             cuenta = cuenta / 1e6, modelo = modelo / 1e6, diferencia = (cuenta - modelo) / 1e6)
+}
+
+tabla <- rbind(evaluar(0), evaluar(3000))
+
+m <- seq(0.01, 0.99, by = 0.01)
+plot(m, sapply(m, prima), type = "l", lwd = 2, ylim = c(0, 16000),
+     xlab = "Fracción de la cohorte con máster", ylab = "Prima del máster (euros al año)")
+abline(v = c(tabla$antes[1], tabla$despues[1]), lty = 2, col = "grey")
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: master
+#| check: true
+# salarios() y cuenta_de_la_vieja() se comprueban con casos propios, con menos titulados que
+# empleos buenos y con más: así el alumno puede cambiar la beca o h sin que deje de valer.
+e <- .envir_result
+euros <- function(x) format(round(x), big.mark = ".", decimal.mark = ",", scientific = FALSE)
+pct <- function(x) paste0(round(100 * x), "%")
+if (!is.function(e$salarios) || !is.function(e$cuenta_de_la_vieja)) {
+  list(correct = FALSE, message = "No encuentro salarios() o cuenta_de_la_vieja().")
+} else if (!isTRUE(all.equal(unname(e$salarios(0.2)[1]), 40000))) {
+  list(correct = FALSE, message = paste0(
+    "Con un 20% de titulados y un 30% de empleos buenos, todos los titulados caben en los empleos buenos: ",
+    "el sueldo medio con máster, salarios(0.2)[\"con\"], debería ser 40.000 euros, y da ", euros(e$salarios(0.2)[1]),
+    ". Los titulados se quedan primero los empleos buenos, y una probabilidad no pasa de 1."))
+} else if (!isTRUE(all.equal(unname(e$salarios(0.6, h = 1000)[1]), 33500))) {
+  list(correct = FALSE, message = paste0(
+    "Con un 60% de titulados, solo la mitad cabe en los empleos buenos: salarios(0.6, h = 1000)[\"con\"] ",
+    "debería ser 25.000 + 0,5 · 15.000 + 1.000 = 33.500 euros, y da ", euros(e$salarios(0.6, h = 1000)[1]),
+    ". Los empleos buenos, una fracción g, se reparten entre los titulados, una fracción m."))
+} else if (!isTRUE(all.equal(e$cuenta_de_la_vieja(0.2, 0.4), e$N * 0.2 * 13125))) {
+  list(correct = FALSE, message = paste0(
+    "Con un 20% de titulados, la prima es de 13.125 euros al año; si la beca sube los titulados al 40%, ",
+    "la cuenta de la vieja, cuenta_de_la_vieja(0.2, 0.4), debería dar ", euros(e$N * 0.2 * 13125),
+    " euros al año, y da ", euros(e$cuenta_de_la_vieja(0.2, 0.4)),
+    ". Son los nuevos titulados, N · (m1 − m0), cada uno con la prima de antes de la beca."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con la beca, los titulados pasan del ", pct(r$antes[1]), " al ", pct(r$despues[1]),
+    ". La cuenta de la vieja promete ", euros(r$cuenta[1]), " millones de euros al año, y el modelo da ",
+    euros(r$modelo[1]), ": la prima baja de ", euros(r$prima_antes[1]), " a ", euros(r$prima_despues[1]),
+    " euros. Si el máster enseña 3.000 euros al año, ", euros(r$cuenta[2]), " millones frente a ", euros(r$modelo[2]), "."))
+}
+```
+
+::: {.hint exercise="master"}
+Si hay menos titulados que empleos buenos ($m \le g$), todos los titulados consiguen uno. Si hay más, los $g$ empleos buenos se reparten entre los $m$ titulados. `pmin()` elige el menor de dos números. Para la cuenta de la vieja, multiplica los nuevos titulados, `N * (m1 - m0)`, por la prima con la fracción de antes.
+:::
+
+::: {.solution exercise="master"}
+`pmin(1, g / m)` en `salarios()`, y `N * (m1 - m0) * prima(m0, h)` en `cuenta_de_la_vieja()`.
+:::
+:::
+
+::::

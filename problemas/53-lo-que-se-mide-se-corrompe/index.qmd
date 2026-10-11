@@ -1,0 +1,186 @@
+---
+title: "Lo que se mide se corrompe"
+numero: 53
+nivel: 2
+duracion: "30 min"
+lectura: "[Campbell (1979)](https://nuevasomosaguas.github.io/biblioteca.html#lohr2021sampling)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, modelos de agentes]
+description: "Se premia a los colegios por su porcentaje de aprobados. Los aprobados suben el doble de lo previsto, y lo que aprenden los alumnos, la mitad."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Una consejería de educación quiere que los alumnos aprendan más, y decide premiar a los colegios por su porcentaje de aprobados. La cuenta parece razonable: hasta ahora, los colegios con más aprobados eran los que más enseñaban, así que si los colegios se esfuerzan por subir los aprobados, subirá lo que aprenden sus alumnos. Donald Campbell avisó en 1979 de lo que suele pasar: cuanto más se usa un indicador cuantitativo para tomar decisiones, más presiones sufre para corromperse, y más deforma el proceso que debía vigilar. Es la **ley de Campbell**; en economía, su gemela se llama ley de Goodhart.
+
+Hay 200 colegios. El premio paga $r$ por cada punto de aprobados, y cada colegio puede subirlos de dos maneras: **enseñando** más, que sube un punto los aprobados y un punto lo que aprenden los alumnos por cada unidad de esfuerzo, o **aprobando** más, con más manga ancha al corregir, que sube los aprobados $\gamma = 3$ puntos por unidad de esfuerzo y lo que aprenden, nada. Las dos cuestan horas del mismo claustro, y la manga ancha, además, tiene un riesgo: una inspección, una queja, la reputación, que pesa $d$ y varía de un colegio a otro. Cada colegio maximiza
+
+$$r\,(e_a + \gamma\,e_n) - \frac{(e_a + e_n)^2}{2} - \frac{d\,e_n^2}{2},$$
+
+donde $e_a$ es el esfuerzo en enseñar y $e_n$, en aprobar. El esfuerzo total sube hasta que su coste marginal iguala el premio, $e_a + e_n = r$, y la manga ancha, hasta que lo que paga de más que enseñar, $r(\gamma - 1)$ por unidad, iguala su riesgo marginal, $d\,e_n$.
+
+Pero al principio casi ningún colegio sabe que la manga ancha es una opción. Lo descubren viendo a los demás: cada año, un colegio que todavía no la usa la adopta con una probabilidad $\beta$ por la fracción de colegios que ya la usan. Lo que aprenden los alumnos se mide con una prueba externa, corregida siempre con el mismo criterio, que ningún colegio controla.
+
+**Tu tarea.**
+
+1. Completa `indulgencia()`: el esfuerzo en aprobar de un colegio que conoce la manga ancha.
+2. Completa `contagio()`: quién conoce la manga ancha el año siguiente.
+3. **La cuenta de la vieja.** Si los colegios solo pudieran responder enseñando, el premio subiría los aprobados y la prueba externa lo mismo: `cuenta` puntos, el esfuerzo total.
+4. **El modelo.** La tabla sigue diez años de premio: la fracción de colegios que conoce la manga ancha y cuánto han subido los aprobados y la prueba externa desde el año 0. Compara las dos con la cuenta de la vieja, y mira cuándo se separan: ¿en qué eslabón está la diferencia?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La cuenta de la vieja dice que el premio sube 6 puntos los aprobados y 6 puntos lo aprendido. El primer año casi acierta: los aprobados suben 6,3 puntos y la prueba externa, 5,9, porque solo el 5% de los colegios conoce la manga ancha. Una evaluación al año confirmaría la política. Pero diez años después, los aprobados han subido 11,7 puntos y la prueba externa, 3,2. La cuenta estática se equivoca en las dos direcciones a la vez: se queda corta con el indicador y se pasa con lo que el indicador debía medir. Y desde el primer año, mientras los aprobados no paran de subir, lo aprendido baja.
+
+El error está en el eslabón de la **retroalimentación**. La respuesta individual de cada colegio no cambia: con el mismo premio y el mismo riesgo, reparte su esfuerzo igual. Lo que cambia es lo que sabe. Los aprobados de los demás, que el premio ha hecho públicos y valiosos, le enseñan que hay una forma más barata de subir los suyos, y la manga ancha se extiende de colegio en colegio, con retraso: la conoce la mitad de los colegios en el año 5 y todos en el año 8. Cuanto más se usa el indicador, menos mide lo que medía, y eso no se ve en el primer año, que es cuando suele evaluarse una política.
+
+El mecanismo no necesita trampas: cada colegio responde razonablemente a lo que se le pide. Pero deja inservible el indicador para lo que se usaba: comparar los aprobados de antes y de después del premio ya no dice nada de lo que se aprende. Es la otra cara de [¿Ha bajado el nivel?](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/14-bachillerato/): allí, la media de los alumnos bajaba sin que nadie supiera menos, porque cambiaba quién entraba; aquí, los aprobados suben sin que nadie sepa más, porque cambia lo que se mide. En los dos casos, la serie oficial no compara lo mismo de un año a otro, y por eso hace falta una prueba que nadie tenga interés en mover.
+
+Campbell, D. T. (1979). Assessing the impact of planned social change. *Evaluation and Program Planning*, 2(1), 67–90.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: campbell
+#| caption: "Tu código"
+# 1. El esfuerzo en aprobar de un colegio que conoce la manga ancha, sin pasar del esfuerzo total r
+indulgencia <- function(r, gamma, d) {
+  pmin(r, ______)
+}
+
+# 2. Cada colegio que no la conoce la adopta con probabilidad beta por la fracción que ya la conoce
+contagio <- function(sabe, beta) {
+  ______
+}
+
+set.seed(1979)
+n <- 200
+base <- rnorm(n, 60, 10)     # porcentaje de aprobados de cada colegio antes del premio
+d <- runif(n, 2, 8)          # el riesgo de la manga ancha en cada colegio
+sabe <- runif(n) < 0.05      # quién conoce la manga ancha al empezar
+r <- 6
+gamma <- 3
+beta <- 1
+
+# 3. La cuenta de la vieja: si solo se pudiera enseñar, todo el esfuerzo iría a enseñar
+cuenta <- r
+
+# 4. El modelo: diez años de premio
+tabla <- data.frame(anio = 0:10, saben = NA, aprobados = NA, prueba = NA, cuenta = c(0, rep(cuenta, 10)))
+for (t in 0:10) {
+  premio <- if (t == 0) 0 else r
+  if (t >= 2) sabe <- contagio(sabe, beta)  # se aprende de los aprobados del año anterior
+  e_n <- ifelse(sabe, indulgencia(premio, gamma, d), 0)
+  e_a <- premio - e_n
+  prueba <- pmin(100, base + e_a)                    # lo que aprenden: solo cuenta enseñar
+  aprobados <- pmin(100, base + e_a + gamma * e_n)   # el indicador: cuentan las dos cosas
+  if (t == 0) inicio <- c(mean(aprobados), mean(prueba))
+  tabla[t + 1, 2:4] <- c(mean(sabe), c(mean(aprobados), mean(prueba)) - inicio)
+}
+tabla$diferencia <- tabla$aprobados - tabla$prueba
+
+matplot(tabla$anio, tabla[, c("aprobados", "prueba", "cuenta")], type = "l", lty = c(1, 1, 2), lwd = 2,
+        col = c("black", "grey50", "grey70"), xlab = "Año", ylab = "Subida desde el año 0 (puntos)")
+legend("topleft", c("aprobados", "prueba externa", "cuenta de la vieja"), col = c("black", "grey50", "grey70"),
+       lty = c(1, 1, 2), lwd = 2, bty = "n")
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: campbell
+#| solution: true
+indulgencia <- function(r, gamma, d) {
+  pmin(r, r * (gamma - 1) / d)
+}
+
+contagio <- function(sabe, beta) {
+  sabe | runif(length(sabe)) < beta * mean(sabe)
+}
+
+set.seed(1979)
+n <- 200
+base <- rnorm(n, 60, 10)
+d <- runif(n, 2, 8)
+sabe <- runif(n) < 0.05
+r <- 6
+gamma <- 3
+beta <- 1
+
+cuenta <- r
+
+tabla <- data.frame(anio = 0:10, saben = NA, aprobados = NA, prueba = NA, cuenta = c(0, rep(cuenta, 10)))
+for (t in 0:10) {
+  premio <- if (t == 0) 0 else r
+  if (t >= 2) sabe <- contagio(sabe, beta)
+  e_n <- ifelse(sabe, indulgencia(premio, gamma, d), 0)
+  e_a <- premio - e_n
+  prueba <- pmin(100, base + e_a)
+  aprobados <- pmin(100, base + e_a + gamma * e_n)
+  if (t == 0) inicio <- c(mean(aprobados), mean(prueba))
+  tabla[t + 1, 2:4] <- c(mean(sabe), c(mean(aprobados), mean(prueba)) - inicio)
+}
+tabla$diferencia <- tabla$aprobados - tabla$prueba
+
+matplot(tabla$anio, tabla[, c("aprobados", "prueba", "cuenta")], type = "l", lty = c(1, 1, 2), lwd = 2,
+        col = c("black", "grey50", "grey70"), xlab = "Año", ylab = "Subida desde el año 0 (puntos)")
+legend("topleft", c("aprobados", "prueba externa", "cuenta de la vieja"), col = c("black", "grey50", "grey70"),
+       lty = c(1, 1, 2), lwd = 2, bty = "n")
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: campbell
+#| check: true
+# indulgencia() se comprueba con casos propios; contagio(), con 10.000 colegios, la mitad
+# enterados: los enterados siguen enterados, y de los demás se entera una fracción beta · 0,5.
+e <- .envir_result
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$indulgencia) || !is.function(e$contagio)) {
+  list(correct = FALSE, message = "No encuentro indulgencia() o contagio().")
+} else if (!isTRUE(all.equal(e$indulgencia(4, 3, c(4, 16)), c(2, 0.5)))) {
+  list(correct = FALSE, message = paste0(
+    "Con r = 4, γ = 3 y un riesgo d = 4, indulgencia() debería dar 2, y da ", coma(e$indulgencia(4, 3, 4)),
+    ". La manga ancha paga r(γ − 1) más que enseñar por unidad de esfuerzo, y su riesgo marginal es d · e_n: iguálalos y despeja."))
+} else {
+  set.seed(53)
+  mitad <- rep(c(TRUE, FALSE), each = 5000)
+  x <- e$contagio(mitad, 0.5)
+  if (length(x) != 10000 || anyNA(x) || !all(x[1:5000])) {
+    list(correct = FALSE, message = paste0(
+      "contagio() tiene que devolver un TRUE o FALSE por colegio, y quien ya conoce la manga ancha no la olvida: ",
+      "con 10.000 colegios, la mitad enterados, deberían seguir enterados los 5.000."))
+  } else if (abs(mean(x[5001:10000]) - 0.25) > 0.03) {
+    list(correct = FALSE, message = paste0(
+      "Con la mitad de los colegios enterados y β = 0,5, debería enterarse cerca del 25% de los demás ",
+      "(0,5 · 0,5), y con tu contagio() se entera el ", round(100 * mean(x[5001:10000])),
+      "%. Cada colegio sortea por su cuenta, con probabilidad beta por la fracción que ya la conoce."))
+  } else {
+    r <- .result
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! La cuenta de la vieja promete ", coma(r$cuenta[2], 0), " puntos de aprobados y de aprendizaje. ",
+      "El primer año, los aprobados suben ", coma(r$aprobados[2]), " y la prueba externa, ", coma(r$prueba[2]),
+      "; el año 10, ", coma(r$aprobados[11]), " y ", coma(r$prueba[11]), ". El indicador se ha separado de lo que medía."))
+  }
+}
+```
+
+::: {.hint exercise="campbell"}
+Para `indulgencia()`, despeja $e_n$ de $r(\gamma - 1) = d\,e_n$. Para `contagio()`, `runif(length(sabe))` da un número al azar por colegio, y `mean(sabe)` es la fracción que ya conoce la manga ancha; no olvides que quien la conoce sigue conociéndola: `|` es el «o» de R.
+:::
+
+::: {.solution exercise="campbell"}
+`r * (gamma - 1) / d` en `indulgencia()`, y `sabe | runif(length(sabe)) < beta * mean(sabe)` en `contagio()`.
+:::
+:::
+
+::::
