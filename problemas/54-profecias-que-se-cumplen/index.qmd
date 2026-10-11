@@ -1,0 +1,190 @@
+---
+title: "Profecías que se cumplen, un poco"
+numero: 54
+nivel: 2
+duracion: "30 min"
+lectura: "[Merton (1948)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2009oxford); [Jussim (2012)](https://nuevasomosaguas.github.io/biblioteca.html#jussim2012social)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, modelos de agentes]
+description: "Un rumor de quiebra hunde un banco sano, o no mueve casi nada: depende de cuánto miedo contagia cada retirada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1948, Robert K. Merton contó la historia de un banco inventado y solvente. Corre el rumor de que va a quebrar; los impositores corren a sacar su dinero, y como ningún banco tiene en caja todos sus depósitos, el banco quiebra. La predicción era falsa cuando se hizo, y se cumplió porque se hizo. Merton la llamó **profecía que se cumple a sí misma**, y la idea salió del banco para explicar casi todo: el alumno del que el profesor espera poco, el grupo del que se espera lo peor.
+
+Lee Jussim le puso el contrapeso. Revisó décadas de estudios sobre expectativas, sobre todo en el aula, y encontró que las profecías que se cumplen existen, pero que en casi todos los contextos medidos son débiles: las expectativas suelen acertar porque se basan en información real, no porque creen lo que predicen. Las dos cosas pueden ser verdad a la vez, y el modelo enseña cómo.
+
+Mil impositores. El rumor llega a una fracción `rumor` de ellos, que retiran su dinero. Los demás no oyen el rumor, pero ven las retiradas: si ya ha retirado una fracción $x$ de los depósitos, cada uno estima que el banco quebrará con probabilidad $k\,x$, y retira si ese miedo supera su `tolerancia`, distinta para cada cual. El número $k$ es el **efecto de las expectativas**: cuánto miedo contagia cada retirada. Con $k = 1$, quien ve retirar el 10% cree que hay un 10% de probabilidad de quiebra. El banco quiebra si las retiradas superan sus reservas, el 25% de los depósitos. Las cifras son inventadas.
+
+**Tu tarea.** Es el guion de la serie de efectos de segundo orden, en cuatro pasos:
+
+1. **La cuenta de la vieja.** El rumor llega al 10%, así que retira el 10%. Ya está escrita.
+2. **El modelo completo.** Completa `retiradas()`: en cada ronda retiran los del rumor, más los demás cuyo miedo, $k\,x$, supera su tolerancia. Se ejecuta para efectos de las expectativas de 0 a 2.
+3. **La diferencia.** `diferencia` es lo que el modelo añade a la cuenta de la vieja. Completa `k_critico`: el efecto más pequeño con el que acaba retirando la mayoría de los depósitos. Mira la tabla y el gráfico: ¿cuánto añade el modelo por debajo de `k_critico`, y cuánto por encima?
+4. **El eslabón.** ¿Qué cambia entre una ronda y la siguiente: lo que cada impositor puede hacer, o lo que cree? ¿De dónde saca lo que cree?
+5. Cuando la comprobación te dé por bueno el código, cambia el rumor a 0.05 y a 0.2. ¿Cómo se mueve `k_critico`?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con un efecto débil, $k = 0{,}25$, el rumor del 10% acaba en retiradas del 10,2%: la cuenta de la vieja casi acierta. Con $k = 0{,}5$, del 10,7%, y con $k = 1$, del 16,6%. Con $k = 1{,}04$ se retira el 20,3%, el doble de lo que dice la cuenta de la vieja, y el banco todavía aguanta. Con $k = 1{,}05$ lo retira todo el mundo y el banco quiebra. El efecto crítico está entre los dos: por debajo, la profecía añade poco; por encima, se cumple entera. Con este rumor no hay término medio, porque cada retirada asusta a los que quedan, y con $k$ alto ese miedo basta para la siguiente.
+
+El eslabón es la **retroalimentación** de la cadena micro-macro de Hedström: nadie cambia sus oportunidades ni sus preferencias, cambia lo que cree. Las retiradas de una ronda son el entorno de la siguiente, y de ese entorno cada impositor saca su estimación de la quiebra. El rumor no hunde el banco; lo hunden las creencias que fabrican las propias retiradas, una ronda después de otra.
+
+El efecto crítico no es una constante. Con un rumor del 5% hace falta $k = 1{,}4$, y con uno del 20% basta $k = 0{,}84$: cuanto más se extiende el rumor, más fácil es que se cumpla. Por eso los bancos tienen seguro de depósitos, como explican Diamond y Dybvig: si el impositor sabe que cobrará pase lo que pase, ver retirar a los demás no le da miedo, y $k$ se hunde por debajo del umbral.
+
+Merton y Jussim no se contradicen. El mecanismo es real y, cuando hay umbrales y cada uno mira lo que hacen los demás, puede ser enorme: una quiebra entera. Pero casi siempre el efecto de las expectativas es más débil que el crítico, y entonces mueve poco: unas décimas, o unos puntos. Que una expectativa influya en lo que pasa no la convierte en una profecía que se cumple a sí misma; para eso hace falta una cascada, y para la cascada, un efecto por encima del umbral.
+
+Biggs, M. (2009). Self-fulfilling prophecies. En P. Hedström y P. Bearman (eds.), *The Oxford Handbook of Analytical Sociology*. Oxford University Press.
+
+Diamond, D. W. y Dybvig, P. H. (1983). Bank runs, deposit insurance, and liquidity. *Journal of Political Economy*, 91(3), 401–419.
+
+Jussim, L. (2012). *Social Perception and Social Reality: Why Accuracy Dominates Bias and Self-Fulfilling Prophecy*. Oxford University Press.
+
+Merton, R. K. (1948). The self-fulfilling prophecy. *The Antioch Review*, 8(2), 193–210.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: profecia
+#| caption: "Tu código"
+N <- 1000
+tolerancia <- qbeta(ppoints(N), 2, 2)  # el miedo que aguanta cada impositor antes de retirar
+reservas <- 0.25                       # lo que el banco puede devolver sin quebrar
+rumor <- 0.1                           # la fracción a la que llega el rumor
+
+# 2. La fracción de los depósitos que acaba retirada, con un efecto de las expectativas k
+retiradas <- function(k, rumor, tolerancia) {
+  x <- rumor
+  for (ronda in 1:1000) {  # con un tope, por si acaso
+    nuevo <- ______        # los del rumor, más los demás cuyo miedo supera su tolerancia
+    if (nuevo == x) break
+    x <- nuevo
+  }
+  x
+}
+
+# 1. La cuenta de la vieja
+cuenta_de_la_vieja <- rumor
+
+# 2. El modelo completo, con efectos de 0 a 2
+k <- seq(0, 2, by = 0.01)
+final <- sapply(k, retiradas, rumor = rumor, tolerancia = tolerancia)
+
+# 3. La diferencia, y el efecto más pequeño con el que retira la mayoría
+diferencia <- final - cuenta_de_la_vieja
+k_critico <- ______
+
+plot(k, final, type = "s", lwd = 2, ylim = c(0, 1),
+     xlab = "Efecto de las expectativas, k", ylab = "Fracción retirada")
+abline(h = c(cuenta_de_la_vieja, reservas), lty = 2, col = c("grey", "red"))
+abline(v = k_critico, lty = 3)
+
+efectos <- c(0.25, 0.5, 1, k_critico - 0.01, k_critico)
+tabla <- data.frame(k = efectos, retirado = sapply(efectos, retiradas, rumor = rumor, tolerancia = tolerancia))
+tabla$diferencia <- tabla$retirado - cuenta_de_la_vieja
+tabla$quiebra <- tabla$retirado > reservas
+tabla
+```
+
+```{webr}
+#| exercise: profecia
+#| solution: true
+N <- 1000
+tolerancia <- qbeta(ppoints(N), 2, 2)
+reservas <- 0.25
+rumor <- 0.1
+
+retiradas <- function(k, rumor, tolerancia) {
+  x <- rumor
+  for (ronda in 1:1000) {
+    nuevo <- rumor + (1 - rumor) * mean(tolerancia < k * x)
+    if (nuevo == x) break
+    x <- nuevo
+  }
+  x
+}
+
+cuenta_de_la_vieja <- rumor
+
+k <- seq(0, 2, by = 0.01)
+final <- sapply(k, retiradas, rumor = rumor, tolerancia = tolerancia)
+
+diferencia <- final - cuenta_de_la_vieja
+k_critico <- min(k[final > 0.5])
+
+plot(k, final, type = "s", lwd = 2, ylim = c(0, 1),
+     xlab = "Efecto de las expectativas, k", ylab = "Fracción retirada")
+abline(h = c(cuenta_de_la_vieja, reservas), lty = 2, col = c("grey", "red"))
+abline(v = k_critico, lty = 3)
+
+efectos <- c(0.25, 0.5, 1, k_critico - 0.01, k_critico)
+tabla <- data.frame(k = efectos, retirado = sapply(efectos, retiradas, rumor = rumor, tolerancia = tolerancia))
+tabla$diferencia <- tabla$retirado - cuenta_de_la_vieja
+tabla$quiebra <- tabla$retirado > reservas
+tabla
+```
+
+```{webr}
+#| exercise: profecia
+#| check: true
+# retiradas() se compara con una versión propia en varios casos, con otras tolerancias y otros
+# rumores; k_critico, con lo que dan los k y final del alumno, que puede cambiar el rumor (tarea 5).
+e <- .envir_result
+f <- e$retiradas
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+pct <- function(x) paste0(format(round(100 * x, 1), decimal.mark = ","), "%")
+ref <- function(k, rumor, tolerancia) {
+  x <- rumor
+  for (ronda in 1:1000) {
+    nuevo <- rumor + (1 - rumor) * mean(tolerancia < k * x)
+    if (nuevo == x) break
+    x <- nuevo
+  }
+  x
+}
+tol <- (1:9) / 10 - 0.05  # nueve impositores: 0,05, 0,15... 0,85
+casos <- list(c(k = 1, rumor = 0.1), c(k = 3, rumor = 0.1), c(k = 0.5, rumor = 0.3), c(k = 0, rumor = 0.2))
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función retiradas().")
+} else if (!is.null(fallo <- Find(function(cs) !isTRUE(all.equal(f(cs[["k"]], cs[["rumor"]], tol), ref(cs[["k"]], cs[["rumor"]], tol))), casos))) {
+  obtenido <- f(fallo[["k"]], fallo[["rumor"]], tol)
+  pista <- if (obtenido > 1) "No se puede retirar más del 100%: los demás son solo 1 - rumor."
+    else if (obtenido < fallo[["rumor"]]) "Los del rumor retiran siempre, ronda tras ronda."
+    else "Retiran los del rumor, más una fracción 1 - rumor de los demás: la de los que tienen una tolerancia menor que su miedo, k * x."
+  list(correct = FALSE, message = paste0(
+    "Con nueve impositores de tolerancias 0,05, 0,15... 0,85, k = ", coma(fallo[["k"]], 1), " y un rumor de ", coma(fallo[["rumor"]], 1),
+    ", retiradas() debería dar ", coma(ref(fallo[["k"]], fallo[["rumor"]], tol)), ", y da ", coma(obtenido), ". ", pista))
+} else if (!is.numeric(e$k_critico) || length(e$k_critico) != 1 || !isTRUE(all.equal(e$k_critico, min(e$k[e$final > 0.5])))) {
+  bueno <- min(e$k[e$final > 0.5])
+  list(correct = FALSE, message = paste0(
+    "k_critico debería ser el k más pequeño de la rejilla con el que se retira más de la mitad, ", coma(bueno, 2),
+    if (is.numeric(e$k_critico) && length(e$k_critico) == 1) paste0(", y es ", coma(e$k_critico, 2)) else "",
+    if (isTRUE(all.equal(e$k_critico, bueno - 0.01))) paste0(". Con ese k se retira el ", pct(e$final[which.min(abs(e$k - e$k_critico))]), ": todavía no es la mayoría.") else
+      ". Busca entre los k aquellos con final > 0.5, y quédate con el menor."))
+} else {
+  t <- e$tabla
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con un rumor del ", pct(e$rumor), ", la cuenta de la vieja dice ", pct(e$cuenta_de_la_vieja), ". Con k = 0,5 se retira el ",
+    pct(e$retiradas(0.5, e$rumor, e$tolerancia)), ", y con k = ", coma(e$k_critico - 0.01, 2), ", el ",
+    pct(e$retiradas(e$k_critico - 0.01, e$rumor, e$tolerancia)), ". Con k = ", coma(e$k_critico, 2), ", el ",
+    pct(e$retiradas(e$k_critico, e$rumor, e$tolerancia)), ": la profecía se cumple de golpe, o casi no se cumple."))
+}
+```
+
+::: {.hint exercise="profecia"}
+`mean(tolerancia < k * x)` es la fracción de impositores cuyo miedo supera su tolerancia; de los que no oyeron el rumor, que son `1 - rumor`, retira esa fracción. Para `k_critico`, `final > 0.5` dice con qué efectos retira la mayoría: quédate con el `min()` de esos `k`.
+:::
+
+::: {.solution exercise="profecia"}
+`rumor + (1 - rumor) * mean(tolerancia < k * x)` en `retiradas()`, y `min(k[final > 0.5])` en `k_critico`.
+:::
+:::
+
+::::

@@ -1,0 +1,198 @@
+---
+title: "Una multa es un precio"
+numero: 48
+nivel: 2
+duracion: "30 min"
+lectura: "[Gintis, Bowles, Boyd y Fehr (2005)](https://nuevasomosaguas.github.io/biblioteca.html#gintis2005moral)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, equilibrios y dinámica]
+description: "Una guardería multa a quien llega tarde a recoger a su hijo, y cada vez llegan tarde más familias; al quitar la multa, siguen llegando tarde."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Algunas familias llegaban tarde a recoger a sus hijos a unas guarderías de Haifa, y una profesora tenía que quedarse después de la hora de cierre. Uri Gneezy y Aldo Rustichini hicieron un experimento: pusieron una multa pequeña por llegar tarde. La teoría de la disuasión es clara: si llegar tarde cuesta más, se llegará menos tarde. Pasó lo contrario: con la multa, el número de familias que llegaban tarde subió de forma significativa. Y cuando se quitó la multa, no bajó. Lo contaron en un artículo con un título que lo resume: *Una multa es un precio*.
+
+Su explicación es que la multa cambió el significado de llegar tarde. Antes era faltar a la profesora, y pesaba la culpa; con la multa pasó a ser un servicio con su tarifa, y quien paga no tiene por qué sentirse culpable. En el modelo, cada familia gana algo llegando tarde, su `prisa` (en euros: una reunión que no corta, un recado más), y la mitad no tiene nunca prisa. Sin multa, llega tarde si su prisa supera la culpa, que vale 10 euros si nadie más llega tarde, pero se divide por dos cada vez que llega tarde otro 15% de las familias: cuanto más normal es, menos pesa. Si llega tarde una fracción $x$ de las familias, la culpa es
+
+$$\text{culpa}\cdot 2^{-x/0{,}15}.$$
+
+Con multa, la culpa desaparece y el coste de llegar tarde es la multa, 1,5 euros. Es el modelo de [los umbrales de Granovetter](../02-granovetter/index.qmd), con un cambio de marco: la multa no se suma a la culpa, la sustituye. Las cifras son redondas e inventadas; el artículo no da las nuestras.
+
+**Tu tarea.** Es el guion de la serie de efectos de segundo orden, en cuatro pasos, y una prueba más:
+
+1. **La cuenta de la vieja.** Completa `cuenta_de_la_vieja`: la fracción que llegaría tarde con la multa si nadie cambia de marco ni de entorno, con la culpa de antes, la del equilibrio `antes`, más la multa.
+2. **El modelo completo.** Completa `llegan_tarde()`: la fracción de familias cuya prisa supera el coste de llegar tarde, que es la culpa sin multa y la multa con ella. `equilibrio()` la aplica ronda tras ronda hasta que nada cambia: así se calculan `con_multa`, y `despues`, cuando se quita la multa.
+3. **La diferencia.** Compara la cuenta de la vieja con el modelo completo. ¿Cuánto se equivoca, y en qué dirección? ¿Vuelve la guardería a lo de antes cuando se quita la multa?
+4. **El eslabón.** El gráfico dibuja, sin multa, la fracción que llega tarde según la que ya llegaba tarde, contra la diagonal: cada cruce es un equilibrio. ¿Qué cambió la multa, la situación de cada familia o la de las demás? ¿Y por qué no se deshace al quitarla?
+5. Cuando la comprobación te dé por bueno el código, prueba una multa de 3 euros y otra de 10. ¿Cuál deja huella al quitarla? ¿Acierta la cuenta de la vieja con la de 10?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin multa, llega tarde el 4,7% de las familias. La cuenta de la vieja dice que una multa de 1,5 euros, sumada a la culpa, lo baja al 3,1%. El modelo completo dice que sube al 41,1%: se equivoca en 38 puntos, y de signo. Y al quitar la multa no se vuelve al 4,7%, sino que se queda en el 41,2%.
+
+El primer error está en el eslabón de la **respuesta individual** de la cadena micro-macro de Hedström: la multa no añade un coste a la situación de cada familia, le cambia el marco con el que decide. Una familia con 3 euros de prisa no llegaba tarde porque la culpa pesaba unos 8 euros; con la multa, solo pesa 1,5, y llega tarde. La cuenta de la vieja suponía que la gente seguía decidiendo igual con una cifra más.
+
+La persistencia viene del eslabón siguiente, la **agregación**: cuantas más familias llegan tarde, menos culpa da llegar tarde. Por eso el gráfico cruza la diagonal tres veces: hay un equilibrio con un 4,7% de familias tarde, otro con un 41,2%, y entre los dos, en torno al 31%, un umbral inestable. La multa empujó a la guardería por encima del umbral, y al quitarla la culpa volvió, pero ya era la culpa de un sitio donde llega tarde más del 40%. Es la **histéresis**: el estado depende del camino, como en [la revolución de Kuran](../06-kuran/index.qmd). Con una multa de 3 euros, en cambio, llega tarde el 25%, por debajo del umbral, y al quitarla se vuelve al 4,7%: la multa sale mal, pero no deja huella.
+
+Y la cuenta de la vieja no siempre se equivoca hacia el mismo lado. Una multa de 10 euros es más cara que casi cualquier prisa, y baja los retrasos al 2,7%: la disuasión funciona. Pero la cuenta de la vieja promete un 0,4%, porque cree que la culpa sigue ahí, sumada a la multa. Samuel Bowles reunió muchos experimentos con el mismo resultado: los incentivos pensados para gente egoísta pueden desplazar los motivos morales que ya hacían el trabajo. No dicen que las multas no funcionen, sino que una multa no se suma sin más a lo que ya había.
+
+Bowles, S. (2008). Policies designed for self-interested citizens may undermine "the moral sentiments": Evidence from economic experiments. *Science*, 320(5883), 1605–1609.
+
+Gintis, H., Bowles, S., Boyd, R. y Fehr, E. (eds.) (2005). *Moral Sentiments and Material Interests: The Foundations of Cooperation in Economic Life*. MIT Press.
+
+Gneezy, U. y Rustichini, A. (2000). A fine is a price. *The Journal of Legal Studies*, 29(1), 1–17.
+
+Granovetter, M. (1978). Threshold models of collective behavior. *American Journal of Sociology*, 83(6), 1420–1443.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: multa
+#| caption: "Tu código"
+N <- 1000
+prisa <- c(rep(0, N / 2), qlnorm(ppoints(N / 2), log(3), 0.75))  # lo que gana cada familia llegando tarde, en euros
+culpa <- 10   # lo que pesa la culpa, en euros, si no llega tarde nadie más
+multa <- 1.5  # en euros
+
+# 2. La fracción que llega tarde si ya llega tarde una fracción x
+llegan_tarde <- function(x, prisa, culpa, multa = 0) {
+  # Sin multa, la culpa, que se divide por dos con cada 15% que llega tarde; con multa, solo la multa
+  coste <- ______
+  mean(prisa > coste)
+}
+
+# Ronda tras ronda, hasta que nadie cambia; con un tope, por si acaso
+equilibrio <- function(x0, prisa, culpa, multa = 0) {
+  x <- x0
+  for (ronda in 1:1000) {
+    nuevo <- llegan_tarde(x, prisa, culpa, multa)
+    if (nuevo == x) break
+    x <- nuevo
+  }
+  x
+}
+
+antes <- equilibrio(0, prisa, culpa)
+
+# 1. La cuenta de la vieja: la culpa de antes, más la multa
+cuenta_de_la_vieja <- ______
+
+# 2. El modelo completo: se pone la multa, y luego se quita
+con_multa <- equilibrio(antes, prisa, culpa, multa)
+despues <- equilibrio(con_multa, prisa, culpa)
+
+# 4. Sin multa: la fracción que llega tarde según la que ya llegaba tarde
+x <- seq(0, 0.6, by = 0.001)
+plot(x, sapply(x, llegan_tarde, prisa = prisa, culpa = culpa), type = "l", lwd = 2,
+     xlab = "Fracción que ya llega tarde", ylab = "Fracción que llega tarde después")
+abline(0, 1, lty = 2, col = "grey")
+points(c(antes, despues), c(antes, despues), pch = 19)
+
+# 3. La diferencia, en %
+round(100 * c(antes = antes, cuenta_de_la_vieja = cuenta_de_la_vieja, con_multa = con_multa,
+              diferencia = con_multa - cuenta_de_la_vieja, despues = despues), 1)
+```
+
+```{webr}
+#| exercise: multa
+#| solution: true
+N <- 1000
+prisa <- c(rep(0, N / 2), qlnorm(ppoints(N / 2), log(3), 0.75))
+culpa <- 10
+multa <- 1.5
+
+llegan_tarde <- function(x, prisa, culpa, multa = 0) {
+  coste <- if (multa > 0) multa else culpa * 2^(-x / 0.15)
+  mean(prisa > coste)
+}
+
+equilibrio <- function(x0, prisa, culpa, multa = 0) {
+  x <- x0
+  for (ronda in 1:1000) {
+    nuevo <- llegan_tarde(x, prisa, culpa, multa)
+    if (nuevo == x) break
+    x <- nuevo
+  }
+  x
+}
+
+antes <- equilibrio(0, prisa, culpa)
+
+cuenta_de_la_vieja <- mean(prisa > culpa * 2^(-antes / 0.15) + multa)
+
+con_multa <- equilibrio(antes, prisa, culpa, multa)
+despues <- equilibrio(con_multa, prisa, culpa)
+
+x <- seq(0, 0.6, by = 0.001)
+plot(x, sapply(x, llegan_tarde, prisa = prisa, culpa = culpa), type = "l", lwd = 2,
+     xlab = "Fracción que ya llega tarde", ylab = "Fracción que llega tarde después")
+abline(0, 1, lty = 2, col = "grey")
+points(c(antes, despues), c(antes, despues), pch = 19)
+
+round(100 * c(antes = antes, cuenta_de_la_vieja = cuenta_de_la_vieja, con_multa = con_multa,
+              diferencia = con_multa - cuenta_de_la_vieja, despues = despues), 1)
+```
+
+```{webr}
+#| exercise: multa
+#| check: true
+# llegan_tarde() se comprueba con cinco familias propias, y la cuenta de la vieja con los
+# valores del alumno: así puede cambiar la multa (tarea 5) sin que deje de valer.
+e <- .envir_result
+f <- e$llegan_tarde
+pct <- function(x) paste0(format(round(100 * x, 1), decimal.mark = ","), "%")
+prueba <- c(0, 1, 2, 5, 12)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función llegan_tarde().")
+} else if (!isTRUE(all.equal(f(0, prueba, 10), 0.2))) {
+  list(correct = FALSE, message = paste0(
+    "Con prisas de 0, 1, 2, 5 y 12 euros, culpa 10 y nadie llegando tarde, solo la de 12 supera la culpa: ",
+    "llegan_tarde(0, c(0, 1, 2, 5, 12), 10) debería dar 0,2, y da ", format(f(0, prueba, 10), decimal.mark = ","), "."))
+} else if (!isTRUE(all.equal(f(0.3, prueba, 10), 0.4))) {
+  list(correct = FALSE, message = paste0(
+    "Si ya llega tarde el 30%, la culpa se ha dividido por dos dos veces, de 10 a 2,5 euros, y llegan tarde las familias ",
+    "con 5 y 12 euros de prisa: llegan_tarde(0.3, c(0, 1, 2, 5, 12), 10) debería dar 0,4, y da ",
+    format(f(0.3, prueba, 10), decimal.mark = ","), ". La culpa depende de x."))
+} else if (!isTRUE(all.equal(f(0, prueba, 10, 1.5), 0.6))) {
+  list(correct = FALSE, message = paste0(
+    "Con una multa de 1,5 euros, llegan tarde las familias con 2, 5 y 12 euros de prisa: ",
+    "llegan_tarde(0, c(0, 1, 2, 5, 12), 10, multa = 1.5) debería dar 0,6, y da ",
+    format(f(0, prueba, 10, 1.5), decimal.mark = ","), ". En el modelo completo, la multa no se suma a la culpa: la sustituye."))
+} else if (!is.numeric(e$cuenta_de_la_vieja) || length(e$cuenta_de_la_vieja) != 1) {
+  list(correct = FALSE, message = "Falta cuenta_de_la_vieja: un número, la fracción que llegaría tarde con la multa si nadie cambiara de marco.")
+} else if (!isTRUE(all.equal(e$cuenta_de_la_vieja,
+                             mean(e$prisa > e$culpa * 2^(-e$antes / 0.15) + e$multa)))) {
+  pista <- if (isTRUE(all.equal(e$cuenta_de_la_vieja, e$con_multa))) {
+    "Eso es el modelo completo, con la culpa sustituida por la multa. La cuenta de la vieja supone que nadie cambia de marco: la culpa sigue ahí, y la multa se le suma."
+  } else if (isTRUE(all.equal(e$cuenta_de_la_vieja, e$antes))) {
+    "Es lo mismo que antes de la multa: falta sumarla al coste."
+  } else {
+    "Llegan tarde las familias cuya prisa supera la culpa del equilibrio de antes, con x = antes, más la multa."
+  }
+  list(correct = FALSE, message = paste0("La cuenta de la vieja no da lo que debería, ",
+    pct(mean(e$prisa > e$culpa * 2^(-e$antes / 0.15) + e$multa)), ", sino ", pct(e$cuenta_de_la_vieja), ". ", pista))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Antes llegaba tarde el ", pct(e$antes), ". La cuenta de la vieja promete ", pct(e$cuenta_de_la_vieja),
+    " con la multa, y el modelo completo da ", pct(e$con_multa), ". Al quitar la multa, ", pct(e$despues),
+    if (abs(e$despues - e$antes) < 0.005) ": vuelve a lo de antes." else ": no vuelve a lo de antes."))
+}
+```
+
+::: {.hint exercise="multa"}
+`if (multa > 0) a else b` elige entre dos costes. Sin multa, el de la fórmula del enunciado, `culpa * 2^(-x / 0.15)`. Para la cuenta de la vieja, cuenta con `mean()` las familias cuya `prisa` supera esa misma culpa, con `x` igual a `antes`, más la `multa`.
+:::
+
+::: {.solution exercise="multa"}
+`if (multa > 0) multa else culpa * 2^(-x / 0.15)` en `llegan_tarde()`, y `mean(prisa > culpa * 2^(-antes / 0.15) + multa)` en `cuenta_de_la_vieja`.
+:::
+:::
+
+::::
