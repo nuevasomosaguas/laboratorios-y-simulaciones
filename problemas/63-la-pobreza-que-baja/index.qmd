@@ -1,0 +1,240 @@
+---
+title: "La pobreza que baja cuando todos pierden"
+numero: 63
+nivel: 1
+duracion: "25 min"
+lectura: "Townsend (1979); Sen (1983)"
+dificultad: "Iniciación"
+categories: [desigualdad, efectos de segundo orden]
+description: "Entre 2008 y 2014, en plena crisis, la pobreza de los mayores de 65 años en España se redujo a menos de la mitad. Nadie ganó más: bajó el umbral."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: pobreza_eurostat.csv, en esta carpeta (SHA-256 724ffeafc2f962b77bb800fab970159dea191e9212784b278abd69845b063489),
+copiado tal cual en el código del ejercicio. Sale de tres tablas de Eurostat para España (geo = ES), descargadas el
+11 de octubre de 2026 de la API https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/TABLA?geo=ES&format=JSON&lang=EN:
+
+- ilc_li02 (SHA-256 905e86ae8c26e62c4b4039fdbf2a142176849d14e1b559270a24dd83c47972a4): tasa de riesgo de pobreza con el
+  umbral del 60% de la mediana (rskpovth = B_60, unit = PC, sex = T), para el total (age = TOTAL) y los mayores de 65 (Y_GE65).
+- ilc_li22b (SHA-256 3de2dc633212083d5c1d6a79976ba234939a0bd82077b8ba82c1f2d93f9887e1): la misma tasa con el umbral
+  anclado en 2008, actualizado con la inflación.
+- ilc_li01 (SHA-256 663b6b76b5671f8ba31b25dcf7ec4cfa724071af9545cdca4378a4b8826bbc39): el umbral para un hogar de una
+  persona (hhcomp = A1, rskpovth = B_60, unit = EUR, statinfo = MED_EI), en euros corrientes.
+
+El año es el de la encuesta de condiciones de vida; la renta es la del año anterior. El CSV se hizo con R y jsonlite, con
+las tres respuestas guardadas como TABLA.json:
+
+library(jsonlite)
+lee <- function(t) {
+  x <- fromJSON(paste0(t, ".json"), simplifyVector = FALSE)
+  ids <- unlist(x$id); n <- unlist(x$size)
+  cats <- lapply(ids, function(d) names(sort(unlist(x$dimension[[d]]$category$index))))
+  g <- expand.grid(rev(cats), stringsAsFactors = FALSE)[, rev(seq_along(ids))]; names(g) <- ids
+  v <- rep(NA_real_, prod(n)); v[as.integer(names(x$value)) + 1] <- unlist(x$value)
+  g$valor <- v; g
+}
+a <- lee("ilc_li22b"); a <- a[a$sex == "T" & a$age %in% c("TOTAL", "Y_GE65"), ]
+r <- lee("ilc_li02"); r <- r[r$sex == "T" & r$unit == "PC" & r$rskpovth == "B_60" & r$statinfo == "MED_EI" & r$age %in% c("TOTAL", "Y_GE65"), ]
+u <- lee("ilc_li01"); u <- u[u$hhcomp == "A1" & u$unit == "EUR" & u$statinfo == "MED_EI" & u$rskpovth == "B_60", ]
+anios <- 2008:2016
+v <- function(d, ag) d$valor[match(paste(ag, anios), paste(d$age, d$time))]
+write.csv(data.frame(anio = anios, umbral = u$valor[match(anios, u$time)],
+                     total_relativo = v(r, "TOTAL"), total_anclado = v(a, "TOTAL"),
+                     mayores_relativo = v(r, "Y_GE65"), mayores_anclado = v(a, "Y_GE65")),
+          "pobreza_eurostat.csv", row.names = FALSE, quote = FALSE)
+
+En 2008 las tasas relativa y anclada coinciden, como debe ser, y el umbral de 2014, 7.961 euros, es el que publica el INE.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+La tasa de pobreza oficial en la Unión Europea es **relativa**: es pobre quien vive en un hogar con una renta por unidad de consumo inferior al 60% de la mediana de su país. Si la renta de todos se duplica, la tasa no cambia. Si la de todos se reduce a la mitad, tampoco. El umbral se mueve con la sociedad.
+
+Eso tiene una consecuencia rara. Entre 2008 y 2014 la renta mediana española cayó, y con ella el umbral: para una persona sola pasó de 8.877 euros en la encuesta de 2009 a 7.961 en la de 2014. Quien tenía una renta fija algo por debajo del umbral, como muchas pensiones mínimas, quedó por encima sin cobrar un euro más. Eurostat publica, para estos casos, una tasa con el umbral **anclado**: el de 2008, actualizado solo con la inflación, que mide si se puede comprar lo mismo que antes.
+
+El código tiene dos partes. Primero, una población **simulada** de 8.000 personas en edad de trabajar y 2.000 pensionistas, 700 de ellos con pensiones cerca de la mínima. En la crisis, todas las rentas del trabajo bajan un 5%, y uno de cada diez pierde además el 60% de la suya, sobre todo en la mitad de abajo; las pensiones bajan un 2%. Todos pierden. Después, las cifras reales de Eurostat para España.
+
+**Tu tarea.**
+
+1. Completa `pobreza()`: el porcentaje de `renta` que queda por debajo de `umbral`.
+2. Completa `umbral_relativo()`: el 60% de la mediana de `renta`.
+3. Mira `escenarios`. En la crisis, ¿qué les pasa a los pensionistas con el umbral relativo y con el anclado? ¿Y si todos pierden un 10%, o si solo se recortan las pensiones?
+4. Compara con el gráfico de los datos reales. ¿Qué tasa elegiría quien quisiera decir que la crisis no afectó a los mayores, y cuál quien quisiera decir lo contrario?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En la simulación, la crisis baja la renta mediana un 6,6% y el umbral relativo pasa de 8.177 a 7.639 euros. La pobreza total relativa sube de 19,7% a 22,1%, y la anclada, a 27,1%: los que perdieron el empleo caen por debajo de los dos umbrales. Los pensionistas, en cambio, cuentan dos historias opuestas. Con el umbral relativo, su pobreza baja del 31,1% al 19,2%; con el anclado, sube al 34,8%, porque su pensión ha bajado un 2% y ahora compra menos. Nadie ha mejorado: lo que ha bajado es la vara de medir.
+
+Los otros dos escenarios separan los mecanismos. Si todos pierden un 10%, la pobreza relativa no se mueve, 19,7% y 31,1%, y la anclada sube al 25,6% en total y al 42,2% entre los pensionistas: la tasa relativa es ciega a un empobrecimiento general. Si solo se recortan las pensiones un 10%, el umbral apenas baja, porque los pensionistas son una quinta parte de la población, y su pobreza relativa sube al 40,8%. Lo que cuenta para la tasa relativa no es cuánto pierde cada cual, sino cuánto pierde respecto a la mediana.
+
+Los datos reales siguen el mismo guion. La pobreza relativa de los mayores de 65 años bajó del 25,5% en 2008 al 11,4% en 2014, y la anclada se quedó en torno al 23%: las pensiones mantuvieron su poder de compra mientras la renta de los demás caía. Para el total de la población, la relativa subió del 19,8% al 22,2%, y la anclada, al 30,9%. Las dos series son correctas, y responden a preguntas distintas.
+
+Las dos tienen defensores serios. Peter Townsend sostuvo que ser pobre es no poder participar en la vida corriente de la propia sociedad, y que lo que eso exige cambia con ella: un teléfono, por ejemplo, no era una necesidad en 1950 y hoy lo es. La Unión Europea adoptó la medida relativa como indicador oficial por esa razón. Quien prefiere un umbral fijo responde que la pobreza es no poder comprar ciertas cosas, comida, calefacción, un techo, y que una tasa que baja cuando todos empobrecen no mide privaciones; Estados Unidos usa desde los años sesenta un umbral fijo en términos reales, el que propuso Mollie Orshansky. Amartya Sen propuso una síntesis: la pobreza es absoluta en lo que una persona puede hacer y ser, y relativa en los bienes que necesita para conseguirlo. Por eso la propia Unión Europea completa la tasa relativa con indicadores de carencia material.
+
+La lección práctica es de efectos de segundo orden: una política o una crisis cambian el indicador también a través de la referencia, no solo a través de la renta de los pobres. Ante cualquier cifra de pobreza conviene preguntar qué umbral usa, y desconfiar de quien elige el umbral después de ver el resultado.
+
+Atkinson, A. B., Cantillon, B., Marlier, E. y Nolan, B. (2002). *Social Indicators: The EU and Social Inclusion*. Oxford University Press.
+
+Orshansky, M. (1965). Counting the poor: Another look at the poverty profile. *Social Security Bulletin*, 28(1), 3–29.
+
+Sen, A. (1983). Poor, relatively speaking. *Oxford Economic Papers*, 35(2), 153–169.
+
+Townsend, P. (1979). *Poverty in the United Kingdom: A Survey of Household Resources and Standards of Living*. Penguin Books.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: pobreza
+#| caption: "Tu código"
+# 1. El porcentaje de rentas por debajo del umbral
+pobreza <- function(renta, umbral) {
+  ______
+}
+
+# 2. El umbral relativo: el 60% de la mediana
+umbral_relativo <- function(renta) {
+  ______
+}
+
+# Una población simulada: renta por unidad de consumo, en euros constantes al año
+set.seed(2008)
+activos <- rlnorm(8000, log(14500), 0.6)
+pensionistas <- c(rnorm(700, 7800, 500),            # pensiones cerca de la mínima
+                  rlnorm(1300, log(14000), 0.35))
+
+# La crisis: todas las rentas del trabajo bajan un 5%, y el paro, más frecuente abajo, se lleva el 60%
+paro <- runif(8000) < 0.03 + 0.15 * (activos < median(activos))
+activos_crisis <- activos * 0.95 * ifelse(paro, 0.4, 1)
+pensionistas_crisis <- pensionistas * 0.98
+
+# 3. La pobreza con el umbral de cada momento y con el de antes de la crisis
+anclado <- umbral_relativo(c(activos, pensionistas))
+escenario <- function(act, pen) {
+  todos <- c(act, pen)
+  u <- umbral_relativo(todos)
+  c(umbral = u, renta_mediana = median(todos),
+    total_relativo = pobreza(todos, u), total_anclado = pobreza(todos, anclado),
+    pensionistas_relativo = pobreza(pen, u), pensionistas_anclado = pobreza(pen, anclado))
+}
+
+# 4. Los datos reales: España, Eurostat. Umbral para una persona sola, en euros, y tasas en %
+eurostat <- data.frame(
+  anio = 2008:2016,
+  umbral = c(8379, 8877, 8763, 8358, 8321, 8114, 7961, 8011, 8209),
+  total_relativo = c(19.8, 20.4, 20.7, 20.6, 20.8, 20.4, 22.2, 22.1, 22.3),
+  total_anclado = c(19.8, 19.7, 20.6, 23.7, 25.9, 28.1, 30.9, 29.9, 29.2),
+  mayores_relativo = c(25.5, 23.8, 21.8, 19.8, 14.8, 12.7, 11.4, 12.3, 13.0),
+  mayores_anclado = c(25.5, 23.2, 21.4, 23.9, 22.8, 23.0, 23.6, 23.5, 22.9)
+)
+matplot(eurostat$anio, eurostat[, 3:6], type = "b", pch = 20, lwd = 2, lty = c(1, 2, 1, 2),
+        col = c("grey50", "grey50", "firebrick", "firebrick"), ylim = c(0, 35),
+        xlab = "Encuesta (la renta es la del año anterior)", ylab = "Tasa de riesgo de pobreza (%)")
+legend("bottomleft", c("Total, umbral relativo", "Total, umbral de 2008", "65 y más, umbral relativo", "65 y más, umbral de 2008"),
+       col = c("grey50", "grey50", "firebrick", "firebrick"), lty = c(1, 2, 1, 2), lwd = 2, bty = "n")
+
+escenarios <- rbind(
+  antes = escenario(activos, pensionistas),
+  crisis = escenario(activos_crisis, pensionistas_crisis),
+  todos_pierden_10 = escenario(activos * 0.9, pensionistas * 0.9),
+  recorte_pensiones_10 = escenario(activos, pensionistas * 0.9)
+)
+round(escenarios, 1)
+```
+
+```{webr}
+#| exercise: pobreza
+#| solution: true
+pobreza <- function(renta, umbral) {
+  100 * mean(renta < umbral)
+}
+
+umbral_relativo <- function(renta) {
+  0.6 * median(renta)
+}
+
+set.seed(2008)
+activos <- rlnorm(8000, log(14500), 0.6)
+pensionistas <- c(rnorm(700, 7800, 500),
+                  rlnorm(1300, log(14000), 0.35))
+
+paro <- runif(8000) < 0.03 + 0.15 * (activos < median(activos))
+activos_crisis <- activos * 0.95 * ifelse(paro, 0.4, 1)
+pensionistas_crisis <- pensionistas * 0.98
+
+anclado <- umbral_relativo(c(activos, pensionistas))
+escenario <- function(act, pen) {
+  todos <- c(act, pen)
+  u <- umbral_relativo(todos)
+  c(umbral = u, renta_mediana = median(todos),
+    total_relativo = pobreza(todos, u), total_anclado = pobreza(todos, anclado),
+    pensionistas_relativo = pobreza(pen, u), pensionistas_anclado = pobreza(pen, anclado))
+}
+
+eurostat <- data.frame(
+  anio = 2008:2016,
+  umbral = c(8379, 8877, 8763, 8358, 8321, 8114, 7961, 8011, 8209),
+  total_relativo = c(19.8, 20.4, 20.7, 20.6, 20.8, 20.4, 22.2, 22.1, 22.3),
+  total_anclado = c(19.8, 19.7, 20.6, 23.7, 25.9, 28.1, 30.9, 29.9, 29.2),
+  mayores_relativo = c(25.5, 23.8, 21.8, 19.8, 14.8, 12.7, 11.4, 12.3, 13.0),
+  mayores_anclado = c(25.5, 23.2, 21.4, 23.9, 22.8, 23.0, 23.6, 23.5, 22.9)
+)
+matplot(eurostat$anio, eurostat[, 3:6], type = "b", pch = 20, lwd = 2, lty = c(1, 2, 1, 2),
+        col = c("grey50", "grey50", "firebrick", "firebrick"), ylim = c(0, 35),
+        xlab = "Encuesta (la renta es la del año anterior)", ylab = "Tasa de riesgo de pobreza (%)")
+legend("bottomleft", c("Total, umbral relativo", "Total, umbral de 2008", "65 y más, umbral relativo", "65 y más, umbral de 2008"),
+       col = c("grey50", "grey50", "firebrick", "firebrick"), lty = c(1, 2, 1, 2), lwd = 2, bty = "n")
+
+escenarios <- rbind(
+  antes = escenario(activos, pensionistas),
+  crisis = escenario(activos_crisis, pensionistas_crisis),
+  todos_pierden_10 = escenario(activos * 0.9, pensionistas * 0.9),
+  recorte_pensiones_10 = escenario(activos, pensionistas * 0.9)
+)
+round(escenarios, 1)
+```
+
+```{webr}
+#| exercise: pobreza
+#| check: true
+# Las dos funciones se comprueban con rentas pequeñas, que se pueden contar a mano.
+e <- .envir_result
+coma <- function(x, d = 1) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+if (!is.function(e$pobreza) || !is.function(e$umbral_relativo)) {
+  list(correct = FALSE, message = "No encuentro pobreza() o umbral_relativo().")
+} else if (!isTRUE(all.equal(e$pobreza(c(1, 2, 3, 4), 2.5), 50))) {
+  list(correct = FALSE, message = paste0(
+    "Con rentas 1, 2, 3 y 4 y un umbral de 2,5, son pobres dos de cuatro: pobreza() debería dar 50, en porcentaje, y da ",
+    coma(e$pobreza(c(1, 2, 3, 4), 2.5)), "."))
+} else if (!isTRUE(all.equal(e$pobreza(c(1, 2, 3, 4), 2), 25))) {
+  list(correct = FALSE, message = paste0(
+    "Con un umbral de 2, quien tiene una renta de 2 justos no es pobre: es pobre quien queda por debajo. pobreza() da ",
+    coma(e$pobreza(c(1, 2, 3, 4), 2)), " y debería dar 25."))
+} else if (!isTRUE(all.equal(e$umbral_relativo(c(10, 20, 90)), 12))) {
+  list(correct = FALSE, message = paste0(
+    "Con rentas 10, 20 y 90, la mediana es 20 y el umbral, 12; umbral_relativo() da ", coma(e$umbral_relativo(c(10, 20, 90))),
+    ". El umbral oficial usa la mediana, no la media, y el 60%."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! En la crisis simulada, la pobreza relativa de los pensionistas baja del ", coma(r["antes", "pensionistas_relativo"]),
+    "% al ", coma(r["crisis", "pensionistas_relativo"]), "%, y con el umbral de antes sube al ", coma(r["crisis", "pensionistas_anclado"]),
+    "%. En España, la de los mayores de 65 años bajó del 25,5% en 2008 al 11,4% en 2014."))
+}
+```
+
+::: {.hint exercise="pobreza"}
+`mean()` de una condición lógica da la proporción de `TRUE`: multiplícala por 100. El umbral oficial se calcula con `median()`.
+:::
+
+::: {.solution exercise="pobreza"}
+`100 * mean(renta < umbral)` en `pobreza()`, y `0.6 * median(renta)` en `umbral_relativo()`.
+:::
+:::
+
+::::

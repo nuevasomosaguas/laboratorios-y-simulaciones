@@ -1,0 +1,250 @@
+---
+title: "¿Cuánto rinde un euro cotizado?"
+numero: 62
+nivel: 2
+duracion: "30 min"
+lectura: "Moraga y Ramos (2020); Samuelson (1958); [Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Cada pensionista recibe 1,74 euros por euro cotizado, según el Banco de España. Para saber si eso es mucho, hay que preguntar: ¿1,74 euros comparado con qué?"
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: supervivencia2024.csv, en esta carpeta (SHA-256 9ff9d6f908662501b6e136bf27c7f41c3d46023a971f6abc87c9b0b512193fb3),
+copiado tal cual en el código del ejercicio: los supervivientes l(x) de 100.000 nacidos, hombres y mujeres, de los 25 a los
+100 años, en la tabla de mortalidad de España de 2024 del INE.
+
+Sale de la Human Life-Table Database (https://www.lifetable.de), archivo ESP.zip,
+https://www.lifetable.de/File/GetDocument/data/ESP/ESP.zip (descargado el 11 de octubre de 2026,
+SHA-256 46f98d23790cfdc593043c3c9c209b82b4cbe9712d3f75264c12d886bf1f4bbd), tabla completa de 2024 (Ref-ID 3498.53),
+«Instituto Nacional de Estadística: Life table for Spain 2024. Downloaded from: www.ine.es (27.11.2025)».
+El CSV se hizo con R, en la carpeta de ESP.csv:
+
+d <- read.csv("ESP.csv")
+d <- d[d$Region == 0 & d$TypeLT == 1 & d$Residence == 0 & d$SocDem == 0 & d$Year1 == 2024 & abs(d$Ref.ID - 3498.53) < 1e-6, ]
+l <- sapply(c(hombres = 1, mujeres = 2), function(s) { t <- d[d$Sex == s, ]; as.integer(round(t$l.x.[match(25:100, t$Age)])) })
+write.csv(data.frame(edad = 25:100, l), "supervivencia2024.csv", row.names = FALSE, quote = FALSE)
+
+Las cifras del Banco de España salen de Moraga y Ramos (2020),
+https://www.bde.es/f/webbde/SES/Secciones/Publicaciones/InformesBoletinesRevistas/ArticulosAnaliticos/20/T3/descargar/Fich/be2003-art24.pdf
+(SHA-256 643bff4d9826ba873354fb20f7e78381c9b63c00fc4d5c86c6106f2a929fc403): la TIR media del 3,5% y sus percentiles
+(cuadro 1), el CPU de 1,74 (cuadro 3), el descuento con el PIB real (página 4 y nota 4), el 64% del tipo por contingencias
+comunes (nota 7) y la edad máxima de 100 años (página 7).
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 2020, María Moraga y Roberto Ramos, del Banco de España, calcularon cuánto rendían las cotizaciones de quienes se jubilaron en 2017. Siguieron la vida laboral de 7.627 personas en la Muestra Continua de Vidas Laborales y obtuvieron dos números. La **tasa interna de retorno** (TIR) media es del 3,5% real anual: es el tipo de interés al que habría que invertir las cotizaciones para pagar con ellas la pensión esperada. El **coste por pensión unitaria** (CPU) medio es de 1,74: los euros de pensión que recibe cada jubilado por cada euro cotizado.
+
+El segundo número es el que más circula, y casi siempre se lee mal. Un euro de 1990 y uno de 2030 no son el mismo euro, así que para comparar lo cotizado con lo cobrado hay que llevarlo todo a un mismo momento con una **tasa de descuento** $r$. Con una supervivencia $l(x)$ y un flujo de dinero $f(x)$ a cada edad, en euros constantes, el valor presente es
+
+$$VP(r) = \sum_x l(x)\, \frac{f(x)}{(1 + r)^{x - 25}}.$$
+
+El CPU es $VP_{\text{pensión}}(r) / VP_{\text{cotización}}(r)$, y la TIR es la $r$ con la que el CPU vale 1. El Banco de España calculó el 1,74 descontando con el crecimiento del PIB real: el histórico para las cotizaciones y un 1,3% anual para las pensiones futuras, el crecimiento potencial que preveían varios organismos.
+
+El código construye una carrera tipo como la del cotizante ficticio del artículo. Una persona empieza a cotizar a los 27 años y se jubila a los 65, tras 38 años, con una base de 26.500 euros al año, en torno al 45% de la base máxima, y constante en términos reales. Su pensión es la media de las bases de sus últimos 25 años, que con 38 años cotizados es la pensión completa, y se revaloriza con el IPC. Como en el artículo, solo cuenta para la jubilación el 64% del tipo por contingencias comunes, que es del 28,3%: el resto paga bajas, incapacidades y otras prestaciones. La supervivencia sale de las tablas del INE de 2024.
+
+**Tu tarea.**
+
+1. Completa `valor_presente()`: el valor presente de un flujo `flujo` con supervivencia `l` y tasa de descuento `r`.
+2. Completa `cpu()`: los euros de pensión por euro cotizado de una carrera `c`, con supervivencia `l` y descuento `r`.
+3. Mira `resumen`: la TIR y el CPU con cuatro tasas de descuento, para hombres y para mujeres. ¿Cuánto vale el CPU cuando se descuenta con la TIR? Y en el gráfico, ¿cuánto vale con un 0%?
+4. Mira `supuestos`: la TIR de un hombre si contara todo el tipo de cotización, o si su salario creciera un 1% real al año. ¿Cuánto depende el 3,5% de los supuestos?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La carrera tipo da una TIR del 3,17% para un hombre y del 3,69% para una mujer, muy cerca del 3,5% medio del Banco de España. El CPU, en cambio, no es un número fijo: depende de la tasa de descuento. Para el hombre vale 2,72 si se descuenta al 0%, es decir, si se suman los euros sin más; 1,81 al 1,3%; 1,32 al 2,3%, el crecimiento medio del PIB español entre 1980 y 2018; y exactamente 1 si se descuenta con la propia TIR, por definición. El 1,74 del Banco de España, con su mezcla de crecimiento histórico y previsto, está en ese rango. No dice que cada jubilado reciba un 74% más de lo que aportó, sin más, sino un 74% más de lo que habrían rendido sus cotizaciones invertidas al ritmo al que creció la economía.
+
+Esa comparación no es arbitraria. Paul Samuelson demostró en 1958 que un sistema de reparto, en el que los trabajadores de hoy pagan las pensiones de hoy, puede ofrecer de forma sostenible un rendimiento igual al crecimiento de su base: en un mundo sin productividad, la tasa de crecimiento de la población, la $r$ de Lotka de la demografía estable. Henry Aaron añadió en 1966 el crecimiento de los salarios: lo sostenible es el crecimiento de la masa salarial. El CPU, descontado con el crecimiento de la economía, compara justo eso, y un CPU de 1 es un sistema que paga lo que su base puede sostener. Llevar el 1,74 a 1 no significa devolver a cada uno lo que puso sin rendimiento, que sería el CPU de 1 descontado al 0%, sino pagar un rendimiento igual al crecimiento, en torno al 1,3%. Lo que la cifra señala como insostenible es la diferencia entre el 3,5% prometido y ese crecimiento: unos dos puntos de rendimiento al año durante toda la jubilación.
+
+Los supuestos pesan. Si contara para la pensión todo el tipo por contingencias comunes y no el 64%, la TIR del hombre bajaría del 3,17% al 1,77%: la cifra depende de una convención contable que el propio artículo explica en una nota. Si el salario creciera un 1% real al año, la TIR subiría al 3,50%, porque la pensión se calcula con los últimos 25 años, los mejores. Y la misma carrera rinde medio punto más a una mujer que a un hombre, porque a los 65 años le quedan de media 23,6 años de vida, frente a 19,9. Una regla igual para todos reparte a favor de quien vive más, y la esperanza de vida también depende de la renta y de los estudios. El Banco de España encontró que una de cada cuatro altas de 2017 rendía más del 4,2%, y otra de cada cuatro menos del 2,5%.
+
+Este cálculo es de una carrera tipo. Una reforma o un recorte reales afectarían a pensiones con carreras, bases y complementos muy distintos, y no se pueden evaluar con una media. Sí se puede saber, antes de discutir qué hacer, qué compara cada número: 3,5% frente a 1,3%, y no 1,74 frente a 1.
+
+Aaron, H. (1966). The social insurance paradox. *The Canadian Journal of Economics and Political Science*, 32(3), 371–374.
+
+Devesa, J. E., Lejárraga, A. y Vidal, C. (2002). El tanto de rendimiento de los sistemas de reparto. *Revista de Economía Aplicada*, 10(30), 109–132.
+
+Moraga, M. y Ramos, R. (2020). Una estimación del rendimiento financiero del sistema de pensiones. *Boletín Económico*, 3/2020, Artículos Analíticos. Banco de España.
+
+Samuelson, P. A. (1958). An exact consumption-loan model of interest with or without the social contrivance of money. *Journal of Political Economy*, 66(6), 467–482.
+
+Wachter, K. W. (2014). *Essential Demographic Methods*. Harvard University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: cotizado
+#| caption: "Tu código"
+# Supervivientes l(x) de 100.000 nacidos, de los 25 a los 100 años. Tabla de mortalidad del INE, 2024.
+edad <- 25:100
+supervivientes <- data.frame(
+  hombres = c(99265, 99226, 99186, 99150, 99115, 99076, 99029, 98986, 98943, 98897, 98834, 98774, 98712, 98642,
+              98567, 98481, 98397, 98300, 98188, 98073, 97951, 97817, 97674, 97518, 97339, 97145, 96936, 96689,
+              96419, 96103, 95757, 95365, 94907, 94424, 93882, 93300, 92643, 91913, 91098, 90237, 89318, 88292,
+              87246, 86126, 84913, 83593, 82201, 80667, 79050, 77328, 75493, 73464, 71260, 69008, 66491, 63836,
+              60987, 57916, 54816, 51454, 47784, 44002, 40012, 35895, 31776, 27822, 23734, 19861, 16305, 13057,
+              10273, 7809, 5829, 4236, 3035, 2148),
+  mujeres = c(99500, 99483, 99467, 99451, 99434, 99413, 99395, 99375, 99350, 99328, 99295, 99265, 99234, 99200,
+              99168, 99128, 99079, 99031, 98977, 98910, 98848, 98767, 98682, 98590, 98486, 98380, 98252, 98112,
+              97956, 97789, 97604, 97404, 97162, 96909, 96635, 96337, 96022, 95668, 95279, 94846, 94384, 93896,
+              93332, 92754, 92113, 91411, 90665, 89884, 89044, 88125, 87121, 86006, 84715, 83372, 81815, 80093,
+              78054, 75779, 73398, 70636, 67500, 63966, 60023, 55801, 51178, 46366, 41250, 36107, 30997, 25966,
+              21324, 17087, 13421, 10116, 7453, 5350)
+)
+
+# Una carrera tipo, en euros constantes: cotizaciones y pensión a cada edad
+carrera <- function(inicio = 27, jubilacion = 65, base = 26500, crecimiento = 0, tipo = 0.283 * 0.64) {
+  bases <- ifelse(edad >= inicio & edad < jubilacion, base * (1 + crecimiento)^(edad - inicio), 0)
+  pension <- mean(bases[edad >= jubilacion - 25 & edad < jubilacion])  # la media de los últimos 25 años
+  data.frame(edad, cotizacion = tipo * bases, pension = ifelse(edad >= jubilacion, pension, 0))
+}
+
+# 1. El valor presente, a los 25 años, de un flujo con supervivencia l y descuento r
+valor_presente <- function(flujo, l, r) {
+  ______
+}
+
+# 2. Los euros de pensión por euro cotizado, descontando con r
+cpu <- function(c, l, r) {
+  ______
+}
+
+# La TIR: la tasa de descuento con la que el CPU vale 1
+tir <- function(c, l) {
+  uniroot(function(r) cpu(c, l, r) - 1, c(-0.05, 0.3))$root
+}
+
+# 3. La TIR, en %, y el CPU con cuatro tasas de descuento
+c0 <- carrera()
+resumen <- t(sapply(supervivientes, function(l) {
+  r <- tir(c0, l)
+  c(tir = 100 * r, cpu_0 = cpu(c0, l, 0), cpu_1.3 = cpu(c0, l, 0.013), cpu_2.3 = cpu(c0, l, 0.023), cpu_tir = cpu(c0, l, r))
+}))
+
+r <- seq(0, 0.05, 0.001)
+plot(100 * r, sapply(r, cpu, c = c0, l = supervivientes$hombres), type = "l", lwd = 2, log = "y",
+     xlab = "Tasa de descuento (% real anual)", ylab = "Euros de pensión por euro cotizado (hombres)")
+abline(h = 1, lty = 2)
+abline(v = c(1.3, 2.3), col = "grey60")
+
+# 4. La TIR de un hombre, en %, con otros supuestos
+supuestos <- c(
+  banco_de_espana = tir(carrera(), supervivientes$hombres),
+  todo_el_tipo = tir(carrera(tipo = 0.283), supervivientes$hombres),
+  salario_crece_1 = tir(carrera(crecimiento = 0.01), supervivientes$hombres)
+)
+round(100 * supuestos, 2)
+round(resumen, 2)
+```
+
+```{webr}
+#| exercise: cotizado
+#| solution: true
+edad <- 25:100
+supervivientes <- data.frame(
+  hombres = c(99265, 99226, 99186, 99150, 99115, 99076, 99029, 98986, 98943, 98897, 98834, 98774, 98712, 98642,
+              98567, 98481, 98397, 98300, 98188, 98073, 97951, 97817, 97674, 97518, 97339, 97145, 96936, 96689,
+              96419, 96103, 95757, 95365, 94907, 94424, 93882, 93300, 92643, 91913, 91098, 90237, 89318, 88292,
+              87246, 86126, 84913, 83593, 82201, 80667, 79050, 77328, 75493, 73464, 71260, 69008, 66491, 63836,
+              60987, 57916, 54816, 51454, 47784, 44002, 40012, 35895, 31776, 27822, 23734, 19861, 16305, 13057,
+              10273, 7809, 5829, 4236, 3035, 2148),
+  mujeres = c(99500, 99483, 99467, 99451, 99434, 99413, 99395, 99375, 99350, 99328, 99295, 99265, 99234, 99200,
+              99168, 99128, 99079, 99031, 98977, 98910, 98848, 98767, 98682, 98590, 98486, 98380, 98252, 98112,
+              97956, 97789, 97604, 97404, 97162, 96909, 96635, 96337, 96022, 95668, 95279, 94846, 94384, 93896,
+              93332, 92754, 92113, 91411, 90665, 89884, 89044, 88125, 87121, 86006, 84715, 83372, 81815, 80093,
+              78054, 75779, 73398, 70636, 67500, 63966, 60023, 55801, 51178, 46366, 41250, 36107, 30997, 25966,
+              21324, 17087, 13421, 10116, 7453, 5350)
+)
+
+carrera <- function(inicio = 27, jubilacion = 65, base = 26500, crecimiento = 0, tipo = 0.283 * 0.64) {
+  bases <- ifelse(edad >= inicio & edad < jubilacion, base * (1 + crecimiento)^(edad - inicio), 0)
+  pension <- mean(bases[edad >= jubilacion - 25 & edad < jubilacion])
+  data.frame(edad, cotizacion = tipo * bases, pension = ifelse(edad >= jubilacion, pension, 0))
+}
+
+valor_presente <- function(flujo, l, r) {
+  sum(l * flujo / (1 + r)^(edad - 25))
+}
+
+cpu <- function(c, l, r) {
+  valor_presente(c$pension, l, r) / valor_presente(c$cotizacion, l, r)
+}
+
+tir <- function(c, l) {
+  uniroot(function(r) cpu(c, l, r) - 1, c(-0.05, 0.3))$root
+}
+
+c0 <- carrera()
+resumen <- t(sapply(supervivientes, function(l) {
+  r <- tir(c0, l)
+  c(tir = 100 * r, cpu_0 = cpu(c0, l, 0), cpu_1.3 = cpu(c0, l, 0.013), cpu_2.3 = cpu(c0, l, 0.023), cpu_tir = cpu(c0, l, r))
+}))
+
+r <- seq(0, 0.05, 0.001)
+plot(100 * r, sapply(r, cpu, c = c0, l = supervivientes$hombres), type = "l", lwd = 2, log = "y",
+     xlab = "Tasa de descuento (% real anual)", ylab = "Euros de pensión por euro cotizado (hombres)")
+abline(h = 1, lty = 2)
+abline(v = c(1.3, 2.3), col = "grey60")
+
+supuestos <- c(
+  banco_de_espana = tir(carrera(), supervivientes$hombres),
+  todo_el_tipo = tir(carrera(tipo = 0.283), supervivientes$hombres),
+  salario_crece_1 = tir(carrera(crecimiento = 0.01), supervivientes$hombres)
+)
+round(100 * supuestos, 2)
+round(resumen, 2)
+```
+
+```{webr}
+#| exercise: cotizado
+#| check: true
+# valor_presente() y cpu() se comprueban con flujos de un solo pago, que se pueden descontar a mano.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+edad <- 25:100
+uno <- rep(1, length(edad))
+pago <- function(a, x = 100) ifelse(edad == a, x, 0)
+if (!is.function(e$valor_presente) || !is.function(e$cpu)) {
+  list(correct = FALSE, message = "No encuentro valor_presente() o cpu().")
+} else if (!isTRUE(all.equal(e$valor_presente(pago(35), uno, 0.05), 100 / 1.05^10))) {
+  list(correct = FALSE, message = paste0(
+    "Un pago de 100 euros a los 35 años, con supervivencia segura y descuento del 5%, vale hoy 100 / 1,05^10 = ",
+    coma(100 / 1.05^10, 2), ", y valor_presente() da ", coma(e$valor_presente(pago(35), uno, 0.05), 2),
+    ". Cada euro se divide por (1 + r) elevado a los años que faltan desde los 25."))
+} else if (!isTRUE(all.equal(e$valor_presente(pago(35), uno / 2, 0), 50))) {
+  list(correct = FALSE, message = paste0(
+    "Si solo llega a los 35 años la mitad, un pago de 100 euros a esa edad vale de media 50, y valor_presente() da ",
+    coma(e$valor_presente(pago(35), uno / 2, 0), 2), ". Multiplica cada pago por la supervivencia l."))
+} else if (!isTRUE(all.equal(e$cpu(data.frame(edad, cotizacion = pago(30), pension = pago(70, 300)), uno, 0), 3)) ||
+           !isTRUE(all.equal(e$cpu(data.frame(edad, cotizacion = pago(30), pension = pago(70, 300)), uno, 0.05),
+                             3 / 1.05^40))) {
+  list(correct = FALSE, message = paste0(
+    "Con 100 euros cotizados a los 30 años y 300 cobrados a los 70, sin descuento, el CPU es 3, y cpu() da ",
+    coma(e$cpu(data.frame(edad, cotizacion = pago(30), pension = pago(70, 300)), uno, 0), 2),
+    ". Es el valor presente de la pensión entre el de la cotización, los dos con la misma r."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La carrera tipo rinde un ", coma(r["hombres", "tir"], 2), "% real a un hombre. Su CPU es ",
+    coma(r["hombres", "cpu_0"], 2), " sin descontar, ", coma(r["hombres", "cpu_1.3"], 2), " descontando al 1,3% y 1 con la propia TIR: ",
+    "el 1,74 depende de con qué se compare."))
+}
+```
+
+::: {.hint exercise="cotizado"}
+En `valor_presente()`, cada edad aporta `l * flujo`, dividido por `(1 + r)` elevado a `edad - 25`; luego se suma. En `cpu()`, llama dos veces a `valor_presente()`, con `c$pension` y con `c$cotizacion`.
+:::
+
+::: {.solution exercise="cotizado"}
+`sum(l * flujo / (1 + r)^(edad - 25))` en `valor_presente()`, y `valor_presente(c$pension, l, r) / valor_presente(c$cotizacion, l, r)` en `cpu()`.
+:::
+:::
+
+::::
