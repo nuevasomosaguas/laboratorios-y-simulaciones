@@ -19,7 +19,7 @@ Un programa de posgrado admite cada año al 10% de sus candidatos, los de mejor 
 
 > Entre nuestros estudiantes, los de más talento son los que menos se esfuerzan. Quien vale no necesita trabajar.
 
-El código de la derecha reproduce su análisis con una población simulada de 10 000 candidatos. En ella, el talento y el esfuerzo son independientes: lo sabemos porque los hemos generado así.
+El código de la derecha reproduce su análisis con una población simulada de 10.000 candidatos. En ella, el talento y el esfuerzo son independientes: lo sabemos porque los hemos generado así.
 
 **Tu tarea.** Encuentra el error del análisis y corrígelo: la última línea debe devolver la correlación entre talento y esfuerzo *en toda la población de candidatos*. Después compárala con la del profesor, que ronda −0,7.
 

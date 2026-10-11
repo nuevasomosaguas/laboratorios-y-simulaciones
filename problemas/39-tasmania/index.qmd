@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Hace unos 10 000 años, la subida del mar inundó el estrecho de Bass y separó Tasmania de Australia. Quedaron aislados unos pocos miles de personas. Cuando llegaron los europeos, los tasmanos tenían una de las tecnologías más sencillas que se conocen: según el registro arqueológico, habían dejado de fabricar herramientas de hueso y de pescar, cosas que sus antepasados sí sabían hacer y que en el continente seguían haciéndose.
+Hace unos 10.000 años, la subida del mar inundó el estrecho de Bass y separó Tasmania de Australia. Quedaron aislados unos pocos miles de personas. Cuando llegaron los europeos, los tasmanos tenían una de las tecnologías más sencillas que se conocen: según el registro arqueológico, habían dejado de fabricar herramientas de hueso y de pescar, cosas que sus antepasados sí sabían hacer y que en el continente seguían haciéndose.
 
 Joseph Henrich propuso en 2004 que no hace falta ningún desastre para explicarlo: basta con que la población sea pequeña. En su modelo, cada aprendiz de una generación imita al más hábil de la anterior, de habilidad $z_h$, pero copiar es difícil y casi siempre sale peor. La habilidad del aprendiz es
 
@@ -31,13 +31,13 @@ donde $\gamma \approx 0{,}5772$ es la constante de Euler. Con muchos aprendices,
 
 1. Completa `simular()`: cada generación, los `N[t]` aprendices copian al más hábil de la anterior, `max(z)`, con la pérdida `alfa` y un error de Gumbel de escala `beta`. La función `gumbel(n)` da `n` errores de escala 1.
 2. Completa `N_critico()`: el tamaño de población con el que $\Delta z = 0$, por debajo del cual la técnica se pierde.
-3. Mira la tabla: dos técnicas, una sencilla ($\alpha = 6$) y otra compleja ($\alpha = 10$), en una isla de 4000 personas y en un continente de 100 000, cifras redondas e inventadas. ¿Cuál se pierde, y dónde?
-4. El gráfico sigue la técnica compleja en una población de 100 000 personas que, en la generación 50, queda reducida a 4000.
+3. Mira la tabla: dos técnicas, una sencilla ($\alpha = 6$) y otra compleja ($\alpha = 10$), en una isla de 4.000 personas y en un continente de 100.000, cifras redondas e inventadas. ¿Cuál se pierde, y dónde?
+4. El gráfico sigue la técnica compleja en una población de 100.000 personas que, en la generación 50, queda reducida a 4.000.
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La técnica sencilla tiene una población crítica de 227 personas, y mejora tanto en la isla como en el continente. La compleja necesita 12 367: en el continente mejora unas 2 unidades por generación, y en la isla pierde algo más de una. El gráfico es la historia de Tasmania en pequeño: durante 50 generaciones la técnica se acumula, y en cuanto la población se aísla empieza a perderse, sin que nadie haya olvidado nada por descuido. Cada generación copia lo mejor que puede al mejor que tiene, y con 4000 aprendices no basta.
+La técnica sencilla tiene una población crítica de 227 personas, y mejora tanto en la isla como en el continente. La compleja necesita 12.367: en el continente mejora unas 2 unidades por generación, y en la isla pierde algo más de una. El gráfico es la historia de Tasmania en pequeño: durante 50 generaciones la técnica se acumula, y en cuanto la población se aísla empieza a perderse, sin que nadie haya olvidado nada por descuido. Cada generación copia lo mejor que puede al mejor que tiene, y con 4.000 aprendices no basta.
 
 Lo que se pierde primero es lo más difícil de copiar, y la población crítica crece exponencialmente con la dificultad: $N^* = e^{\alpha/\beta - \gamma}$. Subir $\alpha$ de 6 a 10 multiplica la población necesaria por 55. Por eso Henrich habla de un *cerebro colectivo*: lo que una sociedad sabe hacer depende de cuántas personas aprenden unas de otras, no solo de lo listas que sean.
 
@@ -160,7 +160,7 @@ if (!is.function(e$simular) || !is.function(e$N_critico)) {
   r <- .result
   list(correct = TRUE, message = paste0(
     "¡Correcto! La técnica sencilla necesita ", round(r$N_critico[1]), " personas y la compleja, ",
-    format(round(n <- r$N_critico[3]), big.mark = if (n >= 1e4) "\u202f" else ""), ". En la isla de 4000, la compleja cambia ",
+    format(round(n <- r$N_critico[3]), big.mark = "."), ". En la isla de 4.000, la compleja cambia ",
     coma(r$simulado[3]), " por generación (la fórmula dice ", coma(r$teorico[3]), "): se pierde."))
 }
 ```

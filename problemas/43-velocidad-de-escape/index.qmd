@@ -19,7 +19,7 @@ Entre 2021 y 2025, la vivienda subió en España un 7,2% al año de media, segú
 
 En física, la velocidad de escape es la mínima para no volver a caer. Aquí el problema tiene la misma forma: por debajo de cierta tasa de ahorro, el ahorro se acerca a la meta sin alcanzarla nunca.
 
-El agente del modelo gana 20 000 euros netos al año y quiere un piso de 180 000, nueve años de renta. Para comprarlo necesita reunir una fracción $k = 0{,}3$ del precio: el 20% de entrada y un 10% de impuestos y gastos. Gasta el 55% de la renta en todo lo que no es vivienda, y vive en uno de tres sitios: con sus padres, en una habitación de 400 euros al mes o en un piso de 600. Cada año, el ahorro acumulado rinde un $r$, y se le suma lo que sobra de la renta tras el consumo y el alquiler. Después suben la renta, el precio y el alquiler, cada uno a su ritmo.
+El agente del modelo gana 20.000 euros netos al año y quiere un piso de 180.000 euros, nueve años de renta. Para comprarlo necesita reunir una fracción $k = 0{,}3$ del precio: el 20% de entrada y un 10% de impuestos y gastos. Gasta el 55% de la renta en todo lo que no es vivienda, y vive en uno de tres sitios: con sus padres, en una habitación de 400 euros al mes o en un piso de 600. Cada año, el ahorro acumulado rinde un $r$, y se le suma lo que sobra de la renta tras el consumo y el alquiler. Después suben la renta, el precio y el alquiler, cada uno a su ritmo.
 
 Si el ahorro se mide como fracción de la meta, $x = S / (k P)$, cada año $x_{t+1} = a\,x_t + c_t$, con $a = (1 + r)/(1 + g_P)$, donde $g_P$ es lo que sube la vivienda. Si los sueldos y el alquiler suben al mismo ritmo que la vivienda, $c$ es constante y $x$ se acerca al punto fijo
 

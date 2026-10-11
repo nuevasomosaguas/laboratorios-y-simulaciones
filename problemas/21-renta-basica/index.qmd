@@ -6,7 +6,7 @@ duracion: "20 min"
 lectura: "Dalton (1920)"
 dificultad: "Iniciación"
 categories: [desigualdad]
-description: "Subir todas las rentas un 10% no cambia el Gini; dar 1000 euros a cada hogar, sí. Y un impuesto proporcional con renta básica lo reduce exactamente en su tipo."
+description: "Subir todas las rentas un 10% no cambia el Gini; dar 1.000 euros a cada hogar, sí. Y un impuesto proporcional con renta básica lo reduce exactamente en su tipo."
 page-layout: full
 # Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
 engine: markdown
@@ -15,19 +15,19 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Un país **imaginario** tiene 5000 hogares con rentas **simuladas**, que no corresponden a ningún país real. Su gobierno estudia varias políticas y quiere saber qué le hace cada una al índice de Gini:
+Un país **imaginario** tiene 5.000 hogares con rentas **simuladas**, que no corresponden a ningún país real. Su gobierno estudia varias políticas y quiere saber qué le hace cada una al índice de Gini:
 
 - **Crecimiento proporcional:** todas las rentas suben un 10%.
-- **Cheque igual:** cada hogar recibe 1000 euros.
+- **Cheque igual:** cada hogar recibe 1.000 euros.
 - **Renta básica:** un impuesto proporcional del 30% sobre todas las rentas, y lo recaudado se reparte a partes iguales. Cada hogar acaba con $(1 - t)\,x + t\,\mu$.
-- **Transferencia de Pigou-Dalton:** el hogar más rico da 1000 euros al más pobre.
+- **Transferencia de Pigou-Dalton:** el hogar más rico da 1.000 euros al más pobre.
 
 **Tu tarea.** Completa `renta_basica()` y `transferencia()`. El código calcula el Gini antes y después de cada política. ¿Cuál lo cambia, y cuánto?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El Gini de partida es 0,440. Subir todas las rentas un 10% lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
+El Gini de partida es 0,440. Subir todas las rentas un 10% lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1.000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
 
 La renta básica lo reduce exactamente al 70%, de 0,440 a 0,308, y no por casualidad: el impuesto proporcional, por sí solo, no cambia el Gini, como el crecimiento proporcional; lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
 

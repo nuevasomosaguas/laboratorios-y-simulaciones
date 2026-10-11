@@ -25,20 +25,20 @@ La multitud se equivoca menos que el individuo medio exactamente en lo que se se
 
 Bryan Caplan le puso un límite. Los errores aleatorios se cancelan al promediar; los *sesgos sistemáticos*, no. Si casi todos los votantes se equivocan hacia el mismo lado, la democracia agrega el error en lugar de corregirlo.
 
-En el código, un tarro tiene **1000 garbanzos**, y dos multitudes **inventadas** de 100 personas los estiman. En la primera, cada uno se equivoca al azar, hacia arriba o hacia abajo; en la segunda, con el mismo ruido, todos tienden además a pasarse en unos 200.
+En el código, un tarro tiene **1.000 garbanzos**, y dos multitudes **inventadas** de 100 personas los estiman. En la primera, cada uno se equivoca al azar, hacia arriba o hacia abajo; en la segunda, con el mismo ruido, todos tienden además a pasarse en unos 200.
 
 **Tu tarea.**
 
 1. Completa `errores()` con el error colectivo y la diversidad. Comprueba en el resultado que en las dos multitudes el error colectivo es el error medio menos la diversidad.
 2. ¿Qué proporción de las personas acierta mejor que la media de su multitud?
-3. Mira el gráfico: el error de la multitud, en garbanzos, según su tamaño. ¿Qué pasa al pasar de 10 a 1000 personas en cada caso?
+3. Mira el gráfico: el error de la multitud, en garbanzos, según su tamaño. ¿Qué pasa al pasar de 10 a 1.000 personas en cada caso?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41% de sus miembros acierta mejor que ella.
+La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93.564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69.946, y no alcanza a cubrir el error medio, 118.028, así que el error colectivo es de 48.082, unos 219 garbanzos. El 41% de sus miembros acierta mejor que ella.
 
-El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
+El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1.000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
 
 Es la misma lógica del *teorema del jurado* que Condorcet publicó en 1785, en el mismo libro que [su paradoja](../15-condorcet/index.qmd): si cada votante acierta con una probabilidad algo mayor que 1/2 y vota con independencia, la mayoría acierta casi con seguridad cuando son muchos. Pero si la probabilidad es algo menor que 1/2, la mayoría se equivoca casi con seguridad. Caplan sostiene que en economía los votantes tienen sesgos de ese tipo, como desconfiar del mercado y del comercio con extranjeros o creer que la economía siempre va a peor, y que por eso el «milagro de la agregación» no los salva.
 
@@ -120,7 +120,7 @@ rbind(al_azar = errores(al_azar, verdad), sesgados = errores(sesgados, verdad))
 #| exercise: multitud
 #| check: true
 f <- .envir_result$errores
-coma <- function(v, d = 0) format(round(v, d), nsmall = d, big.mark = if (all(abs(v) >= 1e4)) "\u202f" else "", decimal.mark = ",")
+coma <- function(v, d = 0) format(round(v, d), nsmall = d, big.mark = ".", decimal.mark = ",")
 if (!is.function(f)) {
   list(correct = FALSE, message = "No encuentro la función errores().")
 } else if (!isTRUE(all.equal(unname(f(c(1, 2, 9), 6)[c("colectivo", "medio", "diversidad")]), c(4, 50/3, 38/3)))) {

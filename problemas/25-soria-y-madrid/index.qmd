@@ -17,7 +17,7 @@ engine: markdown
 ::: {.enunciado}
 El Congreso de los Diputados tiene 350 escaños repartidos en 52 circunscripciones: las 50 provincias, Ceuta y Melilla. Cada provincia tiene al menos dos, Ceuta y Melilla uno, y el resto se reparte según la población. Así, en 2023 Madrid elegía 37 diputados y Soria, 2. En cada circunscripción los escaños se reparten con la *ley D'Hondt* entre los partidos que superan el 3% de los votos válidos.
 
-D'Hondt funciona así: se dividen los votos de cada partido entre 1, 2, 3… hasta el número de escaños, y los escaños van a los cocientes más altos. Con 8 escaños y cuatro partidos de 100 000, 80 000, 30 000 y 20 000 votos, los ocho cocientes más altos dan 4, 3, 1 y 0 escaños.
+D'Hondt funciona así: se dividen los votos de cada partido entre 1, 2, 3… hasta el número de escaños, y los escaños van a los cocientes más altos. Con 8 escaños y cuatro partidos de 100.000, 80.000, 30.000 y 20.000 votos, los ocho cocientes más altos dan 4, 3, 1 y 0 escaños.
 
 Rein Taagepera propuso predecir la fragmentación de un parlamento sin mirar los votos, solo con dos números del sistema electoral: el tamaño de la asamblea, $S$, y la magnitud media de las circunscripciones, $M$. Su *modelo del producto de escaños* dice que el número efectivo de partidos en el parlamento es aproximadamente
 

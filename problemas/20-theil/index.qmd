@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Un país **imaginario** tiene tres regiones, Norte, Centro y Sur, con 2000 hogares cada una. Las rentas son **simuladas**: no corresponden a ningún país real. El Norte es, de media, el doble de rico que el Sur. ¿Cuánta de la desigualdad del país se debe a esa diferencia entre regiones, y cuánta a la que hay dentro de cada una?
+Un país **imaginario** tiene tres regiones, Norte, Centro y Sur, con 2.000 hogares cada una. Las rentas son **simuladas**: no corresponden a ningún país real. El Norte es, de media, el doble de rico que el Sur. ¿Cuánta de la desigualdad del país se debe a esa diferencia entre regiones, y cuánta a la que hay dentro de cada una?
 
 El índice de Gini no permite responder: no se puede partir en una suma de componentes cuando los grupos se solapan. El índice de Theil, que viene de la teoría de la información, sí:
 
@@ -46,7 +46,7 @@ Shorrocks, A. F. (1980). The class of additively decomposable inequality measure
 ```{webr}
 #| exercise: theil
 #| caption: "Tu código"
-# Rentas simuladas de un país imaginario: 2000 hogares en cada región
+# Rentas simuladas de un país imaginario: 2.000 hogares en cada región
 set.seed(1967)
 region <- rep(c("Norte", "Centro", "Sur"), each = 2000)
 medianas <- c(30000, 22000, 15000)

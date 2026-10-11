@@ -39,7 +39,7 @@ La razón es que cada atajo acorta muchos caminos a la vez, los de todas las par
 
 Y por eso nadie lo nota desde dentro. El agrupamiento es lo que cada cual ve a su alrededor, y apenas cambia; la distancia media es una propiedad global, que nadie ve. Es la intuición de Granovetter sobre la *fuerza de los lazos débiles*: los conocidos lejanos son pocos, pero son los que conectan los grupos, y por ellos llegan la información, las ofertas de empleo o las epidemias.
 
-**Para ir más allá:** con 200 personas, la distancia de la red aleatoria es de unos 3 pasos; Watts y Strogatz usaron 1000 personas con 10 vecinos, y ahí la caída es aún más brusca, porque $L(0)$ crece con $N$ y $L(1)$ solo con $\log N$. Prueba `N <- 400` si tienes paciencia.
+**Para ir más allá:** con 200 personas, la distancia de la red aleatoria es de unos 3 pasos; Watts y Strogatz usaron 1.000 personas con 10 vecinos, y ahí la caída es aún más brusca, porque $L(0)$ crece con $N$ y $L(1)$ solo con $\log N$. Prueba `N <- 400` si tienes paciencia.
 
 Milgram, S. (1967). The small world problem. *Psychology Today*, 1(1), 61–67.
 

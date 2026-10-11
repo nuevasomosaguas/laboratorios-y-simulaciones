@@ -21,7 +21,7 @@ $$P(d) = \log_{10}\left(1 + \frac{1}{d}\right), \qquad d = 1, \dots, 9.$$
 
 La cumplen los datos que abarcan varios órdenes de magnitud y crecen de forma multiplicativa, como las poblaciones de los municipios. Las personas que se inventan números no saben imitarla, y por eso se usa en auditoría contable para detectar fraudes. También se ha propuesto para los resultados electorales.
 
-**Tu tarea.** Completa `primer_digito()`, para números positivos, también decimales como 0,034. Después compara con la ley tres conjuntos de datos simulados: poblaciones de municipios, números inventados entre 100 y 999, y los votos de un partido en 5000 mesas electorales limpias, sin ningún fraude. La medida es la desviación absoluta media (MAD); Nigrini considera que más de 0,015 es un incumplimiento.
+**Tu tarea.** Completa `primer_digito()`, para números positivos, también decimales como 0,034. Después compara con la ley tres conjuntos de datos simulados: poblaciones de municipios, números inventados entre 100 y 999, y los votos de un partido en 5.000 mesas electorales limpias, sin ningún fraude. La medida es la desviación absoluta media (MAD); Nigrini considera que más de 0,015 es un incumplimiento.
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
