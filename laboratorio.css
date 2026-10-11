@@ -55,3 +55,8 @@ a.resuelto::after { content: " ✓"; color: #18bc9c; }
   max-height: none;
   overflow: visible;
 }
+
+/* El título de la barra y sus enlaces, sobre la misma línea base: centrados, el título,
+   que es más grande, queda más bajo. Los iconos siguen centrados. */
+.navbar > .navbar-container { align-items: baseline; }
+.navbar-container > .navbar-toggler, #quarto-search, .quarto-navbar-tools { align-self: center; }
