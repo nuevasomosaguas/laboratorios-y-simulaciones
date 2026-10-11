@@ -1,0 +1,156 @@
+---
+title: "¿Cuántos descubrimientos sobreviven?"
+numero: 41
+nivel: 2
+duracion: "30 min"
+lectura: "[Benjamini y Hochberg (1995)](https://nuevasomosaguas.github.io/biblioteca.html#efron2016computer)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Cien contrastes, noventa de ellos humo. Con el umbral de 0,05, un tercio de lo que celebras es falso."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+John Ioannidis tituló en 2005 *Why Most Published Research Findings Are False*. Parte del argumento es aritmética: si se contrastan muchas hipótesis y casi todas son falsas, los falsos positivos que deja pasar el umbral de 0,05 pueden superar a los hallazgos verdaderos. Un estudio con 100 contrastes y ninguna relación real produce, en promedio, cinco «descubrimientos».
+
+Bonferroni lo arregla dividiendo el umbral entre el número de contrastes, $0{,}05/m$: así controla la probabilidad de colar *un solo* falso positivo. Con muchos contrastes es tan exigente que también deja escapar los efectos reales. Yoav Benjamini y Yosef Hochberg propusieron en 1995 controlar otra cosa, la **tasa de falsos descubrimientos** (FDR): la proporción esperada de falsos positivos entre lo que se declara significativo. El procedimiento cabe en una línea:
+
+1. Ordena los $m$ valores *p*: $p_{(1)} \le p_{(2)} \le \dots \le p_{(m)}$.
+2. Busca el mayor $k$ con $p_{(k)} \le \frac{k}{m}\,q$.
+3. Declara descubrimientos los $k$ primeros.
+
+Los datos: 100 contrastes, de los que en 90 la hipótesis nula es cierta y en 10 hay un efecto real. Cada contraste da un estadístico $z$, normal de media 0 si la nula es cierta y de media 3 si no.
+
+**Tu tarea.**
+
+1. Completa `bh(p, q)`: la condición de la rampa, $p_{(i)} \le \frac{i}{m}\,q$, para los valores *p* ordenados. El resto de la función ya convierte esa condición en descubrimientos. Debe coincidir con `p.adjust(p, method = "BH") <= q`, la versión de R en una sola llamada.
+2. Completa `proporcion_falsos(descubre, real)`: la fracción de los descubrimientos que son falsos. Si no hay ningún descubrimiento, la proporción es 0.
+3. Lee la tabla: cuántos descubrimientos da cada umbral en una muestra, y cuántos son falsos.
+4. Lo que devuelve el código es la proporción media de falsos descubrimientos en 2000 repeticiones. ¿Cuál se acerca a 0,05?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con el umbral ingenuo, de cada tres descubrimientos uno es falso: en promedio, 4,5 de los 90 nulos pasan el umbral, frente a unos 8,5 de los 10 efectos reales. La proporción media de falsos descubrimientos ronda 0,33, seis veces el 0,05 que el umbral parece prometer. Bonferroni casi nunca se equivoca, pero encuentra solo unos tres de los diez efectos reales. Benjamini-Hochberg deja la proporción de falsos en torno a 0,045, que es $q\,m_0/m = 0{,}05 \times 90/100$, y encuentra cerca de la mitad de los efectos.
+
+La lección es que el 0,05 de un contraste no es el 0,05 de un artículo. Un valor *p* controla el error de un contraste suelto; lo que llega a los titulares es una selección entre muchos, y lo que hay que controlar es la calidad de esa selección. Es el mismo mecanismo que Simmons, Nelson y Simonsohn describen en la flexibilidad del analista, con la diferencia de que allí los contrastes están ocultos. Y es lo que hace posibles los estudios de asociación del genoma completo, que contrastan millones de variantes a la vez.
+
+**Para ir más allá:** la FDR controla el promedio, no cada estudio. Guarda la proporción de falsos de BH en cada repetición y mira su distribución: ¿en qué fracción de repeticiones supera 0,2?
+
+Benjamini, Y. y Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. *Journal of the Royal Statistical Society: Series B*, 57(1), 289–300.
+
+Ioannidis, J. P. A. (2005). Why most published research findings are false. *PLoS Medicine*, 2(8), e124.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: fdr
+#| caption: "Tu código"
+# 1. Benjamini-Hochberg
+bh <- function(p, q = 0.05) {
+  m <- length(p)
+  orden <- order(p)
+  bajo_rampa <- ______  # p ordenados frente a la rampa (i/m) q
+  k <- max(0, which(bajo_rampa))
+  descubre <- logical(m)
+  descubre[orden[seq_len(k)]] <- TRUE
+  descubre
+}
+
+# 2. La fracción de los descubrimientos que son falsos
+proporcion_falsos <- function(descubre, real) ______
+
+# 3. Cien contrastes: noventa nulos y diez reales
+real <- rep(c(FALSE, TRUE), c(90, 10))
+contrastes <- function() 2 * pnorm(-abs(rnorm(100, mean = ifelse(real, 3, 0))))
+umbrales <- function(p) list(
+  ingenuo    = p < 0.05,
+  bonferroni = p < 0.05 / length(p),
+  bh         = bh(p)
+)
+set.seed(1995)
+p <- contrastes()
+sapply(umbrales(p), function(d) c(descubrimientos = sum(d), falsos = sum(d & !real)))
+
+# 4. Dos mil repeticiones
+set.seed(2005)
+rowMeans(replicate(2000, sapply(umbrales(contrastes()), proporcion_falsos, real = real)))
+```
+
+```{webr}
+#| exercise: fdr
+#| solution: true
+bh <- function(p, q = 0.05) {
+  m <- length(p)
+  orden <- order(p)
+  bajo_rampa <- p[orden] <= seq_len(m) / m * q
+  k <- max(0, which(bajo_rampa))
+  descubre <- logical(m)
+  descubre[orden[seq_len(k)]] <- TRUE
+  descubre
+}
+
+proporcion_falsos <- function(descubre, real) sum(descubre & !real) / max(1, sum(descubre))
+
+real <- rep(c(FALSE, TRUE), c(90, 10))
+contrastes <- function() 2 * pnorm(-abs(rnorm(100, mean = ifelse(real, 3, 0))))
+umbrales <- function(p) list(
+  ingenuo    = p < 0.05,
+  bonferroni = p < 0.05 / length(p),
+  bh         = bh(p)
+)
+set.seed(1995)
+p <- contrastes()
+sapply(umbrales(p), function(d) c(descubrimientos = sum(d), falsos = sum(d & !real)))
+
+set.seed(2005)
+rowMeans(replicate(2000, sapply(umbrales(contrastes()), proporcion_falsos, real = real)))
+```
+
+```{webr}
+#| exercise: fdr
+#| check: true
+e <- .envir_result
+coma <- function(x, digitos = 3) format(round(x, digitos), nsmall = digitos, decimal.mark = ",")
+# El ejemplo del artículo de 1995: BH descubre 4 con q = 0,05, y Bonferroni, 3
+ejemplo <- c(0.0001, 0.0004, 0.0019, 0.0095, 0.0201, 0.0278, 0.0298, 0.0344,
+             0.0459, 0.3240, 0.4262, 0.5719, 0.6528, 0.7590, 1.0000)
+set.seed(1)
+azar <- replicate(20, runif(30)^3, simplify = FALSE)
+coincide <- function(f) all(vapply(azar, function(p) identical(f(p, 0.1), p.adjust(p, "BH") <= 0.1), NA))
+if (!all(c("bh", "proporcion_falsos") %in% ls(e))) {
+  list(correct = FALSE, message = "Faltan funciones: bh() o proporcion_falsos().")
+} else if (!identical(e$bh(ejemplo), rep(c(TRUE, FALSE), c(4, 11)))) {
+  list(correct = FALSE, message = paste0(
+    "Con los 15 valores p del artículo de 1995, bh() debería descubrir los 4 primeros, y descubre ",
+    sum(e$bh(ejemplo)), ". ¿Comparas los p ordenados con (i/m) q?"))
+} else if (!identical(e$bh(rev(ejemplo)), rev(rep(c(TRUE, FALSE), c(4, 11))))) {
+  list(correct = FALSE, message = "Con los valores p desordenados, bh() falla: la rampa se compara con los p ordenados, p[orden].")
+} else if (!coincide(e$bh)) {
+  list(correct = FALSE, message = "bh() no coincide con p.adjust(p, \"BH\") <= q para otros valores de q. ¿Usas el argumento q?")
+} else if (!isTRUE(all.equal(e$proporcion_falsos(c(TRUE, TRUE, TRUE, FALSE), c(TRUE, FALSE, FALSE, FALSE)), 2 / 3))) {
+  list(correct = FALSE, message = "Con tres descubrimientos, dos de ellos sin efecto real, proporcion_falsos() debería dar 2/3.")
+} else if (!identical(e$proporcion_falsos(c(FALSE, FALSE), c(TRUE, FALSE)), 0)) {
+  list(correct = FALSE, message = "Sin ningún descubrimiento, proporcion_falsos() debería dar 0, no NaN: no hay falsos entre cero descubrimientos.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con el umbral ingenuo, el ", round(100 * .result[["ingenuo"]]), " % de los descubrimientos es falso; ",
+    "con Benjamini-Hochberg, el ", coma(100 * .result[["bh"]], 1), " %, por debajo del 5 % prometido."))
+}
+```
+
+::: {.hint exercise="fdr"}
+`p[orden]` son los valores *p* ordenados, y `seq_len(m)` es el vector de rangos $1, \dots, m$: compara uno con otro, elemento a elemento. Para la proporción, `sum(descubre & !real)` cuenta los falsos; cuidado con dividir entre cero.
+:::
+
+::: {.solution exercise="fdr"}
+`bajo_rampa <- p[orden] <= seq_len(m) / m * q` y `proporcion_falsos <- function(descubre, real) sum(descubre & !real) / max(1, sum(descubre))`.
+:::
+:::
+
+::::
