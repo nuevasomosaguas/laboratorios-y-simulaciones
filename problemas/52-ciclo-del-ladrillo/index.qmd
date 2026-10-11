@@ -1,0 +1,211 @@
+---
+title: "El ciclo del ladrillo"
+numero: 52
+nivel: 2
+duracion: "30 min"
+lectura: "[Strogatz (2015)](https://nuevasomosaguas.github.io/biblioteca.html#strogatz2015nonlinear); [Stachurski (2009)](https://nuevasomosaguas.github.io/biblioteca.html#strogatz2015nonlinear)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, equilibrios y dinámica]
+description: "Sube la demanda de vivienda, sube el precio, se construye más y el mercado se asienta. Salvo que las casas tarden dos años y las promotoras esperen que lo que subió siga subiendo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 2006, los ayuntamientos españoles dieron licencia para construir 736.269 viviendas de nueva planta. En 2013 dieron 31.117, el 4,2% de aquella cifra. Entre medias, los precios dejaron de subir y empezaron a bajar, y la construcción se hundió. Los problemas [La velocidad de escape](../43-velocidad-de-escape/) y [Dos sueldos, un alquiler](../44-dos-sueldos/) miran la vivienda desde quien compra; este la mira desde quien construye.
+
+La **cuenta de la vieja** de un manual de primero: si la demanda de vivienda sube, sube el precio; al subir el precio se construye más, y el mercado se asienta en un precio más alto, con más casas. Lo que esa cuenta no tiene en cuenta es el tiempo. Una promotora decide hoy cuánto construir, con el precio que espera, y las casas llegan al mercado un par de años después, cuando el precio ya es otro.
+
+El modelo es la telaraña de Ezekiel, con un periodo de dos años, lo que tarda en construirse un edificio. $p_t$ es lo que el precio se aparta del de antes de que suba la demanda, en tanto por uno. La demanda sube en $D$ a cada precio y baja con él, con elasticidad $\varepsilon_d$; las casas que llegan en $t$ se decidieron en $t-1$, con el precio que se esperaba, $p^e_t$, y una elasticidad $\varepsilon_s$. Cuando las casas llegan, el precio es el que vacía el mercado:
+
+$$p_t = \frac{D - \varepsilon_s \, p^e_t}{|\varepsilon_d|}, \qquad p^e_t = p_{t-1} + \lambda \, (p_{t-1} - p_{t-2}).$$
+
+Con $\lambda = 0$, las promotoras esperan que el precio se quede como está; con $\lambda > 0$, que lo que subió siga subiendo. En la cuenta de la vieja, el precio esperado es el de equilibrio y $p^* = D / (\varepsilon_s + |\varepsilon_d|)$. Las elasticidades, $\varepsilon_d = -1$ y $\varepsilon_s = 0{,}6$, y el choque, $D = 0{,}2$, son cifras redondas e ilustrativas, no estimaciones.
+
+Si se mide el precio desde $p^*$, cada periodo depende de los dos anteriores, y el ciclo se apaga si las dos raíces de
+
+$$z^2 + \rho\,(1 + \lambda)\,z - \rho\,\lambda = 0, \qquad \rho = \frac{\varepsilon_s}{|\varepsilon_d|},$$
+
+tienen módulo menor que 1. Con $\lambda = 0$, las raíces son $0$ y $-\rho$: es la telaraña clásica, que se apaga si la oferta responde menos que la demanda. Con $\lambda > 0$, la raíz que sale primero del círculo lo hace por $z = -1$, que es cuando el precio sube y baja cada periodo sin apagarse.
+
+**Tu tarea.**
+
+1. **La cuenta de la vieja.** Antes de completar nada, mira `estatico`: cuánto sube el precio, según el manual.
+2. **El modelo completo.** Completa en `ciclo()` el precio que esperan las promotoras.
+3. **La diferencia.** Completa `umbral()`: el $\rho$ por encima del cual el ciclo no se apaga, con un $\lambda$ dado. Sustituye $z = -1$ en la ecuación y despeja $\rho$. La columna `raiz_mayor` calcula las raíces con `polyroot()`: tiene que pasar de 1 justo cuando $\rho$ pasa del umbral. Mira en la tabla cuánto se aleja el precio de la cuenta de la vieja.
+4. **El eslabón.** Con las promotoras que extrapolan, ¿qué elasticidad de la oferta apaga el ciclo? Prueba `es <- 0.5` y `es <- 0.4`.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La cuenta de la vieja dice que el precio sube un 12,5% y se queda ahí. El modelo completo dice otra cosa desde el primer periodo: como las casas de hoy se decidieron antes de que subiera la demanda, el precio salta un 20%. Ese 20% anima a construir, las casas llegan dos años después y el precio cae al 8%; con tan poco, se construye menos, y vuelve a subir. Con expectativas que no extrapolan, el ciclo se apaga: en 20 años está en el 12,4%, y el error de la cuenta de la vieja no pasa de 7,5 puntos. Si las promotoras esperan que se repita una cuarta parte de la última subida, el ciclo aún se apaga, pero despacio: la raíz mayor es 0,914, y a los 20 años el precio sigue bailando entre el 16% y el 9%.
+
+Con $\lambda = 0{,}5$, el umbral baja a $\rho = 1/(1 + 2\lambda) = 0{,}5$, y con una oferta de 0,6 el ciclo crece en vez de apagarse: la raíz mayor es 1,159. En el periodo 9 el precio está un 41% por encima del de partida, y en el 10, un 21% por debajo, aunque la demanda sea más alta que al principio. El error de la cuenta de la vieja llega a 33 puntos. El cálculo estático se equivoca, y en las dos direcciones: unas veces el precio está muy por encima de lo que dice y otras muy por debajo. Con `es <- 0.5`, justo en el umbral, el precio oscila para siempre entre el 5% y el 21%, y con `es <- 0.4` se apaga.
+
+El eslabón que falla es la **retroalimentación**, el tercero de la cadena de Hedström: el precio que sale de las decisiones de todos cambia lo que cada promotora cree que va a pasar, y esa creencia decide las casas que llegarán, con dos años de retraso. Sin el retraso, el mercado iría derecho al 12,5%; sin la extrapolación, el ciclo se apagaría solo. Juntos, el ciclo se alimenta a sí mismo. Y que la oferta responda mucho no estabiliza el mercado, sino al revés: cuanto mayor es $\rho$, más se construye en cada subida y más hondo cae el precio después. Glaeser, Gyourko y Saiz (2008) llegan, con otro modelo y con datos de Estados Unidos, a una conclusión vecina: donde la oferta es más elástica, las burbujas de precios son más cortas y suaves, pero se construye de más, y eso es lo que más cuesta después.
+
+El modelo exagera. Una casa no se consume en un periodo, como el trigo o los cerdos de la telaraña original, sino que se suma a un parque que dura décadas, y eso amortigua el ciclo y lo alarga; y una explosión como la del modelo la paran la capacidad de las constructoras y el crédito. Pero las dos piezas son reales: los edificios tardan años, y quien compra o construye tras una subida espera que los precios sigan subiendo, como recogen Glaeser y Nathanson (2017).
+
+Ezekiel, M. (1938). The cobweb theorem. *The Quarterly Journal of Economics*, 52(2), 255–280.
+
+Glaeser, E. L., Gyourko, J. y Saiz, A. (2008). Housing supply and housing bubbles. *Journal of Urban Economics*, 64(2), 198–217.
+
+Glaeser, E. L. y Nathanson, C. G. (2017). An extrapolative model of house price dynamics. *Journal of Financial Economics*, 126(1), 147–170.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Ministerio de Vivienda y Agenda Urbana (2025). *Observatorio de Vivienda y Suelo. Boletín anual 2024*. <https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Documents/2025/040725-ObservatoriodeviviendaysueloBoletnanual24.pdf>
+
+Stachurski, J. (2009). *Economic Dynamics: Theory and Computation*. MIT Press.
+
+Strogatz, S. H. (2015). *Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering* (2.ª ed.). Westview Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: ladrillo
+#| caption: "Tu código"
+ed <- -1    # elasticidad de la demanda: ilustrativa
+es <- 0.6   # elasticidad de la oferta: cuánto más se construye por cada 1% de precio esperado; ilustrativa
+D <- 0.2    # el choque: a cada precio, un 20% más de demanda
+n <- 10     # periodos de dos años: lo que tarda en construirse un edificio
+
+# 1. La cuenta de la vieja: el precio sube, la oferta responde y el mercado se asienta
+estatico <- D / (es + abs(ed))
+
+# 2. El modelo completo: el precio de cada periodo, en tanto por uno sobre el de antes del choque
+ciclo <- function(lambda) {
+  p <- numeric(n + 2)  # p[1] y p[2]: antes del choque, el precio de siempre
+  for (t in 3:(n + 2)) {
+    esperado <- ______  # lo que esperaban las promotoras, mirando p[t - 1] y p[t - 2]
+    p[t] <- (D - es * esperado) / abs(ed)
+  }
+  p[-(1:2)]
+}
+
+# 3. El rho = es / |ed| por encima del cual el ciclo no se apaga
+umbral <- function(lambda) {
+  ______
+}
+
+lambdas <- c(ingenuas = 0, extrapolan_poco = 0.25, extrapolan = 0.5)
+p <- sapply(lambdas, ciclo)
+
+matplot(100 * p, type = "b", pch = 16, lty = 1, col = c("#27ae60", "#2980b9", "#c0392b"),
+        xlab = "Periodo (dos años)", ylab = "Precio, % sobre el de antes del choque")
+abline(h = 100 * estatico, lty = 2)  # la cuenta de la vieja
+legend("topleft", names(lambdas), col = c("#27ae60", "#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+rho <- es / abs(ed)
+data.frame(lambda = lambdas,
+           umbral = round(umbral(lambdas), 3),
+           se_amortigua = rho < umbral(lambdas),
+           raiz_mayor = round(sapply(lambdas, function(l) max(Mod(polyroot(c(-rho * l, rho * (1 + l), 1))))), 3),
+           estatico = round(100 * estatico, 1),
+           maximo = round(100 * apply(p, 2, max), 1),
+           minimo = round(100 * apply(p, 2, min), 1),
+           final = round(100 * p[n, ], 1),
+           error_maximo = round(100 * apply(abs(p - estatico), 2, max), 1))
+```
+
+```{webr}
+#| exercise: ladrillo
+#| solution: true
+ed <- -1
+es <- 0.6
+D <- 0.2
+n <- 10
+
+estatico <- D / (es + abs(ed))
+
+ciclo <- function(lambda) {
+  p <- numeric(n + 2)
+  for (t in 3:(n + 2)) {
+    esperado <- p[t - 1] + lambda * (p[t - 1] - p[t - 2])
+    p[t] <- (D - es * esperado) / abs(ed)
+  }
+  p[-(1:2)]
+}
+
+umbral <- function(lambda) {
+  1 / (1 + 2 * lambda)
+}
+
+lambdas <- c(ingenuas = 0, extrapolan_poco = 0.25, extrapolan = 0.5)
+p <- sapply(lambdas, ciclo)
+
+matplot(100 * p, type = "b", pch = 16, lty = 1, col = c("#27ae60", "#2980b9", "#c0392b"),
+        xlab = "Periodo (dos años)", ylab = "Precio, % sobre el de antes del choque")
+abline(h = 100 * estatico, lty = 2)
+legend("topleft", names(lambdas), col = c("#27ae60", "#2980b9", "#c0392b"), lwd = 2, bty = "n")
+
+rho <- es / abs(ed)
+data.frame(lambda = lambdas,
+           umbral = round(umbral(lambdas), 3),
+           se_amortigua = rho < umbral(lambdas),
+           raiz_mayor = round(sapply(lambdas, function(l) max(Mod(polyroot(c(-rho * l, rho * (1 + l), 1))))), 3),
+           estatico = round(100 * estatico, 1),
+           maximo = round(100 * apply(p, 2, max), 1),
+           minimo = round(100 * apply(p, 2, min), 1),
+           final = round(100 * p[n, ], 1),
+           error_maximo = round(100 * apply(abs(p - estatico), 2, max), 1))
+```
+
+```{webr}
+#| exercise: ladrillo
+#| check: true
+# ciclo() se comprueba en un mercado propio (otro choque, otras elasticidades, cuatro periodos),
+# y umbral() con lambdas propias: el alumno puede cambiar sus parámetros.
+e <- .envir_result
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+prueba <- list(D = 0.3, es = 0.5, ed = -1, n = 4)
+referencia <- function(lambda) {
+  p <- numeric(6)
+  for (t in 3:6) p[t] <- 0.3 - 0.5 * (p[t - 1] + lambda * (p[t - 1] - p[t - 2]))
+  p[-(1:2)]
+}
+ciclo_prueba <- function(f, lambda) {
+  environment(f) <- list2env(prueba, parent = environment(f))
+  f(lambda)
+}
+if (!is.function(e$ciclo) || !is.function(e$umbral)) {
+  list(correct = FALSE, message = "No encuentro ciclo() o umbral().")
+} else if (!isTRUE(all.equal(ciclo_prueba(e$ciclo, 0), referencia(0)))) {
+  list(correct = FALSE, message = paste0(
+    "Sin extrapolación (lambda = 0), las promotoras esperan el precio del periodo anterior. En un mercado de prueba ",
+    "(D = 0,3, es = 0,5, ed = -1), el segundo periodo debería dar ", coma(referencia(0)[2]), ", y da ",
+    coma(ciclo_prueba(e$ciclo, 0)[2]), "."))
+} else if (!isTRUE(all.equal(ciclo_prueba(e$ciclo, 1), referencia(1)))) {
+  list(correct = FALSE, message = paste0(
+    "Con lambda = 0 está bien, pero no con extrapolación. En el mismo mercado de prueba, con lambda = 1, el tercer periodo ",
+    "debería dar ", coma(referencia(1)[3]), ", y da ", coma(ciclo_prueba(e$ciclo, 1)[3]),
+    ". Las promotoras esperan el último precio más una fracción lambda de la última subida, la de p[t - 2] a p[t - 1]."))
+} else if (!isTRUE(all.equal(e$umbral(c(0, 1, 0.25)), c(1, 1/3, 2/3)))) {
+  list(correct = FALSE, message = paste0(
+    "umbral(1) debería dar 0,333, y da ", coma(e$umbral(1)), ". Con lambda = 0, el umbral es 1, el de la telaraña clásica. ",
+    "Sustituye z = -1 en z² + rho (1 + lambda) z - rho lambda = 0 y despeja rho."))
+} else {
+  r <- .result
+  ultimo <- nrow(r)
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La cuenta de la vieja dice que el precio sube un ", coma(r$estatico[1], 1), "% y se queda ahí. ",
+    "Con promotoras que extrapolan (lambda = ", coma(r$lambda[ultimo], 2), "), el umbral es ", coma(r$umbral[ultimo]),
+    ", el ciclo ", if (r$se_amortigua[ultimo]) "se apaga" else "no se apaga",
+    " y el precio llega a apartarse ", coma(r$error_maximo[ultimo], 1), " puntos de la cuenta de la vieja."))
+}
+```
+
+::: {.hint exercise="ladrillo"}
+El precio esperado es el último, `p[t - 1]`, más `lambda` veces la última subida, que es la diferencia entre `p[t - 1]` y `p[t - 2]`. Para el umbral, con $z = -1$ la ecuación queda $1 - \rho(1 + \lambda) - \rho\lambda = 0$.
+:::
+
+::: {.solution exercise="ladrillo"}
+`esperado <- p[t - 1] + lambda * (p[t - 1] - p[t - 2])` en `ciclo()`, y `1 / (1 + 2 * lambda)` en `umbral()`.
+:::
+:::
+
+::::

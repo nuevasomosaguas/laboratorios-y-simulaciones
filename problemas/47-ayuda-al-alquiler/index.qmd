@@ -1,0 +1,222 @@
+---
+title: "¿Quién se queda la ayuda al alquiler?"
+numero: 47
+nivel: 2
+duracion: "30 min"
+lectura: "[Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting); [Varian (2024)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, equilibrios y dinámica]
+description: "Una ayuda de 250 euros al mes debería bajar el alquiler en 250 euros. Si la reciben todos los que buscan piso y los pisos no aumentan, la mayor parte acaba en el bolsillo del casero."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En [La velocidad de escape](../43-velocidad-de-escape/), el agente que gana 20.000 euros netos al año y vive en un piso de 600 euros al mes no reúne nunca la entrada de su piso de 180.000 euros: su ahorro llega, como mucho, al 32% de la entrada, en el año 27, y desde ahí retrocede. Supón que el Gobierno le ayuda a pagar el alquiler. El Bono Alquiler Joven de 2022 da 250 euros al mes, durante dos años, a quienes tienen hasta 35 años y rentas bajas. La **cuenta de la vieja** es inmediata: el alquiler baja de 600 a 350 euros, el agente ahorra 3.000 euros más al año y la ventana se abre mucho más.
+
+Esa cuenta da por hecho que nadie reacciona. Pero la ayuda no la cobra solo él: la cobran todos los jóvenes que buscan un piso como el suyo, y cada uno puede pagar ahora un poco más. Si el número de pisos en alquiler no cambia, porque construirlos lleva años, esa demanda de más solo puede ir a una parte: al precio.
+
+El modelo del mercado es el más sencillo. Si el alquiler se aparta de los 600 euros de hoy, la cantidad de pisos que se piden y se ofrecen, en proporción a la de hoy, es
+
+$$\text{demanda} = 1 + \varepsilon_d \left(\frac{p_\text{neto}}{600} - 1\right), \qquad \text{oferta} = 1 + \varepsilon_s \left(\frac{p}{600} - 1\right),$$
+
+donde $p$ es lo que cobra el casero y $p_\text{neto}$ lo que paga el inquilino: $p$ menos la ayuda, si la cobra. Las elasticidades miden cuánto cambia la cantidad, en porcentaje, por cada 1% que cambia el precio. Aquí $\varepsilon_s = 0{,}1$, porque a corto plazo la oferta de alquiler es casi rígida, y $\varepsilon_d = -0{,}5$. Son cifras redondas e ilustrativas, no estimaciones. En el equilibrio, demanda y oferta coinciden, y la teoría de la incidencia dice qué parte de la ayuda se queda el casero:
+
+$$\text{incidencia} = \frac{|\varepsilon_d|}{\varepsilon_s + |\varepsilon_d|}.$$
+
+Para no perjudicar a la ayuda, en el modelo dura para siempre y sube cada año como el alquiler. El resto es el problema 43: la vivienda sube al 7% al año, y los sueldos y el alquiler, al 4%.
+
+**Tu tarea.**
+
+1. **La cuenta de la vieja.** Antes de completar nada, mira `neto_vieja`: el alquiler neto si nadie reacciona.
+2. **El modelo completo.** Completa en `exceso()` la demanda de quienes cobran la ayuda: miran lo que pagan de verdad. `uniroot()` busca el alquiler `p` con el que la demanda y la oferta coinciden.
+3. **La diferencia.** Completa `incidencia()` y compárala con la cuota del casero que sale del mercado. Mira la tabla: ¿hasta dónde llega la ventana del ahorro con la cuenta de la vieja, y hasta dónde con el mercado?
+4. **El eslabón.** Pon `cobertura <- 0.01`: la ayuda la cobra uno de cada cien que buscan piso. ¿Quién acierta ahora, la cuenta de la vieja o el mercado? Vuelve a 1 y pon `es <- 1`, la oferta de cuando da tiempo a construir. ¿Qué parte se queda ahora el casero?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con la cuenta de la vieja, el agente paga 350 euros y su ahorro llega al 84% de la entrada: la ayuda gana 53 puntos de ventana. Con el mercado, el alquiler sube a 808 euros, el casero se queda 208 de los 250 euros, el 83%, y el agente paga 558 euros: su ahorro llega al 40%, 9 puntos más que sin ayuda. La ayuda funciona, pero en la sexta parte de lo previsto. Con los sueldos y el alquiler al 7%, la tarea 3 del problema 43, el error cambia la respuesta: la cuenta de la vieja dice que el agente escapa en el año 18, y el mercado, que no escapa nunca y se queda en el 73%.
+
+El error está en la **agregación**, el segundo eslabón de la cadena de Hedström entre lo micro y lo macro. La respuesta individual es razonable: con 250 euros más, cada joven puede pagar un poco más por el piso que busca. Lo que la cuenta de la vieja no ve es que lo hacen todos a la vez, frente a los mismos pisos, y la suma de esas respuestas cambia el precio que paga cada uno. La tarea 4 lo separa: si la ayuda la cobra uno de cada cien, el alquiler sube solo 2 euros, el agente paga 352 y la cuenta de la vieja acierta casi del todo. La incidencia no es una propiedad de la ayuda, sino de cuántos la cobran frente a una oferta que no se mueve. Y cuando la cobran unos sí y otros no, el alquiler sube también para los que no la cobran.
+
+Tampoco es una ley fija contra las ayudas. Con $\varepsilon_s = 1$, cuando los pisos nuevos llegan, el casero se queda un tercio, el agente paga 433 euros y su ahorro llega al 67% de la entrada. El cálculo estático se equivoca, y cuánto depende de la elasticidad de la oferta: casi nada en un mercado que puede crecer, casi todo en el centro de una ciudad donde no se construye. Los datos apuntan a lo segundo. En Francia, tras una reforma que extendió las ayudas al alquiler, cada euro de ayuda subió 78 céntimos el alquiler de quienes empezaban a cobrarla, y parte de la demanda nueva fue de estudiantes que se independizaron gracias a ella (Fack, 2006).
+
+El control de alquileres es el caso simétrico. La cuenta de la vieja dice que el inquilino paga menos. Para el que ya vive en el piso es verdad, pero el casero responde: en San Francisco, los edificios a los que se extendió el control en 1994 redujeron su oferta de alquiler un 15%, vendiéndolos a propietarios o reconvirtiéndolos, y la escasez probablemente subió el alquiler de los que buscaban piso (Diamond, McQuade y Qian, 2019). Quien no se mueve vive en un mercado, y quien busca, en otro, como en el problema 43.
+
+Diamond, R., McQuade, T. y Qian, F. (2019). The effects of rent control expansion on tenants, landlords, and inequality: Evidence from San Francisco. *American Economic Review*, 109(9), 3365–3394.
+
+Fack, G. (2006). Are housing benefit an effective way to redistribute income? Evidence from a natural experiment in France. *Labour Economics*, 13(6), 747–771.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Real Decreto 42/2022, de 18 de enero, por el que se regula el Bono Alquiler Joven y el Plan Estatal para el acceso a la vivienda 2022-2025. *Boletín Oficial del Estado*, 16, 19 de enero de 2022. <https://www.boe.es/buscar/doc.php?id=BOE-A-2022-802>
+
+Varian, H. R. (2024). *Intermediate Microeconomics with Calculus: A Modern Approach* (2.ª ed.). W. W. Norton.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: ayuda
+#| caption: "Tu código"
+# El agente del problema 43
+renta <- 20000; precio <- 180000; consumo <- 0.55; k <- 0.3
+gp <- 0.07; gy <- 0.04; ga <- 0.04; r <- 0.02
+
+alquiler <- 600   # el piso, en euros al mes
+ayuda <- 250      # el Bono Alquiler Joven, en euros al mes
+es <- 0.1         # elasticidad de la oferta de alquiler a corto plazo: ilustrativa
+ed <- -0.5        # elasticidad de la demanda: ilustrativa
+cobertura <- 1    # la fracción de quienes buscan este piso que cobra la ayuda
+
+# La fracción de la entrada que el agente ha reunido cada año (el problema 43)
+ahorrar <- function(alquiler, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    ahorro <- ahorro * (1 + r) + (1 - consumo) * renta - alquiler
+    renta <- renta * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+
+# 1. La cuenta de la vieja: nadie reacciona y el alquiler no se mueve
+neto_vieja <- alquiler - ayuda
+
+# 2. El mercado: la demanda menos la oferta, si el casero cobra p euros al mes
+exceso <- function(p) {
+  con_ayuda <- ______                       # quienes cobran la ayuda miran lo que pagan de verdad
+  sin_ayuda <- 1 + ed * (p / alquiler - 1)  # quienes no la cobran miran p
+  demanda <- cobertura * con_ayuda + (1 - cobertura) * sin_ayuda
+  oferta <- 1 + es * (p / alquiler - 1)
+  demanda - oferta
+}
+p <- uniroot(exceso, c(alquiler, alquiler + ayuda), extendInt = "yes")$root  # el alquiler con el que se vacía el mercado
+
+# 3. La parte de la ayuda que se queda el casero, según la teoría
+incidencia <- function(es, ed) {
+  ______
+}
+
+netos <- c(sin_ayuda = alquiler, cuenta_de_la_vieja = neto_vieja, mercado = p - ayuda)
+x <- sapply(12 * netos, ahorrar)
+
+matplot(x, type = "l", lty = 1, lwd = 2, col = c("#c0392b", "#7f8c8d", "#2980b9"),
+        xlab = "Año", ylab = "Fracción de la entrada reunida")
+abline(h = 1, lty = 2)
+legend("topleft", names(netos), col = c("#c0392b", "#7f8c8d", "#2980b9"), lwd = 2, bty = "n")
+
+print(round(c(alquiler_de_mercado = p, cuota_del_casero = (p - alquiler) / ayuda,
+              incidencia = incidencia(es, ed)), 3))
+data.frame(alquiler_neto = round(netos),
+           maximo = round(apply(x, 2, max), 3),
+           anio_del_maximo = apply(x, 2, which.max),
+           escapa_en = apply(x, 2, function(v) which(v >= 1)[1]))
+```
+
+```{webr}
+#| exercise: ayuda
+#| solution: true
+renta <- 20000; precio <- 180000; consumo <- 0.55; k <- 0.3
+gp <- 0.07; gy <- 0.04; ga <- 0.04; r <- 0.02
+
+alquiler <- 600
+ayuda <- 250
+es <- 0.1
+ed <- -0.5
+cobertura <- 1
+
+ahorrar <- function(alquiler, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    ahorro <- ahorro * (1 + r) + (1 - consumo) * renta - alquiler
+    renta <- renta * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+
+neto_vieja <- alquiler - ayuda
+
+exceso <- function(p) {
+  con_ayuda <- 1 + ed * ((p - ayuda) / alquiler - 1)
+  sin_ayuda <- 1 + ed * (p / alquiler - 1)
+  demanda <- cobertura * con_ayuda + (1 - cobertura) * sin_ayuda
+  oferta <- 1 + es * (p / alquiler - 1)
+  demanda - oferta
+}
+p <- uniroot(exceso, c(alquiler, alquiler + ayuda), extendInt = "yes")$root
+
+incidencia <- function(es, ed) {
+  abs(ed) / (es + abs(ed))
+}
+
+netos <- c(sin_ayuda = alquiler, cuenta_de_la_vieja = neto_vieja, mercado = p - ayuda)
+x <- sapply(12 * netos, ahorrar)
+
+matplot(x, type = "l", lty = 1, lwd = 2, col = c("#c0392b", "#7f8c8d", "#2980b9"),
+        xlab = "Año", ylab = "Fracción de la entrada reunida")
+abline(h = 1, lty = 2)
+legend("topleft", names(netos), col = c("#c0392b", "#7f8c8d", "#2980b9"), lwd = 2, bty = "n")
+
+print(round(c(alquiler_de_mercado = p, cuota_del_casero = (p - alquiler) / ayuda,
+              incidencia = incidencia(es, ed)), 3))
+data.frame(alquiler_neto = round(netos),
+           maximo = round(apply(x, 2, max), 3),
+           anio_del_maximo = apply(x, 2, which.max),
+           escapa_en = apply(x, 2, function(v) which(v >= 1)[1]))
+```
+
+```{webr}
+#| exercise: ayuda
+#| check: true
+# exceso() se comprueba con un mercado propio (otro alquiler, otra ayuda, otras elasticidades,
+# media cobertura), e incidencia() con elasticidades propias: el alumno puede cambiar las suyas.
+e <- .envir_result
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+prueba <- list(alquiler = 500, ayuda = 100, es = 0.5, ed = -1, cobertura = 0.5)
+exceso_prueba <- function(f, p) {
+  environment(f) <- list2env(prueba, parent = environment(f))
+  f(p)
+}
+if (!is.function(e$exceso) || !is.function(e$incidencia)) {
+  list(correct = FALSE, message = "No encuentro exceso() o incidencia().")
+} else if (!isTRUE(all.equal(c(exceso_prueba(e$exceso, 550), exceso_prueba(e$exceso, 520)), c(-0.05, 0.04)))) {
+  list(correct = FALSE, message = paste0(
+    "En un mercado de prueba (alquiler de 500 euros, ayuda de 100, es = 0,5, ed = -1, la mitad cobra la ayuda), ",
+    "exceso(550) debería dar -0,050, y da ", coma(exceso_prueba(e$exceso, 550)), ". ",
+    "Quien cobra la ayuda decide con lo que le cuesta el piso a él: lo que cobra el casero menos la ayuda."))
+} else if (!isTRUE(all.equal(e$incidencia(c(0.5, 1), c(-1.5, -0.25)), c(0.75, 0.2)))) {
+  list(correct = FALSE, message = paste0(
+    "incidencia(0.5, -1.5) debería dar 0,750, y da ", coma(e$incidencia(0.5, -1.5)), ". ",
+    "Es la parte de la ayuda que acaba en el alquiler: cuanto más rígida la oferta, mayor. Cuidado con el signo de ed."))
+} else {
+  r <- .result
+  cuota <- (e$p - e$alquiler) / e$ayuda
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El casero se queda ", round(e$p - e$alquiler), " de los ", e$ayuda, " euros de la ayuda (",
+    round(100 * cuota), "%). Con la cuenta de la vieja, el ahorro llega al ", round(100 * r$maximo[2]),
+    "% de la entrada; con el mercado, al ", round(100 * r$maximo[3]), "%, y sin ayuda, al ", round(100 * r$maximo[1]), "%."))
+}
+```
+
+::: {.hint exercise="ayuda"}
+`con_ayuda` es la misma recta que `sin_ayuda`, pero con lo que paga de verdad quien cobra la ayuda en lugar de `p`. Para la incidencia, escribe la fórmula del enunciado; `abs()` quita el signo a `ed`.
+:::
+
+::: {.solution exercise="ayuda"}
+`con_ayuda <- 1 + ed * ((p - ayuda) / alquiler - 1)` en `exceso()`, y `abs(ed) / (es + abs(ed))` en `incidencia()`.
+:::
+:::
+
+::::
