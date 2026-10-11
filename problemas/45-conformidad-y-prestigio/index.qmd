@@ -1,0 +1,185 @@
+---
+title: "Por qué una buena idea no se extiende sola"
+numero: 45
+nivel: 2
+duracion: "30 min"
+lectura: "[Boyd y Richerson (1985)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2007mathematical)"
+dificultad: "Intermedio"
+categories: [equilibrios y dinámica]
+description: "Copiar a la mayoría frena las novedades, buenas o malas; copiar al famoso las empuja, también las malas."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Las ideas no se copian solo por lo que valen. Robert Boyd y Peter Richerson distinguieron en 1985 varios sesgos de transmisión: unas ideas se adoptan por su contenido, porque funcionan mejor; otras por **conformidad**, porque las tiene la mayoría; y otras por **prestigio**, porque las defiende alguien admirado. Joel Mokyr usa ese marco para explicar la Revolución Industrial: Bacon y Newton fueron *emprendedores culturales*, modelos de prestigio cuya forma de entender el conocimiento útil acabó copiando media Europa.
+
+En una población, una fracción $p$ tiene la idea nueva. Cada generación, quien aprende prefiere la idea que funciona mejor, y la nueva tiene una ventaja $s$ sobre la vieja (negativa si es peor); además, tiende a quedarse con la de la mayoría, con una fuerza $D$. En el modelo de Boyd y Richerson, la fracción de la generación siguiente es
+
+$$p' = p + s\,p(1-p) + D\,p(1-p)(2p-1).$$
+
+El último término frena la idea mientras es minoritaria ($p < 1/2$) y la empuja cuando es mayoritaria. Con conformidad, hay un umbral $p^*$ en el que los dos sesgos se equilibran: por debajo, la idea se pierde; por encima, se impone.
+
+El prestigio entra así: durante las primeras $T$ generaciones, una fracción $w$ de la población copia directamente al modelo de prestigio, que tiene la idea nueva, y el resto aprende como antes.
+
+**Tu tarea.**
+
+1. Completa `conformidad()`: la fracción con la idea nueva en la generación siguiente.
+2. Completa `umbral()`: la $p^*$ en la que $s + D(2p - 1) = 0$, con conformidad mayor que la ventaja ($D > |s|$).
+3. Mira la tabla: cinco escenarios, todos con la idea nueva en el 1% de la población, durante 100 generaciones, con cifras redondas e inventadas. ¿Cuándo se impone una idea buena, y cuándo una mala?
+4. El gráfico sigue los cinco escenarios, con los umbrales de la idea buena y de la mala en gris.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin conformidad, la idea buena se abre paso sola, pero despacio: en 100 generaciones llega al 58%. Con conformidad ($D = 0{,}1$), la misma idea desaparece, porque su ventaja ($s = 0{,}05$) es menor que el freno de ser minoritaria. Su umbral es $p^* = 0{,}25$: tiene que llegar a una cuarta parte de la población para que la conformidad deje de frenarla y empiece a empujarla.
+
+Ahí entra el prestigio. Basta con que un 5% copie al modelo durante 10 generaciones para que la idea pase del 25%, y desde entonces la conformidad hace el resto: en la generación 100 la tiene toda la población, aunque el modelo de prestigio ya no esté. Es el mecanismo de Mokyr en miniatura: los emprendedores culturales no tienen que convencer a todos, solo empujar la idea más allá del umbral.
+
+El mismo empujón no basta para una idea peor ($s = -0{,}05$), cuyo umbral es 0,75: la conformidad, que frena las novedades, también protege de las malas. Pero un prestigio más fuerte, un 10% durante 20 generaciones, la lleva más allá del 75%, y entonces la conformidad la fija igual que fijaba la buena: en la generación 100 la tiene el 99%. Copiar al famoso acelera las ideas, buenas o malas, y copiar a la mayoría las congela donde estén.
+
+El modelo deja fuera casi todo: el prestigio de quién, ganado cómo, y por qué unas élites fueron receptivas al conocimiento útil y otras no, que es la parte histórica del argumento de Mokyr. Lo que muestra es que los dos sesgos juntos producen umbrales, y que con umbrales una minoría influyente puede cambiar una población entera.
+
+Boyd, R. y Richerson, P. J. (1985). *Culture and the Evolutionary Process*. University of Chicago Press.
+
+Henrich, J. y Gil-White, F. J. (2001). The evolution of prestige: Freely conferred deference as a mechanism for enhancing the benefits of cultural transmission. *Evolution and Human Behavior*, 22(3), 165–196.
+
+Mokyr, J. (2016). *A Culture of Growth: The Origins of the Modern Economy*. Princeton University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: conformidad
+#| caption: "Tu código"
+# 1. Una generación: ventaja de contenido s y conformidad D
+conformidad <- function(p, s, D) {
+  ______
+}
+
+# 2. La fracción en la que la conformidad deja de frenar la idea y empieza a empujarla
+umbral <- function(s, D) {
+  ______
+}
+
+# Una población durante n generaciones; en las T primeras, una fracción w copia al modelo de prestigio
+trayectoria <- function(s, D, w = 0, T = 0, p0 = 0.01, n = 100) {
+  p <- numeric(n)
+  x <- p0
+  for (t in 1:n) {
+    copia <- if (t <= T) w else 0
+    x <- (1 - copia) * conformidad(x, s, D) + copia
+    p[t] <- x
+  }
+  p
+}
+
+# 3. Cinco escenarios
+casos <- data.frame(
+  escenario = c("buena, sin conformidad", "buena, con conformidad", "buena, prestigio débil",
+                "mala, prestigio débil", "mala, prestigio fuerte"),
+  s = c(0.05, 0.05, 0.05, -0.05, -0.05),
+  D = c(0, 0.1, 0.1, 0.1, 0.1),
+  w = c(0, 0, 0.05, 0.05, 0.1),
+  T = c(0, 0, 10, 10, 20)
+)
+p <- mapply(trayectoria, casos$s, casos$D, casos$w, casos$T)  # una columna por escenario
+casos$final <- p[100, ]
+casos$umbral <- ifelse(casos$D > 0, umbral(casos$s, casos$D), NA)
+
+# 4. Las cinco trayectorias
+matplot(p, type = "l", lty = 1, lwd = 2, col = 1:5, ylim = c(0, 1),
+        xlab = "Generación", ylab = "Fracción con la idea nueva")
+abline(h = c(0.25, 0.75), lty = 2, col = "grey")
+legend("right", casos$escenario, col = 1:5, lwd = 2, bty = "n", cex = 0.8)
+
+casos$final <- round(casos$final, 2)
+casos
+```
+
+```{webr}
+#| exercise: conformidad
+#| solution: true
+conformidad <- function(p, s, D) {
+  p + s * p * (1 - p) + D * p * (1 - p) * (2 * p - 1)
+}
+
+umbral <- function(s, D) {
+  (1 - s / D) / 2
+}
+
+trayectoria <- function(s, D, w = 0, T = 0, p0 = 0.01, n = 100) {
+  p <- numeric(n)
+  x <- p0
+  for (t in 1:n) {
+    copia <- if (t <= T) w else 0
+    x <- (1 - copia) * conformidad(x, s, D) + copia
+    p[t] <- x
+  }
+  p
+}
+
+casos <- data.frame(
+  escenario = c("buena, sin conformidad", "buena, con conformidad", "buena, prestigio débil",
+                "mala, prestigio débil", "mala, prestigio fuerte"),
+  s = c(0.05, 0.05, 0.05, -0.05, -0.05),
+  D = c(0, 0.1, 0.1, 0.1, 0.1),
+  w = c(0, 0, 0.05, 0.05, 0.1),
+  T = c(0, 0, 10, 10, 20)
+)
+p <- mapply(trayectoria, casos$s, casos$D, casos$w, casos$T)
+casos$final <- p[100, ]
+casos$umbral <- ifelse(casos$D > 0, umbral(casos$s, casos$D), NA)
+
+matplot(p, type = "l", lty = 1, lwd = 2, col = 1:5, ylim = c(0, 1),
+        xlab = "Generación", ylab = "Fracción con la idea nueva")
+abline(h = c(0.25, 0.75), lty = 2, col = "grey")
+legend("right", casos$escenario, col = 1:5, lwd = 2, bty = "n", cex = 0.8)
+
+casos$final <- round(casos$final, 2)
+casos
+```
+
+```{webr}
+#| exercise: conformidad
+#| check: true
+# Las dos funciones se comprueban con casos propios, que separan el término de contenido
+# del de conformidad: así el alumno puede cambiar los escenarios sin que deje de valer.
+e <- .envir_result
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$conformidad) || !is.function(e$umbral)) {
+  list(correct = FALSE, message = "No encuentro conformidad() o umbral().")
+} else if (!isTRUE(all.equal(e$conformidad(0.5, 0.1, 0.3), 0.525))) {
+  list(correct = FALSE, message = paste0(
+    "Con p = 0,5, la conformidad no empuja hacia ningún lado, y conformidad(0.5, s = 0.1, D = 0.3) debería dar 0,525 ",
+    "(0,5 más la ventaja de contenido), y da ", coma(e$conformidad(0.5, 0.1, 0.3)), ". Revisa el término s * p * (1 - p)."))
+} else if (!isTRUE(all.equal(e$conformidad(c(0.2, 0.8), 0, 0.3), c(0.1712, 0.8288)))) {
+  list(correct = FALSE, message = paste0(
+    "Sin ventaja de contenido, conformidad(0.2, s = 0, D = 0.3) debería bajar a 0,171, porque la idea es minoritaria, ",
+    "y da ", coma(e$conformidad(0.2, 0, 0.3)), ". El término de conformidad es D * p * (1 - p) * (2 * p - 1)."))
+} else if (!isTRUE(all.equal(e$umbral(c(0.05, -0.1), c(0.2, 0.2)), c(0.375, 0.75)))) {
+  list(correct = FALSE, message = paste0(
+    "umbral(0.05, 0.2) debería dar 0,375, y da ", coma(e$umbral(0.05, 0.2)),
+    ". Es la p con la que s + D * (2 * p - 1) vale 0: despeja p."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con conformidad, la idea buena se pierde (", coma(r$final[2], 2), ") hasta que el prestigio la empuja más allá de ",
+    coma(r$umbral[3], 2), ", y entonces se impone (", coma(r$final[3], 2), "). La mala necesita pasar de ", coma(r$umbral[5], 2),
+    ", y con prestigio fuerte también se impone (", coma(r$final[5], 2), ")."))
+}
+```
+
+::: {.hint exercise="conformidad"}
+La fórmula del enunciado se escribe tal cual en R: `p * (1 - p)` es la varianza del rasgo, y `(2 * p - 1)` cambia de signo cuando la idea pasa de minoritaria a mayoritaria. Para el umbral, iguala $s + D(2p - 1)$ a 0 y despeja $p$.
+:::
+
+::: {.solution exercise="conformidad"}
+`p + s * p * (1 - p) + D * p * (1 - p) * (2 * p - 1)` en `conformidad()`, y `(1 - s / D) / 2` en `umbral()`.
+:::
+:::
+
+::::
