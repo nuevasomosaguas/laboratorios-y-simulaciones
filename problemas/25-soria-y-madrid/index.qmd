@@ -3,7 +3,7 @@ title: "Soria y Madrid"
 numero: 25
 nivel: 2
 duracion: "30 min"
-lectura: "[Taagepera (2007)](https://nuevasomosaguas.github.io/biblioteca.html#taagepera2007predicting)"
+lectura: "[Taagepera (2007)](https://nuevasomosaguas.github.io/biblioteca.html#taagepera2008making)"
 dificultad: "Intermedio"
 categories: [juegos y votación]
 description: "Cincuenta y dos circunscripciones, la ley D'Hondt y una fórmula de una línea que predice cuántos partidos caben en el Congreso sin mirar un solo voto."

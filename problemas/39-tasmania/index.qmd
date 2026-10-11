@@ -3,7 +3,7 @@ title: "Por qué Tasmania perdió tecnología"
 numero: 39
 nivel: 2
 duracion: "30 min"
-lectura: "[Henrich (2016)](https://nuevasomosaguas.github.io/biblioteca.html#henrich2016secret)"
+lectura: "[Henrich (2016)](https://nuevasomosaguas.github.io/biblioteca.html#mesoudi2011cultural)"
 dificultad: "Intermedio"
 categories: [demografía, equilibrios y dinámica]
 description: "Si todos imitan al mejor y nadie lo copia del todo bien, una población pequeña olvida lo que sabía hacer."

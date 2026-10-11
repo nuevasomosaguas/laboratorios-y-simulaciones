@@ -3,7 +3,7 @@ title: "¿Cuántas generaciones dura la cuna?"
 numero: 37
 nivel: 1
 duracion: "25 min"
-lectura: "[Stachurski (2009)](https://nuevasomosaguas.github.io/biblioteca.html#stachurski2009economic)"
+lectura: "[Stachurski (2009)](https://nuevasomosaguas.github.io/biblioteca.html#strogatz2015nonlinear)"
 semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
 dificultad: "Iniciación"
 categories: [desigualdad, equilibrios y dinámica]
