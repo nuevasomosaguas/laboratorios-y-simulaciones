@@ -16,7 +16,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En [la revolución que nadie vio venir](../06-kuran/index.qmd), el 70 % de la población rechaza el régimen en privado, pero nadie lo dice en público. Una encuesta no arregla nada: si el encuestador pregunta «¿rechaza usted el régimen?», la gente le contesta lo mismo que diría en la plaza. La encuesta mide lo que se dice, no lo que se piensa.
+En [la revolución que nadie vio venir](../06-kuran/index.qmd), el 70% de la población rechaza el régimen en privado, pero nadie lo dice en público. Una encuesta no arregla nada: si el encuestador pregunta «¿rechaza usted el régimen?», la gente le contesta lo mismo que diría en la plaza. La encuesta mide lo que se dice, no lo que se piensa.
 
 En 1965, Stanley Warner propuso una salida: que el encuestador no sepa qué pregunta está contestando cada persona. El encuestado tira un dado a escondidas. Si sale del 1 al 4, con probabilidad $p = 2/3$, contesta sí o no a la afirmación A, «rechazo el régimen»; si sale 5 o 6, a la afirmación B, «apoyo el régimen». Un «sí» no delata a nadie, porque puede ser un opositor al que le tocó A o un partidario al que le tocó B.
 
@@ -35,9 +35,9 @@ El encuestador no sabe quién contestó a qué, pero conoce $p$, y de ahí puede
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El dado funciona: la media de las 2000 estimaciones es 0,699, y el 70 % que la encuesta directa no vería aparece. Pero sale caro. El error típico pasa de 0,015 a 0,047, y la varianza se multiplica por 10,1: para saber lo mismo que con 1000 respuestas sinceras, hacen falta unas 10 000 con el dado.
+El dado funciona: la media de las 2000 estimaciones es 0,699, y el 70% que la encuesta directa no vería aparece. Pero sale caro. El error típico pasa de 0,015 a 0,047, y la varianza se multiplica por 10,1: para saber lo mismo que con 1000 respuestas sinceras, hacen falta unas 10 000 con el dado.
 
-La tarea 3 muestra el dilema. Con `p <- 0.9` el coste baja a 1,7, pero un «sí» ya casi delata: el 95 % de quienes lo dicen son opositores, frente al 70 % de cualquiera, y la gente vuelve a tener motivos para mentir. Con `p <- 0.5`, una moneda, nadie queda delatado porque la respuesta no dice nada: $\lambda$ vale 0,5 sea cual sea $\pi$, el denominador de `estimar()` es cero y no hay estimación posible. La privacidad y la información son la misma cosa vista desde dos lados.
+La tarea 3 muestra el dilema. Con `p <- 0.9` el coste baja a 1,7, pero un «sí» ya casi delata: el 95% de quienes lo dicen son opositores, frente al 70% de cualquiera, y la gente vuelve a tener motivos para mentir. Con `p <- 0.5`, una moneda, nadie queda delatado porque la respuesta no dice nada: $\lambda$ vale 0,5 sea cual sea $\pi$, el denominador de `estimar()` es cero y no hay estimación posible. La privacidad y la información son la misma cosa vista desde dos lados.
 
 Es la ficha de Kuran en la biblioteca: la falsificación de preferencias separa lo que se desea de lo que se dice desear, y la respuesta aleatorizada y los experimentos de listas son las herramientas para medir la distancia entre los dos.
 
@@ -113,12 +113,12 @@ c(media = mean(estimaciones),
 f <- .envir_result$estimar
 e <- .envir_result
 coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
-si <- c(TRUE, TRUE, TRUE, FALSE, FALSE)  # 60 % de síes
+si <- c(TRUE, TRUE, TRUE, FALSE, FALSE)  # 60% de síes
 if (!is.function(f)) {
   list(correct = FALSE, message = "No encuentro la función estimar().")
 } else if (!isTRUE(all.equal(f(si, 0.8), 2/3))) {
   list(correct = FALSE, message = paste0(
-    "Con un 60 % de síes y p = 0,8, estimar() debería dar 0,667, y da ", coma(f(si, 0.8), 3),
+    "Con un 60% de síes y p = 0,8, estimar() debería dar 0,667, y da ", coma(f(si, 0.8), 3),
     ". Despeja π de λ = p·π + (1 − p)(1 − π), con λ = mean(si)."))
 } else if (!isTRUE(all.equal(f(si, 0.25), 0.3))) {
   list(correct = FALSE, message = "estimar() acierta con p = 0,8 pero no con p = 0,25. ¿Has despejado π con la fórmula general?")
@@ -133,9 +133,9 @@ if (!is.function(f)) {
     "¡Correcto! Con p = ", coma(e$p, 1), " no hay estimación posible: el denominador 2p − 1 es cero, y la respuesta no dice nada sobre lo que piensa nadie."))
 } else {
   list(correct = TRUE, message = paste0(
-    "¡Correcto! El dado recupera el ", round(100 * .result[["media"]]), " % que la encuesta directa no vería, pero con ",
+    "¡Correcto! El dado recupera el ", round(100 * .result[["media"]]), "% que la encuesta directa no vería, pero con ",
     coma(.result[["coste"]], 1), " veces más varianza. Y quien dice «sí» es opositor con una probabilidad del ",
-    round(100 * .result[["sospecha"]]), " %, frente al ", round(100 * e$privado), " % de cualquiera."))
+    round(100 * .result[["sospecha"]]), "%, frente al ", round(100 * e$privado), "% de cualquiera."))
 }
 ```
 

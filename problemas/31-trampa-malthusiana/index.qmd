@@ -29,13 +29,13 @@ Cada año, la población crece a la tasa $(b - d)/1000$.
 
 1. Completa la línea de `simular()` que calcula la población del año siguiente.
 2. Completa `y_eq`, el salario de equilibrio, en el que los nacimientos igualan a las muertes. `uniroot()` busca el cero de una función.
-3. En el año 201, la técnica mejora un 20 %. Mira las dos gráficas: ¿qué pasa con la renta? ¿Y con la población? Prueba después a doblar `A` en lugar de subirla un 20 %.
+3. En el año 201, la técnica mejora un 20%. Mira las dos gráficas: ¿qué pasa con la renta? ¿Y con la población? Prueba después a doblar `A` en lugar de subirla un 20%.
 4. Vuelve a 3,6 y haz que se muera más a cualquier renta, con ciudades insalubres o guerras: `muertes <- function(y) 60 - 20 * y`. ¿Qué le pasa ahora al salario de equilibrio?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La mejora técnica sube la renta de 1 a 1,2 de golpe, pero la renta alta hace que nazca más gente y muera menos, y la población crece hasta que la renta vuelve a 1. Unos 190 años después de la mejora ya está a menos de un 1 % del equilibrio. Al final, la población ha pasado de 9 a 12,95 millones, y nadie vive mejor. El salario de equilibrio sale de igualar $b(y) = d(y)$, una ecuación en la que $A$ no aparece: la tecnología decide cuánta gente hay, no cómo vive.
+La mejora técnica sube la renta de 1 a 1,2 de golpe, pero la renta alta hace que nazca más gente y muera menos, y la población crece hasta que la renta vuelve a 1. Unos 190 años después de la mejora ya está a menos de un 1% del equilibrio. Al final, la población ha pasado de 9 a 12,95 millones, y nadie vive mejor. El salario de equilibrio sale de igualar $b(y) = d(y)$, una ecuación en la que $A$ no aparece: la tecnología decide cuánta gente hay, no cómo vive.
 
 La tarea 4 es la paradoja que Clark pone en el centro del libro. Si se muere más a cualquier renta, el salario de equilibrio sube a 1,17: la población es menor y cada cual tiene más tierra. En el mundo malthusiano, los vicios eran virtudes. Las guerras, la peste y la suciedad de las ciudades subían el nivel de vida, y la higiene y la paz lo bajaban. Clark explica así, en parte, por qué la Inglaterra preindustrial, sucia y enferma, vivía mejor que el Japón de la época, mucho más limpio. Bajar los nacimientos, casándose más tarde, tiene el mismo efecto sin tanto sufrimiento.
 
@@ -66,7 +66,7 @@ simular <- function(A, N0) {
   data.frame(ano = seq_along(A), N = N, y = renta(N, A))
 }
 
-A <- rep(c(3, 3.6), c(200, 400))  # en el año 201, la técnica mejora un 20 %
+A <- rep(c(3, 3.6), c(200, 400))  # en el año 201, la técnica mejora un 20%
 s <- simular(A, N0 = 9)
 
 # El salario de equilibrio: los nacimientos igualan a las muertes

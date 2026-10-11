@@ -29,7 +29,7 @@ donde $\varphi$ es la densidad normal, `dnorm()`, y $1 - \Phi(z)$ es justamente 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con un acceso del 20 %, la media de los que entran es 1,40 desviaciones típicas; con un 80 %, 0,35. El profesor tiene razón en lo que ve y se equivoca en la causa: nadie ha empeorado, ha cambiado quién entra. Es un *efecto composición*.
+Con un acceso del 20%, la media de los que entran es 1,40 desviaciones típicas; con un 80%, 0,35. El profesor tiene razón en lo que ve y se equivoca en la causa: nadie ha empeorado, ha cambiado quién entra. Es un *efecto composición*.
 
 Y hay algo más raro: la media de los que se quedan fuera también baja, de −0,35 a −1,40. Los que pasan de un grupo al otro están por debajo de la media de los que ya estaban dentro, y por encima de la de los que se quedan fuera, así que las dos medias bajan a la vez, aunque la media de todos siga en 0. En medicina se llama *fenómeno de Will Rogers*: con mejores pruebas diagnósticas, enfermos leves pasan al grupo de los graves, y la supervivencia de los dos grupos mejora sin que nadie viva más.
 

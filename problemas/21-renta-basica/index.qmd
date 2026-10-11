@@ -6,7 +6,7 @@ duracion: "20 min"
 lectura: "Dalton (1920)"
 dificultad: "Iniciación"
 categories: [desigualdad]
-description: "Subir todas las rentas un 10 % no cambia el Gini; dar 1000 euros a cada hogar, sí. Y un impuesto proporcional con renta básica lo reduce exactamente en su tipo."
+description: "Subir todas las rentas un 10% no cambia el Gini; dar 1000 euros a cada hogar, sí. Y un impuesto proporcional con renta básica lo reduce exactamente en su tipo."
 page-layout: full
 # Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
 engine: markdown
@@ -17,9 +17,9 @@ engine: markdown
 ::: {.enunciado}
 Un país **imaginario** tiene 5000 hogares con rentas **simuladas**, que no corresponden a ningún país real. Su gobierno estudia varias políticas y quiere saber qué le hace cada una al índice de Gini:
 
-- **Crecimiento proporcional:** todas las rentas suben un 10 %.
+- **Crecimiento proporcional:** todas las rentas suben un 10%.
 - **Cheque igual:** cada hogar recibe 1000 euros.
-- **Renta básica:** un impuesto proporcional del 30 % sobre todas las rentas, y lo recaudado se reparte a partes iguales. Cada hogar acaba con $(1 - t)\,x + t\,\mu$.
+- **Renta básica:** un impuesto proporcional del 30% sobre todas las rentas, y lo recaudado se reparte a partes iguales. Cada hogar acaba con $(1 - t)\,x + t\,\mu$.
 - **Transferencia de Pigou-Dalton:** el hogar más rico da 1000 euros al más pobre.
 
 **Tu tarea.** Completa `renta_basica()` y `transferencia()`. El código calcula el Gini antes y después de cada política. ¿Cuál lo cambia, y cuánto?
@@ -27,9 +27,9 @@ Un país **imaginario** tiene 5000 hogares con rentas **simuladas**, que no corr
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El Gini de partida es 0,440. Subir todas las rentas un 10 % lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
+El Gini de partida es 0,440. Subir todas las rentas un 10% lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
 
-La renta básica lo reduce exactamente al 70 %, de 0,440 a 0,308, y no por casualidad: el impuesto proporcional, por sí solo, no cambia el Gini, como el crecimiento proporcional; lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
+La renta básica lo reduce exactamente al 70%, de 0,440 a 0,308, y no por casualidad: el impuesto proporcional, por sí solo, no cambia el Gini, como el crecimiento proporcional; lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
 
 La transferencia del más rico al más pobre apenas lo mueve, en el quinto decimal, pero lo baja. Es el *principio de Pigou-Dalton*: toda transferencia de un rico a un pobre que no invierta su orden debe reducir la desigualdad. Cualquier medida razonable lo cumple, y el Gini también.
 
@@ -109,7 +109,7 @@ if (!is.function(e$renta_basica) || !is.function(e$transferencia)) {
   list(correct = FALSE, message = "No encuentro renta_basica() o transferencia().")
 } else if (!isTRUE(all.equal(e$renta_basica(c(10, 20, 30), 0.5), c(15, 20, 25)))) {
   list(correct = FALSE, message = paste0(
-    "Con rentas 10, 20 y 30 y un tipo del 50 %, cada hogar paga la mitad y recibe la mitad de la media, 10: quedan 15, 20 y 25. renta_basica() da ",
+    "Con rentas 10, 20 y 30 y un tipo del 50%, cada hogar paga la mitad y recibe la mitad de la media, 10: quedan 15, 20 y 25. renta_basica() da ",
     toString(e$renta_basica(c(10, 20, 30), 0.5)), "."))
 } else if (!isTRUE(all.equal(sum(e$renta_basica(c(3, 8, 40, 1), 0.3)), 52))) {
   list(correct = FALSE, message = "renta_basica() no reparte exactamente lo recaudado: la renta total tiene que ser la misma antes y después.")
@@ -123,7 +123,7 @@ if (!is.function(e$renta_basica) || !is.function(e$transferencia)) {
   coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
   list(correct = TRUE, message = paste0(
     "¡Correcto! El Gini pasa de ", coma(.result[["inicial"]]), " a ", coma(.result[["renta_basica_30"]]),
-    " con la renta básica, exactamente el 70 %. Subir todo un 10 % no lo mueve; el cheque igual lo baja a ",
+    " con la renta básica, exactamente el 70%. Subir todo un 10% no lo mueve; el cheque igual lo baja a ",
     coma(.result[["cheque_1000"]]), "."))
 }
 ```

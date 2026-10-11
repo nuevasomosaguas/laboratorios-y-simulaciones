@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En 1881, el astrónomo Simon Newcomb notó que las primeras páginas de las tablas de logaritmos estaban mucho más gastadas que las últimas. En 1938, el físico Frank Benford lo comprobó con veinte mil números de todo tipo: en muchos conjuntos de datos reales, el primer dígito es un 1 en el 30 % de los casos y un 9 en menos del 5 %. La *ley de Benford* da la proporción de cada primer dígito:
+En 1881, el astrónomo Simon Newcomb notó que las primeras páginas de las tablas de logaritmos estaban mucho más gastadas que las últimas. En 1938, el físico Frank Benford lo comprobó con veinte mil números de todo tipo: en muchos conjuntos de datos reales, el primer dígito es un 1 en el 30% de los casos y un 9 en menos del 5%. La *ley de Benford* da la proporción de cada primer dígito:
 
 $$P(d) = \log_{10}\left(1 + \frac{1}{d}\right), \qquad d = 1, \dots, 9.$$
 
@@ -55,7 +55,7 @@ poblaciones <- round(rlnorm(5000, meanlog = 7, sdlog = 2))
 poblaciones <- poblaciones[poblaciones >= 1]
 inventados <- sample(100:999, 5000, replace = TRUE)
 electores <- sample(300:700, 5000, replace = TRUE)
-votos <- rbinom(5000, electores, 0.7 * 0.45)  # participación del 70 %; el partido saca el 45 %
+votos <- rbinom(5000, electores, 0.7 * 0.45)  # participación del 70%; el partido saca el 45%
 
 barplot(rbind(benford, frecuencias(poblaciones), frecuencias(inventados), frecuencias(votos)),
         beside = TRUE, names.arg = 1:9, col = c("grey30", "#18bc9c", "#2980b9", "#c0392b"),

@@ -56,8 +56,8 @@ Epstein, J. M. (2006). *Generative Social Science: Studies in Agent-Based Comput
 #| caption: "Tu código"
 lado <- 20          # una cuadrícula de 20 × 20 casillas, cerrada sobre sí misma
 vision <- 4         # cada cual ve hasta 4 casillas en cada dirección
-n_ciudadanos <- 280 # el 70 % de las casillas
-n_policias <- 16    # el 4 %
+n_ciudadanos <- 280 # el 70% de las casillas
+n_policias <- 16    # el 4%
 k <- 2.3            # con un policía y un rebelde a la vista, P = 0,9
 umbral <- 0.1
 max_carcel <- 30    # la condena, entre 1 y 30 periodos
@@ -142,8 +142,8 @@ c(antes = max(brusca[1:50]), pico_brusca = max(brusca), pico_gradual = max(gradu
 #| solution: true
 lado <- 20          # una cuadrícula de 20 × 20 casillas, cerrada sobre sí misma
 vision <- 4         # cada cual ve hasta 4 casillas en cada dirección
-n_ciudadanos <- 280 # el 70 % de las casillas
-n_policias <- 16    # el 4 %
+n_ciudadanos <- 280 # el 70% de las casillas
+n_policias <- 16    # el 4%
 k <- 2.3            # con un policía y un rebelde a la vista, P = 0,9
 umbral <- 0.1
 max_carcel <- 30    # la condena, entre 1 y 30 periodos

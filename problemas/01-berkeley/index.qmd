@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En el otoño de 1973, la Universidad de California en Berkeley admitió en sus estudios de posgrado al 44 % de los hombres que lo solicitaron y solo al 35 % de las mujeres. En sus seis departamentos más grandes, la diferencia era aún mayor: el 44,5 % frente al 30,4 %. Con una diferencia así, y miles de solicitudes, parece difícil no hablar de discriminación.
+En el otoño de 1973, la Universidad de California en Berkeley admitió en sus estudios de posgrado al 44% de los hombres que lo solicitaron y solo al 35% de las mujeres. En sus seis departamentos más grandes, la diferencia era aún mayor: el 44,5% frente al 30,4%. Con una diferencia así, y miles de solicitudes, parece difícil no hablar de discriminación.
 
 Bickel, Hammel y O'Connell (1975) miraron los datos departamento por departamento. La admisión la decidía cada departamento, no la universidad, así que es ahí donde habría que buscar el sesgo.
 

@@ -6,7 +6,7 @@ duracion: "35 min"
 lectura: "[Watts y Strogatz (1998)](https://nuevasomosaguas.github.io/biblioteca.html#watts1998collective)"
 dificultad: "Intermedio"
 categories: [modelos de agentes]
-description: "Basta con recablear un 1 % de los lazos para que la distancia media se reduzca a la mitad, y nadie nota que sus amigos ya no se conocen tanto."
+description: "Basta con recablear un 1% de los lazos para que la distancia media se reduzca a la mitad, y nadie nota que sus amigos ya no se conocen tanto."
 page-layout: full
 # Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
 engine: markdown
@@ -33,7 +33,7 @@ Dos números describen la red, y la matriz de adyacencia `A`, con un 1 en `A[i, 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El anillo de 200 personas con 6 vecinos cada una tiene un agrupamiento de 0,6 y una distancia media de 17,1 pasos. Con $p = 0{,}01$, unos seis lazos recableados de 600, la distancia media ya se ha quedado en la mitad, mientras que el agrupamiento conserva el 97 %. Con $p = 0{,}1$, la distancia es poco más de la cuarta parte y el agrupamiento aún conserva el 77 %. Hay todo un intervalo de $p$ en el que la red es a la vez local y pequeña: un *mundo pequeño*.
+El anillo de 200 personas con 6 vecinos cada una tiene un agrupamiento de 0,6 y una distancia media de 17,1 pasos. Con $p = 0{,}01$, unos seis lazos recableados de 600, la distancia media ya se ha quedado en la mitad, mientras que el agrupamiento conserva el 97%. Con $p = 0{,}1$, la distancia es poco más de la cuarta parte y el agrupamiento aún conserva el 77%. Hay todo un intervalo de $p$ en el que la red es a la vez local y pequeña: un *mundo pequeño*.
 
 La razón es que cada atajo acorta muchos caminos a la vez, los de todas las parejas que pasan cerca de sus dos extremos, mientras que solo rompe unos pocos triángulos, los del lazo que desaparece. Por eso la distancia cae mucho antes que el agrupamiento.
 
@@ -216,9 +216,9 @@ if (!is.function(e$agrupamiento) || !is.function(e$recablear)) {
   fila <- which.min(abs(.result$p - 0.01))
   list(correct = TRUE, message = paste0(
     "¡Correcto! Con p = ", coma(.result$p[fila], 3), ", la distancia media se queda en el ", round(100 * .result$L[fila]),
-    " % de la del anillo, y el agrupamiento conserva el ", round(100 * .result$C[fila]), " %. ",
-    "Con p = 1, la distancia es el ", round(100 * .result$L[nrow(.result)]), " % y el agrupamiento, el ",
-    round(100 * .result$C[nrow(.result)]), " %."))
+    "% de la del anillo, y el agrupamiento conserva el ", round(100 * .result$C[fila]), "%. ",
+    "Con p = 1, la distancia es el ", round(100 * .result$L[nrow(.result)]), "% y el agrupamiento, el ",
+    round(100 * .result$C[nrow(.result)]), "%."))
 }
 ```
 

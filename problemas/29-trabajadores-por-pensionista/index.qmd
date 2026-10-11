@@ -7,7 +7,7 @@ lectura: "[Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wac
 semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
 dificultad: "Intermedio"
 categories: [demografía, equilibrios y dinámica]
-description: "Una pensión que hoy cuesta el 7 % del salario costará el 17 %, y la cuenta ya está escrita en la tabla de vida."
+description: "Una pensión que hoy cuesta el 7% del salario costará el 17%, y la cuenta ya está escrita en la tabla de vida."
 page-layout: full
 # Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
 engine: markdown
@@ -18,7 +18,7 @@ engine: markdown
 ::: {.enunciado}
 Es la continuación de [la inercia demográfica](../28-inercia-demografica/index.qmd): el mismo país joven, con 4,5 hijos por mujer, cuya fecundidad cae de golpe al nivel de reemplazo. Allí mirábamos cuánta gente hay; aquí, de qué edad.
 
-El país funda un sistema de pensiones *de reparto*: los trabajadores de hoy pagan las pensiones de hoy. Si la pensión es el 60 % del salario, y suponemos que trabaja todo el mundo de 20 a 64 años y se jubila todo el mundo a los 65, la cuenta es sencilla. Lo que se paga, `pensionistas × 0,6 × salario`, tiene que ser lo que se cotiza, `trabajadores × cotización × salario`, así que
+El país funda un sistema de pensiones *de reparto*: los trabajadores de hoy pagan las pensiones de hoy. Si la pensión es el 60% del salario, y suponemos que trabaja todo el mundo de 20 a 64 años y se jubila todo el mundo a los 65, la cuenta es sencilla. Lo que se paga, `pensionistas × 0,6 × salario`, tiene que ser lo que se cotiza, `trabajadores × cotización × salario`, así que
 
 $$\text{cotización} = 0{,}6 \times \frac{\text{pensionistas}}{\text{trabajadores}}.$$
 
@@ -34,9 +34,9 @@ El cociente es la *tasa de dependencia*. Los políticos prometen la pensión; la
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Al principio, el país tiene 8,8 trabajadoras por cada pensionista, y la pensión del 60 % se paga con una cotización del 6,8 %. Es fácil prometer. Cuando la fecundidad cae al reemplazo, las generaciones grandes envejecen y, 65 años después, quedan 2,9 trabajadoras por pensionista y hace falta cotizar el 20,4 %. Después la tasa baja algo y se asienta en la de la población estacionaria: 3,5 trabajadoras por pensionista y una cotización del 17,1 %.
+Al principio, el país tiene 8,8 trabajadoras por cada pensionista, y la pensión del 60% se paga con una cotización del 6,8%. Es fácil prometer. Cuando la fecundidad cae al reemplazo, las generaciones grandes envejecen y, 65 años después, quedan 2,9 trabajadoras por pensionista y hace falta cotizar el 20,4%. Después la tasa baja algo y se asienta en la de la población estacionaria: 3,5 trabajadoras por pensionista y una cotización del 17,1%.
 
-Lo importante es la tarea 4. Con `tgf <- 3` el camino es otro, pero el destino es el mismo, porque la tasa de dependencia final solo depende de `L`, de cuánto se vive a cada edad. Es contabilidad actuarial: con la fecundidad en el reemplazo y sin migración, la cotización a la que se llega está escrita en la tabla de vida, y ninguna promesa la cambia. Lo que sí la cambia es mover la frontera dentro de esa tabla: jubilarse a los 70 baja la tasa de dependencia final de 0,28 a 0,18 y la cotización, al 10,8 %. Las otras palancas son la pensión, la inmigración y una fecundidad por encima del reemplazo.
+Lo importante es la tarea 4. Con `tgf <- 3` el camino es otro, pero el destino es el mismo, porque la tasa de dependencia final solo depende de `L`, de cuánto se vive a cada edad. Es contabilidad actuarial: con la fecundidad en el reemplazo y sin migración, la cotización a la que se llega está escrita en la tabla de vida, y ninguna promesa la cambia. Lo que sí la cambia es mover la frontera dentro de esa tabla: jubilarse a los 70 baja la tasa de dependencia final de 0,28 a 0,18 y la cotización, al 10,8%. Las otras palancas son la pensión, la inmigración y una fecundidad por encima del reemplazo.
 
 El modelo es una caricatura: no todo el mundo trabaja de 20 a 64 años, y con más paro la tasa de dependencia real es mayor. Pero la lógica es la del debate español: la generación del *baby boom* empieza a jubilarse y la esperanza de vida a los 65 sigue subiendo, y las dos cosas suben la cotización necesaria.
 
@@ -157,8 +157,8 @@ if (!is.function(f)) {
 } else {
   list(correct = TRUE, message = paste0(
     "¡Correcto! Se pasa de ", coma(1 / e$tasa[1]), " trabajadoras por pensionista a ", coma(1 / e$estacionaria),
-    ", y la cotización necesaria, del ", coma(100 * e$sustitucion * e$tasa[1]), " % al ",
-    coma(100 * e$sustitucion * e$estacionaria), " %, con una punta del ", coma(100 * e$sustitucion * max(e$tasa)), " %."))
+    ", y la cotización necesaria, del ", coma(100 * e$sustitucion * e$tasa[1]), "% al ",
+    coma(100 * e$sustitucion * e$estacionaria), "%, con una punta del ", coma(100 * e$sustitucion * max(e$tasa)), "%."))
 }
 ```
 

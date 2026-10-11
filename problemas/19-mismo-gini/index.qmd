@@ -23,12 +23,12 @@ con los parámetros elegidos a propósito para el ejercicio.
 
 El índice de Gini es el doble del área entre la diagonal y la curva de Lorenz, o lo que es lo mismo, $G = 1 - 2\int_0^1 L(p)\,dp$. Cuando no se sabe hacer la integral a mano, se aproxima con la regla del trapecio sobre una rejilla fina de valores de $p$.
 
-**Tu tarea.** Completa `gini_de_lorenz()`, que calcula el Gini de una curva de Lorenz por trapecios. El código lo aplica a los dos países y lo compara con otras tres medidas: la renta de la mitad más pobre, la del 10 % más rico y la *ratio de Palma*, lo que se lleva el 10 % más rico entre lo que se lleva el 40 % más pobre. ¿Qué país es más desigual?
+**Tu tarea.** Completa `gini_de_lorenz()`, que calcula el Gini de una curva de Lorenz por trapecios. El código lo aplica a los dos países y lo compara con otras tres medidas: la renta de la mitad más pobre, la del 10% más rico y la *ratio de Palma*, lo que se lleva el 10% más rico entre lo que se lleva el 40% más pobre. ¿Qué país es más desigual?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Los dos países tienen un Gini de 0,40, y sin embargo reparten la renta de forma muy distinta. En B, la mitad más pobre recibe más que en A, el 25,7 % frente al 22,9 %, y el 10 % más rico también, el 37,3 % frente al 29,5 %. Quien sale perdiendo en B son las clases medias. Las dos curvas de Lorenz se cruzan hacia $p = 0{,}66$.
+Los dos países tienen un Gini de 0,40, y sin embargo reparten la renta de forma muy distinta. En B, la mitad más pobre recibe más que en A, el 25,7% frente al 22,9%, y el 10% más rico también, el 37,3% frente al 29,5%. Quien sale perdiendo en B son las clases medias. Las dos curvas de Lorenz se cruzan hacia $p = 0{,}66$.
 
 Atkinson demostró en 1970 que, si dos curvas de Lorenz no se cruzan, todas las medidas razonables de desigualdad coinciden en cuál es más desigual. Si se cruzan, el orden depende de la medida, y cada medida encierra un juicio de valor sobre qué parte del reparto importa más: el Gini pesa sobre todo el centro; la ratio de Palma, solo los extremos. Ningún número único dice cuál de los dos países es más justo.
 
@@ -119,7 +119,7 @@ if (!is.function(f)) {
   coma <- function(v) format(v, nsmall = 3, decimal.mark = ",")
   list(correct = TRUE, message = paste0(
     "¡Correcto! Los dos países tienen un Gini de ", coma(.result["A", "gini"]),
-    ", y en B la mitad más pobre y el 10 % más rico reciben más que en A: pierde la clase media."))
+    ", y en B la mitad más pobre y el 10% más rico reciben más que en A: pierde la clase media."))
 }
 ```
 

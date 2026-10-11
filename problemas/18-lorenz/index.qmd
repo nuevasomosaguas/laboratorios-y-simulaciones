@@ -17,7 +17,7 @@ engine: markdown
 ::: {.enunciado}
 Un pueblo **inventado** tiene veinte hogares, con las rentas anuales, en miles de euros, del código de la derecha. Los datos no son de ningún sitio real: están hechos para el ejercicio.
 
-En 1905, el estadístico Max Lorenz propuso dibujar la desigualdad. Se ordenan los hogares de más pobre a más rico, y para cada proporción $p$ de los hogares más pobres se marca la proporción $L(p)$ de la renta total que reciben. Si todos ganasen lo mismo, la curva sería la diagonal: el 20 % más pobre tendría el 20 % de la renta. Cuanto más se aleja la curva de la diagonal, más desigual es el reparto.
+En 1905, el estadístico Max Lorenz propuso dibujar la desigualdad. Se ordenan los hogares de más pobre a más rico, y para cada proporción $p$ de los hogares más pobres se marca la proporción $L(p)$ de la renta total que reciben. Si todos ganasen lo mismo, la curva sería la diagonal: el 20% más pobre tendría el 20% de la renta. Cuanto más se aleja la curva de la diagonal, más desigual es el reparto.
 
 En 1912, Corrado Gini resumió esa distancia en un número: la diferencia absoluta media entre dos hogares cualesquiera, dividida por el doble de la renta media,
 
@@ -30,7 +30,7 @@ Vale 0 si todos ganan lo mismo y se acerca a 1 si un hogar se lo lleva todo. Y e
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El Gini del pueblo es 0,34, y el cálculo por el área da exactamente lo mismo. Los dos hogares más ricos, el 10 %, se llevan el 28,5 % de la renta: más que los diez más pobres, que reúnen el 27,4 %. La media, 21 900 euros, queda muy por encima de la mediana, 16 500: unos pocos hogares de renta alta tiran de ella hacia arriba.
+El Gini del pueblo es 0,34, y el cálculo por el área da exactamente lo mismo. Los dos hogares más ricos, el 10%, se llevan el 28,5% de la renta: más que los diez más pobres, que reúnen el 27,4%. La media, 21 900 euros, queda muy por encima de la mediana, 16 500: unos pocos hogares de renta alta tiran de ella hacia arriba.
 
 El Gini resume toda la curva en un número, y en ese resumen se pierde información: dos curvas muy distintas pueden tener el mismo Gini, como se ve en [el problema siguiente](../19-mismo-gini/index.qmd).
 
@@ -127,7 +127,7 @@ if (!is.function(e$lorenz) || !is.function(e$gini)) {
 } else {
   list(correct = TRUE, message = paste0(
     "¡Correcto! El Gini del pueblo es ", coma(.result[["gini"]]), ", igual que el doble del área. Los dos hogares más ricos se llevan el ",
-    coma(100 * .result[["dos_mas_ricos"]], 1), " % de la renta, y la mitad más pobre, el ", coma(100 * .result[["mitad_pobre"]], 1), " %."))
+    coma(100 * .result[["dos_mas_ricos"]], 1), "% de la renta, y la mitad más pobre, el ", coma(100 * .result[["mitad_pobre"]], 1), "%."))
 }
 ```
 

@@ -16,7 +16,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-El índice de Gini es una foto: dice cómo se reparte la renta hoy, no si los pobres de hoy son los hijos de los pobres de ayer. Para eso hay que seguir a las familias de una generación a la siguiente. La herramienta más sencilla es una *matriz de transición*: se reparte a los padres en quintiles de renta, del 20 % más pobre (Q1) al 20 % más rico (Q5), y se cuenta en qué quintil acaban sus hijos. La fila $i$ dice cómo se reparten los hijos de los padres del quintil $i$.
+El índice de Gini es una foto: dice cómo se reparte la renta hoy, no si los pobres de hoy son los hijos de los pobres de ayer. Para eso hay que seguir a las familias de una generación a la siguiente. La herramienta más sencilla es una *matriz de transición*: se reparte a los padres en quintiles de renta, del 20% más pobre (Q1) al 20% más rico (Q5), y se cuenta en qué quintil acaban sus hijos. La fila $i$ dice cómo se reparten los hijos de los padres del quintil $i$.
 
 Si cada generación repite la misma matriz $P$, las familias siguen una *cadena de Markov*. Una familia que empieza en Q1 tiene, en la generación siguiente, la distribución de la fila 1 de $P$; dentro de $t$ generaciones, la de la fila 1 de $P^t$. Con un vector fila de probabilidades $x$, un paso es $x \leftarrow x P$.
 
@@ -24,7 +24,7 @@ Las dos matrices de la derecha son **inventadas**: un país rígido, donde más 
 
 **Tu tarea.**
 
-1. Completa `generaciones()`: cuántas generaciones tarda una familia que empieza en el quintil `desde` en olvidar su origen. La distancia al olvido es la *distancia de variación total* entre su distribución y el reparto uniforme, el 20 % en cada quintil, y la familia ha olvidado su origen cuando baja de 0,05. Falta el paso de la cadena.
+1. Completa `generaciones()`: cuántas generaciones tarda una familia que empieza en el quintil `desde` en olvidar su origen. La distancia al olvido es la *distancia de variación total* entre su distribución y el reparto uniforme, el 20% en cada quintil, y la familia ha olvidado su origen cuando baja de 0,05. Falta el paso de la cadena.
 2. Completa `resumen()`: `lambda2` es el módulo del segundo autovalor de `P`. Los autovalores de `eigen()` vienen ordenados de mayor a menor módulo, y pueden ser complejos.
 3. Mira la tabla y el gráfico. ¿Cuál es la probabilidad de que el hijo de una familia de Q1 llegue a Q5? ¿Y el nieto?
 4. Prueba con una sociedad de castas, donde cada hijo hereda el quintil de sus padres: `resumen(diag(5))`.
@@ -32,9 +32,9 @@ Las dos matrices de la derecha son **inventadas**: un país rígido, donde más 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-A la larga, los dos países son igual de desiguales: cada quintil tiene el 20 % de las familias. No podría ser de otra manera, porque un quintil es, por definición, el 20 % de los hijos: cada columna de $P$ suma 1, igual que cada fila, y la distribución estacionaria es la uniforme. Por eso la distribución a largo plazo no dice nada de la movilidad. Lo que dice algo es la velocidad a la que se llega a ella.
+A la larga, los dos países son igual de desiguales: cada quintil tiene el 20% de las familias. No podría ser de otra manera, porque un quintil es, por definición, el 20% de los hijos: cada columna de $P$ suma 1, igual que cada fila, y la distribución estacionaria es la uniforme. Por eso la distribución a largo plazo no dice nada de la movilidad. Lo que dice algo es la velocidad a la que se llega a ella.
 
-En el país rígido, el hijo de una familia de Q1 tiene un 2 % de probabilidades de llegar a Q5, y el nieto, un 6,6 %. La familia tarda 6 generaciones en olvidar su origen, unos 150 años. En el país fluido, el hijo ya tiene un 12 %, el nieto un 18,2 %, y en 2 generaciones la cuna ya no importa. Las familias de Q3 olvidan antes en los dos países, en 3 y 1 generaciones, porque empiezan más cerca del centro.
+En el país rígido, el hijo de una familia de Q1 tiene un 2% de probabilidades de llegar a Q5, y el nieto, un 6,6%. La familia tarda 6 generaciones en olvidar su origen, unos 150 años. En el país fluido, el hijo ya tiene un 12%, el nieto un 18,2%, y en 2 generaciones la cuna ya no importa. Las familias de Q3 olvidan antes en los dos países, en 3 y 1 generaciones, porque empiezan más cerca del centro.
 
 La velocidad la marca el segundo autovalor: la distancia al reparto uniforme se encoge más o menos como $\lambda_2^t$. En el país rígido, $\lambda_2 = 0{,}62$, y $0{,}62^t$ baja de 0,05 hacia $t \approx 6$; en el fluido, $\lambda_2 = 0{,}21$, y basta con 2. En la sociedad de castas, $\lambda_2 = 1$: nada se olvida, y `generaciones()` devuelve `NA`. Por eso $1 - \lambda_2$ es uno de los índices de movilidad clásicos.
 
@@ -179,8 +179,8 @@ if (!is.function(e$generaciones) || !is.function(e$resumen)) {
     "¡Correcto! En el país rígido, λ₂ = ", coma(.result["rigido", "lambda2"]), " y la familia de Q1 tarda ",
     .result["rigido", "generaciones_Q1"], " generaciones en olvidar su origen; en el fluido, λ₂ = ",
     coma(.result["fluido", "lambda2"]), " y bastan ", .result["fluido", "generaciones_Q1"], ". ",
-    "El nieto de Q1 llega a Q5 con un ", coma(100 * .result["rigido", "nieto_Q1_a_Q5"], 1), " % frente a un ",
-    coma(100 * .result["fluido", "nieto_Q1_a_Q5"], 1), " %."))
+    "El nieto de Q1 llega a Q5 con un ", coma(100 * .result["rigido", "nieto_Q1_a_Q5"], 1), "% frente a un ",
+    coma(100 * .result["fluido", "nieto_Q1_a_Q5"], 1), "%."))
 }
 ```
 

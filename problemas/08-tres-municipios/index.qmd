@@ -1,5 +1,5 @@
 ---
-title: "Tres municipios, un mismo 20 %"
+title: "Tres municipios, un mismo 20%"
 numero: 8
 nivel: 1
 duracion: "25 min"
@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Tres municipios ofrecen el mismo curso gratuito de formación a sus parados, y en los tres se apunta solo el 20 %. El curso es igual de útil en todas partes: a quien lo hace le sirve, de verdad, en un 0,7.
+Tres municipios ofrecen el mismo curso gratuito de formación a sus parados, y en los tres se apunta solo el 20%. El curso es igual de útil en todas partes: a quien lo hace le sirve, de verdad, en un 0,7.
 
 Según el esquema DBO de Hedström, una acción se explica por tres componentes: los *deseos*, las *creencias* y las *oportunidades*. Aquí, cada parado se apunta si su deseo de formarse multiplicado por su creencia en que el curso le servirá llega a 0,3, y si además tiene la oportunidad real de ir.
 
@@ -30,9 +30,9 @@ Hay tres intervenciones posibles:
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-En el municipio A falta deseo; en el B, la gente subestima la utilidad del curso; en el C no hay forma de llegar. El dato agregado, un 20 % en los tres, no dice nada sobre el mecanismo, y la política que funciona en uno es inútil en otro: el autobús no sirve donde nadie quiere ir, y la campaña de información no sirve donde nadie puede llegar.
+En el municipio A falta deseo; en el B, la gente subestima la utilidad del curso; en el C no hay forma de llegar. El dato agregado, un 20% en los tres, no dice nada sobre el mecanismo, y la política que funciona en uno es inútil en otro: el autobús no sirve donde nadie quiere ir, y la campaña de información no sirve donde nadie puede llegar.
 
-Fíjate también en la subvención en el municipio B: sube la participación al 40 %. Un evaluador que solo probase la subvención concluiría que funciona a medias, cuando el problema era otro. Es la idea central de Hedström: sin mecanismo no hay diagnóstico.
+Fíjate también en la subvención en el municipio B: sube la participación al 40%. Un evaluador que solo probase la subvención concluiría que funciona a medias, cuando el problema era otro. Es la idea central de Hedström: sin mecanismo no hay diagnóstico.
 
 Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
 :::
@@ -106,7 +106,7 @@ if (!is.function(f)) {
   columnas <- colnames(.solution)[colSums(abs(.result - .solution)) > 1e-9]
   list(correct = FALSE, message = paste0("se_apunta() está bien, pero no la columna ", paste(columnas, collapse = " ni la "), "."))
 } else {
-  list(correct = TRUE, message = "¡Correcto! El mismo 20 % y tres diagnósticos: cada intervención solo funciona del todo en su municipio.")
+  list(correct = TRUE, message = "¡Correcto! El mismo 20% y tres diagnósticos: cada intervención solo funciona del todo en su municipio.")
 }
 ```
 

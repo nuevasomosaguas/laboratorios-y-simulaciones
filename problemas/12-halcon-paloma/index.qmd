@@ -30,7 +30,7 @@ Si en la población hay una proporción $x$ de halcones, cada animal se cruza co
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con $V = 4$ y $C = 10$, la población acaba con un 40 % de halcones: $V/C$. Es una *estrategia evolutivamente estable*: si hubiese más halcones, se encontrarían demasiado entre ellos y les iría peor que a las palomas; si hubiese menos, les iría mejor. Ninguna población solo de palomas resiste: un halcón mutante se haría con todo.
+Con $V = 4$ y $C = 10$, la población acaba con un 40% de halcones: $V/C$. Es una *estrategia evolutivamente estable*: si hubiese más halcones, se encontrarían demasiado entre ellos y les iría peor que a las palomas; si hubiese menos, les iría mejor. Ninguna población solo de palomas resiste: un halcón mutante se haría con todo.
 
 Pero en ese equilibrio cada animal gana de media 1,2, mientras que en una población solo de palomas ganaría 2. La selección no maximiza el bienestar del grupo, sino el éxito relativo de cada estrategia: un dilema social sin que nadie decida nada. Cuando la pelea sale barata, con $C < V$, los halcones lo invaden todo.
 
@@ -105,7 +105,7 @@ if (!is.function(f)) {
 } else {
   coma <- function(v) format(round(v, 2), nsmall = 2, decimal.mark = ",")
   list(correct = TRUE, message = paste0(
-    "¡Correcto! La población llega a un ", round(100 * .result[["halcones"]]), " % de halcones, ",
+    "¡Correcto! La población llega a un ", round(100 * .result[["halcones"]]), "% de halcones, ",
     "y cada animal gana de media ", coma(.result[["pago_medio"]]), " frente a ", coma(.result[["solo_palomas"]]),
     " si todos fuesen palomas."))
 }

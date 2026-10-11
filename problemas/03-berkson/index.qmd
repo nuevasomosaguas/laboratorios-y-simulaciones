@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Un programa de posgrado admite cada año al 10 % de sus candidatos, los de mejor puntuación en una prueba que mide a la vez el talento y el esfuerzo. Un profesor, intrigado, cruza las dos medidas de sus estudiantes y llega a una conclusión que repite en cada claustro:
+Un programa de posgrado admite cada año al 10% de sus candidatos, los de mejor puntuación en una prueba que mide a la vez el talento y el esfuerzo. Un profesor, intrigado, cruza las dos medidas de sus estudiantes y llega a una conclusión que repite en cada claustro:
 
 > Entre nuestros estudiantes, los de más talento son los que menos se esfuerzan. Quien vale no necesita trabajar.
 
@@ -41,7 +41,7 @@ n <- 10000
 talento <- rnorm(n)
 esfuerzo <- rnorm(n)
 
-# Se admite al 10 % con mejor puntuación en la prueba
+# Se admite al 10% con mejor puntuación en la prueba
 puntuacion <- talento + esfuerzo
 admitido <- puntuacion > quantile(puntuacion, 0.9)
 estudiantes <- data.frame(talento, esfuerzo)[admitido, ]

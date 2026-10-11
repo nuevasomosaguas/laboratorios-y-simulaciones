@@ -26,7 +26,7 @@ Con tres candidatos hay seis órdenes posibles. Una elección se resume en cuán
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con preferencias al azar, hay un ciclo en un 8,6 % de las elecciones simuladas; el valor teórico para muchos votantes, que calculó Guilbaud en 1952, es del 8,77 %. Con tres votantes sería el 5,6 %, y la frecuencia crece con el número de candidatos.
+Con preferencias al azar, hay un ciclo en un 8,6% de las elecciones simuladas; el valor teórico para muchos votantes, que calculó Guilbaud en 1952, es del 8,77%. Con tres votantes sería el 5,6%, y la frecuencia crece con el número de candidatos.
 
 Con preferencias unimodales no aparece ninguno. Es el *teorema del votante mediano* de Black: si las preferencias se ordenan en un solo eje, siempre gana el candidato que prefiere el votante mediano. La paradoja de Condorcet no depende de la irracionalidad de nadie, sino de la estructura de las preferencias: cuando la política tiene una sola dimensión, la mayoría funciona; cuando tiene varias, puede no haber nada que la mayoría prefiera. Es la puerta de entrada al teorema de imposibilidad de Arrow.
 
@@ -113,7 +113,7 @@ if (!is.function(f)) {
 } else {
   list(correct = TRUE, message = paste0(
     "¡Correcto! Hay un ciclo en el ", format(round(100 * .result[["al_azar"]], 1), decimal.mark = ","),
-    " % de las elecciones al azar, y en ninguna con preferencias unimodales."))
+    "% de las elecciones al azar, y en ninguna con preferencias unimodales."))
 }
 ```
 

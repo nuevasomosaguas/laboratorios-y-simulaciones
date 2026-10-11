@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En 1906, en una feria de ganado de Plymouth, 787 visitantes pagaron por adivinar cuánto pesaría un buey una vez sacrificado y limpio. Francis Galton recogió las papeletas: la mediana de las estimaciones fue de 1207 libras, y el peso real, de 1198. La multitud, sin saber nada de bueyes, se equivocó en menos del 1 %.
+En 1906, en una feria de ganado de Plymouth, 787 visitantes pagaron por adivinar cuánto pesaría un buey una vez sacrificado y limpio. Francis Galton recogió las papeletas: la mediana de las estimaciones fue de 1207 libras, y el peso real, de 1198. La multitud, sin saber nada de bueyes, se equivocó en menos del 1%.
 
 Scott Page explicó por qué con una identidad exacta, el *teorema de predicción por diversidad*. Si cada persona da una estimación $s_i$ de un valor verdadero $\theta$, y la multitud da la media $c = \bar s$, entonces
 
@@ -36,7 +36,7 @@ En el código, un tarro tiene **1000 garbanzos**, y dos multitudes **inventadas*
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41 % de sus miembros acierta mejor que ella.
+La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41% de sus miembros acierta mejor que ella.
 
 El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
 

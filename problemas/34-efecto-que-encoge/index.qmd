@@ -37,11 +37,11 @@ El código simula mil estudios de un efecto real de d = 0,2, con entre 10 y 200 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con los mil estudios, el metaanálisis da 0,197: el efecto real. Con los 290 que se publican, 0,318, un 60 % más. Sumar estudios no corrige el sesgo de selección, porque todos los publicados están sesgados en la misma dirección: el metaanálisis solo lo hace más preciso, y por eso más convincente.
+Con los mil estudios, el metaanálisis da 0,197: el efecto real. Con los 290 que se publican, 0,318, un 60% más. Sumar estudios no corrige el sesgo de selección, porque todos los publicados están sesgados en la misma dirección: el metaanálisis solo lo hace más preciso, y por eso más convincente.
 
 El embudo lo delata. Los estudios precisos, arriba, se publican casi todos, porque con ellos un efecto de 0,2 sale significativo. Los imprecisos, abajo, solo se publican si han tenido la suerte de estimar un efecto grande, y quedan todos a la derecha de la línea negra: falta el lado izquierdo del embudo. El término independiente de Egger es −0,02 con todos los estudios y 2,10 con los publicados.
 
-De ahí el título. La d media publicada de los estudios pequeños es 0,579, y la de los grandes, 0,286: cuanto más grande es el estudio, más pequeño es el efecto. Es lo que se ve cuando un efecto llamativo se replica con muestras grandes, y no significa que el efecto haya cambiado: los primeros estudios eran pequeños y solo se publicaron los que exageraban. Con un efecto real de cero, se publica el 1,5 % de los estudios, que son justo los falsos positivos a favor, y el metaanálisis de lo publicado encuentra un efecto de 0,322 donde no hay nada.
+De ahí el título. La d media publicada de los estudios pequeños es 0,579, y la de los grandes, 0,286: cuanto más grande es el estudio, más pequeño es el efecto. Es lo que se ve cuando un efecto llamativo se replica con muestras grandes, y no significa que el efecto haya cambiado: los primeros estudios eran pequeños y solo se publicaron los que exageraban. Con un efecto real de cero, se publica el 1,5% de los estudios, que son justo los falsos positivos a favor, y el metaanálisis de lo publicado encuentra un efecto de 0,322 donde no hay nada.
 
 Harrer y sus colegas dedican el capítulo 9 de su libro al sesgo de publicación: el gráfico de embudo, el test de Egger y los métodos que intentan corregirlo, como el *trim-and-fill*, PET-PEESE o los modelos de selección. Ninguno lo arregla del todo, y la solución de fondo no es estadística: registrar los estudios antes de hacerlos, como los *registered reports*, y publicar los resultados salgan como salgan.
 
@@ -164,7 +164,7 @@ if (!is.function(e$metaanalisis) || !is.function(e$egger)) {
 } else {
   list(correct = TRUE, message = paste0(
     "¡Correcto! Se publica el ", format(round(100 * .result[["publicados"]], 1), decimal.mark = ","),
-    " % de los estudios. El metaanálisis de todos da ", coma(.result[["todos"]]),
+    "% de los estudios. El metaanálisis de todos da ", coma(.result[["todos"]]),
     ", y el de los publicados, ", coma(.result[["solo_publicados"]]),
     ". Egger pasa de ", coma(.result[["egger_todos"]], 2), " a ", coma(.result[["egger_publicados"]], 2), "."))
 }

@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Una ciudad es una cuadrícula de 20 × 20 casas, con dos grupos de vecinos, rojos y azules, y un 10 % de casas vacías. Cada vecino mira las ocho casas que lo rodean y se queda contento si al menos un tercio de sus vecinos son de su grupo. Si no, se muda a una casa vacía cualquiera.
+Una ciudad es una cuadrícula de 20 × 20 casas, con dos grupos de vecinos, rojos y azules, y un 10% de casas vacías. Cada vecino mira las ocho casas que lo rodean y se queda contento si al menos un tercio de sus vecinos son de su grupo. Si no, se muda a una casa vacía cualquiera.
 
 Nadie en esta ciudad quiere vivir solo entre los suyos: a todos les basta con no estar en minoría de dos a uno. Schelling (1971) mostró, con monedas sobre un tablero, adónde lleva eso.
 
@@ -26,7 +26,7 @@ Las casas del borde tienen menos vecinos. Un vecino sin nadie alrededor está co
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Al principio, con los vecinos repartidos al azar, cada uno tiene de media un 50 % de vecinos parecidos. Al final, en torno al 75 %, mucho más de lo que nadie pedía. Cada mudanza deja a algún vecino del barrio de origen un poco más en minoría, y lo empuja a mudarse también. Una preferencia individual suave produce un resultado colectivo extremo: no se puede deducir la segregación de la ciudad del grado de prejuicio de sus habitantes, ni al revés.
+Al principio, con los vecinos repartidos al azar, cada uno tiene de media un 50% de vecinos parecidos. Al final, en torno al 75%, mucho más de lo que nadie pedía. Cada mudanza deja a algún vecino del barrio de origen un poco más en minoría, y lo empuja a mudarse también. Una preferencia individual suave produce un resultado colectivo extremo: no se puede deducir la segregación de la ciudad del grado de prejuicio de sus habitantes, ni al revés.
 
 Schelling, T. C. (1971). Dynamic models of segregation. *Journal of Mathematical Sociology*, 1(2), 143–186.
 :::
@@ -144,7 +144,7 @@ if (!is.function(f)) {
   } else {
     list(correct = TRUE, message = paste0(
       "¡Correcto! Los vecinos parecidos pasan del ", round(100 * .result[["inicial"]]),
-      " % al ", round(100 * .result[["final"]]), " %, y nadie pedía más de un tercio."))
+      "% al ", round(100 * .result[["final"]]), "%, y nadie pedía más de un tercio."))
   }
 }
 ```

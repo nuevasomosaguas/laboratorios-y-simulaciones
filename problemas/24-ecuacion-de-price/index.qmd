@@ -23,19 +23,19 @@ $$\bar W \, \Delta \bar p = \underbrace{\operatorname{Cov}(W_i, p_i)}_{\text{ent
 
 donde la covarianza y la media se calculan con el peso de cada grupo, su tamaño entre el total. No es un modelo, sino contabilidad: vale para cualquier rasgo y cualquier forma de agruparlo.
 
-En el modelo, cada altruista paga un coste $c$ y cada miembro de un grupo recibe un beneficio $b \, p_i$, mayor cuanto más altruistas haya en él. Un egoísta tiene $1 + b \, p_i$ hijos, y un altruista, $1 - c + b \, p_i$. Hay dos grupos de 100 individuos: uno con un 20 % de altruistas y otro con un 80 %.
+En el modelo, cada altruista paga un coste $c$ y cada miembro de un grupo recibe un beneficio $b \, p_i$, mayor cuanto más altruistas haya en él. Un egoísta tiene $1 + b \, p_i$ hijos, y un altruista, $1 - c + b \, p_i$. Hay dos grupos de 100 individuos: uno con un 20% de altruistas y otro con un 80%.
 
 **Tu tarea.**
 
 1. Completa los dos términos de `price()`: `entre`, la covarianza ponderada entre $W_i$ y $p_i$, y `dentro`, la media ponderada de $W_i \, \Delta p_i$.
 2. ¿Qué pasa con los altruistas dentro de cada grupo? ¿Y en el total?
-3. Cambia los grupos a `altruistas <- c(40, 60)` y `egoistas <- c(60, 40)`. La proporción total es la misma, el 50 %. ¿Qué cambia?
+3. Cambia los grupos a `altruistas <- c(40, 60)` y `egoistas <- c(60, 40)`. La proporción total es la misma, el 50%. ¿Qué cambia?
 4. Mira el gráfico: sigue a los dos grupos de partida durante doce generaciones, sin que se mezclen nunca.
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-En el grupo con pocos altruistas, su proporción baja del 20 % al 11 %; en el otro, del 80 % al 76 %. Y en el total sube del 50 % al 57 %, porque el grupo altruista crece mucho más: es otra vez [la paradoja de Simpson](../01-berkeley/index.qmd). La ecuación de Price lo cuantifica: la selección entre grupos aporta 0,36 y la selección dentro de ellos resta 0,16.
+En el grupo con pocos altruistas, su proporción baja del 20% al 11%; en el otro, del 80% al 76%. Y en el total sube del 50% al 57%, porque el grupo altruista crece mucho más: es otra vez [la paradoja de Simpson](../01-berkeley/index.qmd). La ecuación de Price lo cuantifica: la selección entre grupos aporta 0,36 y la selección dentro de ellos resta 0,16.
 
 **La regla de Hamilton.** Con este modelo, los dos términos se pueden escribir a mano. Dentro de un grupo, el altruista tiene siempre $c$ hijos menos que el egoísta, así que el término de dentro es $-c \, \operatorname{E}[p_i(1 - p_i)]$. Entre grupos, la descendencia media es $W_i = 1 + (b - c)\,p_i$, y el término de entre es $(b - c)\operatorname{Var}(p_i)$. La varianza total del rasgo, $\bar p(1 - \bar p)$, es la suma de la varianza entre grupos y la de dentro, $\operatorname{E}[p_i(1 - p_i)]$. Si llamamos $r$ a la parte de la varianza que está entre grupos,
 
@@ -43,7 +43,7 @@ $$\bar W \, \Delta \bar p = \bar p(1 - \bar p)\,[(b - c)\,r - c\,(1 - r)] = \bar
 
 El altruismo avanza si y solo si $r b > c$. Es la regla de Hamilton, y $r$ es el *parentesco*: lo que se parecen, en el rasgo, los miembros de un mismo grupo, sean o no familia. Con los grupos de partida, $r = 0,36$ y $r b = 1,8$, mayor que $c = 1$. Con los grupos de la tarea 3, más parecidos entre sí, $r = 0,04$, $r b = 0,2$, y el altruismo retrocede en el total aunque la proporción inicial sea la misma: la selección entre grupos solo actúa sobre la variación que hay entre ellos.
 
-La tarea 4 muestra el límite: si los grupos no se rehacen nunca, el altruismo sube tres generaciones, hasta el 64 %, y luego cae hacia cero, porque dentro de cada grupo pierde siempre y la variación entre grupos se agota. Para que el altruismo se mantenga, los grupos tienen que disolverse y volver a formarse, de modo que se renueve la variación entre ellos: es el modelo de los *grupos de rasgo* de David Sloan Wilson.
+La tarea 4 muestra el límite: si los grupos no se rehacen nunca, el altruismo sube tres generaciones, hasta el 64%, y luego cae hacia cero, porque dentro de cada grupo pierde siempre y la variación entre grupos se agota. Para que el altruismo se mantenga, los grupos tienen que disolverse y volver a formarse, de modo que se renueve la variación entre ellos: es el modelo de los *grupos de rasgo* de David Sloan Wilson.
 
 Price, G. R. (1970). Selection and covariance. *Nature*, 227, 520–521.
 

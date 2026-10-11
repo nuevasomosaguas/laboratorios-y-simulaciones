@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-El Congreso de los Diputados tiene 350 escaños repartidos en 52 circunscripciones: las 50 provincias, Ceuta y Melilla. Cada provincia tiene al menos dos, Ceuta y Melilla uno, y el resto se reparte según la población. Así, en 2023 Madrid elegía 37 diputados y Soria, 2. En cada circunscripción los escaños se reparten con la *ley D'Hondt* entre los partidos que superan el 3 % de los votos válidos.
+El Congreso de los Diputados tiene 350 escaños repartidos en 52 circunscripciones: las 50 provincias, Ceuta y Melilla. Cada provincia tiene al menos dos, Ceuta y Melilla uno, y el resto se reparte según la población. Así, en 2023 Madrid elegía 37 diputados y Soria, 2. En cada circunscripción los escaños se reparten con la *ley D'Hondt* entre los partidos que superan el 3% de los votos válidos.
 
 D'Hondt funciona así: se dividen los votos de cada partido entre 1, 2, 3… hasta el número de escaños, y los escaños van a los cocientes más altos. Con 8 escaños y cuatro partidos de 100 000, 80 000, 30 000 y 20 000 votos, los ocho cocientes más altos dan 4, 3, 1 y 0 escaños.
 
@@ -23,7 +23,7 @@ Rein Taagepera propuso predecir la fragmentación de un parlamento sin mirar los
 
 $$N = (MS)^{1/6}.$$
 
-El *número efectivo de partidos* de Laakso y Taagepera cuenta los partidos ponderando por su tamaño: si las proporciones de escaños (o de votos) son $p_i$, es $1 / \sum_i p_i^2$. Con dos partidos iguales vale 2; con uno del 90 % y otro del 10 %, 1,2.
+El *número efectivo de partidos* de Laakso y Taagepera cuenta los partidos ponderando por su tamaño: si las proporciones de escaños (o de votos) son $p_i$, es $1 / \sum_i p_i^2$. Con dos partidos iguales vale 2; con uno del 90% y otro del 10%, 1,2.
 
 **Tu tarea.**
 
@@ -35,9 +35,9 @@ El *número efectivo de partidos* de Laakso y Taagepera cuenta los partidos pond
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-En Madrid, con 37 escaños, los cinco partidos que pasan del 3 % consiguen diputados en proporción bastante fiel a sus votos. En Soria solo hay dos escaños, y se los reparten los dos grandes: el tercer partido, con casi el 10 % de los votos, necesitaría casi el triple para sacar uno. Como las provincias pequeñas son muchas, D'Hondt con circunscripciones provinciales concentra el Congreso: con estos votos inventados, los 4,0 partidos efectivos en votos se quedan en 3,0 en escaños.
+En Madrid, con 37 escaños, los cinco partidos que pasan del 3% consiguen diputados en proporción bastante fiel a sus votos. En Soria solo hay dos escaños, y se los reparten los dos grandes: el tercer partido, con casi el 10% de los votos, necesitaría casi el triple para sacar uno. Como las provincias pequeñas son muchas, D'Hondt con circunscripciones provinciales concentra el Congreso: con estos votos inventados, los 4,0 partidos efectivos en votos se quedan en 3,0 en escaños.
 
-La predicción de Taagepera es 3,6, y el Congreso de 2023, con 137 escaños para el PP, 121 para el PSOE, 33 para Vox, 31 para Sumar y 28 repartidos entre siete partidos más, tuvo 3,4 partidos efectivos. La fórmula no ha mirado ni un voto, y acierta mejor que la simulación, que los tiene todos. No es casualidad: los votos no caen del cielo. Votantes y partidos aprenden con los años qué candidaturas tienen opciones, y el voto mismo se adapta al sistema electoral (es el «efecto psicológico» de Duverger). Los votos de la simulación son inventados; el producto de escaños resume el equilibrio al que tienden los votos reales. El mismo modelo predice que el partido más grande tendrá $(MS)^{-1/8}$ de los escaños, un 37,9 %; el PP tuvo el 39,1 %, y el partido B de la simulación, el 40,6 %.
+La predicción de Taagepera es 3,6, y el Congreso de 2023, con 137 escaños para el PP, 121 para el PSOE, 33 para Vox, 31 para Sumar y 28 repartidos entre siete partidos más, tuvo 3,4 partidos efectivos. La fórmula no ha mirado ni un voto, y acierta mejor que la simulación, que los tiene todos. No es casualidad: los votos no caen del cielo. Votantes y partidos aprenden con los años qué candidaturas tienen opciones, y el voto mismo se adapta al sistema electoral (es el «efecto psicológico» de Duverger). Los votos de la simulación son inventados; el producto de escaños resume el equilibrio al que tienden los votos reales. El mismo modelo predice que el partido más grande tendrá $(MS)^{-1/8}$ de los escaños, un 37,9%; el PP tuvo el 39,1%, y el partido B de la simulación, el 40,6%.
 
 Con una sola circunscripción nacional, el producto de escaños es $350 \times 350$ y la predicción sube a 7 partidos efectivos. En la simulación, los escaños pasan a reflejar casi exactamente los votos, 3,9 partidos frente a 4,0: con los votos fijos no aparecen partidos nuevos, pero Taagepera predice que, con el tiempo, aparecerían, porque votar a un partido pequeño ya no sería tirar el voto.
 
@@ -81,7 +81,7 @@ set.seed(1977)
 votos <- sapply(escanos, function(m) m * apoyo * exp(rnorm(length(apoyo), 0, 0.25)))
 votos <- matrix(votos, nrow = length(apoyo), dimnames = list(names(apoyo), names(escanos)))
 
-# El umbral del 3 % y D'Hondt
+# El umbral del 3% y D'Hondt
 repartir <- function(v, m) {
   v[v / sum(v) < 0.03] <- 0
   dhondt(v, m)

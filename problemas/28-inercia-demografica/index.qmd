@@ -16,7 +16,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Imagina un país joven donde cada mujer tiene 4,5 hijos y la población crece casi un 3 % al año. Un buen día, de golpe, la fecundidad cae al *nivel de reemplazo*: cada mujer tiene, de media, justo una hija que llega a sustituirla. ¿Cuándo deja de crecer la población?
+Imagina un país joven donde cada mujer tiene 4,5 hijos y la población crece casi un 3% al año. Un buen día, de golpe, la fecundidad cae al *nivel de reemplazo*: cada mujer tiene, de media, justo una hija que llega a sustituirla. ¿Cuándo deja de crecer la población?
 
 La respuesta intuitiva es «enseguida», y es falsa. Para verlo hace falta proyectar la población por edades, con la *matriz de Leslie*: se divide a las mujeres en grupos de cinco años de edad, y cada paso de cinco años la matriz dice cuántas sobreviven al grupo siguiente y cuántas hijas tienen. Como es habitual en demografía, solo se cuentan las mujeres.
 
@@ -32,9 +32,9 @@ El código de partida trae una tabla de vida inventada, con una esperanza de vid
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con 4,5 hijos por mujer, cada nacida tiene de media 2,14 hijas que llegan a la edad de su madre, y la población crece un 2,7 % al año. El reemplazo está en 2,11 hijos por mujer, no en 2: algunas niñas mueren antes de ser madres y nacen algo más de niños que de niñas. Cuando la fecundidad cae ahí de golpe, la población todavía crece un 61 % y tarda 65 años en dejar de hacerlo.
+Con 4,5 hijos por mujer, cada nacida tiene de media 2,14 hijas que llegan a la edad de su madre, y la población crece un 2,7% al año. El reemplazo está en 2,11 hijos por mujer, no en 2: algunas niñas mueren antes de ser madres y nacen algo más de niños que de niñas. Cuando la fecundidad cae ahí de golpe, la población todavía crece un 61% y tarda 65 años en dejar de hacerlo.
 
-La razón está en la estructura por edades. Un país que ha crecido deprisa es joven: el 64 % de sus mujeres tiene menos de 30 años. Aunque cada una tenga solo una hija, hay muchas más madres que abuelas, y los nacimientos superan a las muertes hasta que las generaciones grandes envejecen y la pirámide se convierte en la de una *población estacionaria*, con la forma de la propia tabla de vida. Es la *inercia demográfica*, que Nathan Keyfitz midió en 1971. Con `tgf <- 3` la población es menos joven y la inercia, menor, un 29 % en lugar de un 61 %, pero sigue ahí.
+La razón está en la estructura por edades. Un país que ha crecido deprisa es joven: el 64% de sus mujeres tiene menos de 30 años. Aunque cada una tenga solo una hija, hay muchas más madres que abuelas, y los nacimientos superan a las muertes hasta que las generaciones grandes envejecen y la pirámide se convierte en la de una *población estacionaria*, con la forma de la propia tabla de vida. Es la *inercia demográfica*, que Nathan Keyfitz midió en 1971. Con `tgf <- 3` la población es menos joven y la inercia, menor, un 29% en lugar de un 61%, pero sigue ahí.
 
 Es lo que ha pasado en buena parte del mundo: muchos países llegaron al reemplazo en los años noventa y su población ha seguido creciendo. Y funciona igual al revés: un país con la fecundidad por debajo del reemplazo durante décadas, como España, seguiría perdiendo población durante años aunque la fecundidad subiera mañana al reemplazo, porque le faltan madres.
 
@@ -171,7 +171,7 @@ if (!is.function(e$nrr)) {
     list(correct = TRUE, message = paste0(
       "¡Correcto! Con ", format(e$tgf, decimal.mark = ","), " hijos por mujer, cada nacida tiene ", coma(e$nrr(e$m)),
       " hijas. Tras caer al reemplazo, la población todavía crece un ", round(100 * (max(e$total) / e$total[1] - 1)),
-      " % durante ", 5 * (which.max(e$total) - 1), " años."))
+      "% durante ", 5 * (which.max(e$total) - 1), " años."))
   }
 }
 ```

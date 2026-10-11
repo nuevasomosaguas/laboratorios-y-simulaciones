@@ -139,8 +139,8 @@ if (!all(c("bh", "proporcion_falsos") %in% ls(e))) {
   list(correct = FALSE, message = "Sin ningún descubrimiento, proporcion_falsos() debería dar 0, no NaN: no hay falsos entre cero descubrimientos.")
 } else {
   list(correct = TRUE, message = paste0(
-    "¡Correcto! Con el umbral ingenuo, el ", round(100 * .result[["ingenuo"]]), " % de los descubrimientos es falso; ",
-    "con Benjamini-Hochberg, el ", coma(100 * .result[["bh"]], 1), " %, por debajo del 5 % prometido."))
+    "¡Correcto! Con el umbral ingenuo, el ", round(100 * .result[["ingenuo"]]), "% de los descubrimientos es falso; ",
+    "con Benjamini-Hochberg, el ", coma(100 * .result[["bh"]], 1), "%, por debajo del 5% prometido."))
 }
 ```
 

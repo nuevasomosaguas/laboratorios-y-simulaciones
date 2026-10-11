@@ -29,7 +29,7 @@ $$f(s) = \frac{0{,}4825 - 0{,}0717\,s}{1 - 0{,}5893\,s}.$$
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Cada hombre tiene de media 1,26 hijos varones, así que la población crece. Y sin embargo, el 82 % de los apellidos acaba extinguiéndose. No hay contradicción: casi la mitad de los hombres no tiene ningún hijo varón, y un apellido recién nacido depende de muy pocas personas. Los que sobreviven crecen mucho, y compensan con creces a los que desaparecen. Por eso unos pocos apellidos acaban dominando, en Corea o en China, sin que ninguna familia haya sido especialmente prolífica.
+Cada hombre tiene de media 1,26 hijos varones, así que la población crece. Y sin embargo, el 82% de los apellidos acaba extinguiéndose. No hay contradicción: casi la mitad de los hombres no tiene ningún hijo varón, y un apellido recién nacido depende de muy pocas personas. Los que sobreviven crecen mucho, y compensan con creces a los que desaparecen. Por eso unos pocos apellidos acaban dominando, en Corea o en China, sin que ninguna familia haya sido especialmente prolífica.
 
 Lo que sale de esta pregunta victoriana, los procesos de ramificación, describe también las cadenas de contagio, las reacciones nucleares en cadena y la supervivencia de una mutación nueva.
 
@@ -117,8 +117,8 @@ if (!is.function(f)) {
   coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
   list(correct = TRUE, message = paste0(
     "¡Correcto! Con ", coma(.result[["hijos_medios"]]), " hijos varones de media, se extingue el ",
-    round(100 * .result[["extincion"]]), " % de los apellidos; en la simulación, el ",
-    round(100 * .result[["simulada"]]), " % en 30 generaciones."))
+    round(100 * .result[["extincion"]]), "% de los apellidos; en la simulación, el ",
+    round(100 * .result[["simulada"]]), "% en 30 generaciones."))
 }
 ```
 

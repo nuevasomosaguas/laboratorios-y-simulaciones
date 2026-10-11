@@ -30,7 +30,7 @@ $$T = \underbrace{\sum_g s_g\, T_g}_{\text{dentro}} + \underbrace{\sum_g s_g \ln
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El índice de Theil del país es 0,160. La parte entre regiones es 0,037, el 23 % del total; el 77 % restante es desigualdad dentro de cada región. Aunque el Norte duplique al Sur, la mayor parte de la desigualdad está entre vecinos de la misma región. Una política que igualase por completo la renta media de las tres regiones dejaría intacto ese 77 %.
+El índice de Theil del país es 0,160. La parte entre regiones es 0,037, el 23% del total; el 77% restante es desigualdad dentro de cada región. Aunque el Norte duplique al Sur, la mayor parte de la desigualdad está entre vecinos de la misma región. Una política que igualase por completo la renta media de las tres regiones dejaría intacto ese 77%.
 
 La descomposición sirve para cualquier partición: entre hombres y mujeres, entre niveles de estudios, entre el campo y la ciudad. Shorrocks demostró que las medidas que se descomponen así forman una familia concreta, la de la entropía generalizada, a la que pertenece el índice de Theil y no el de Gini.
 
@@ -111,7 +111,7 @@ if (!is.function(f)) {
   coma <- function(v) format(round(v, 3), nsmall = 3, decimal.mark = ",")
   list(correct = TRUE, message = paste0(
     "¡Correcto! Theil total ", coma(.result[["total"]]), ": ", coma(.result[["entre"]]), " entre regiones, el ",
-    round(100 * .result[["parte_entre"]]), " %, y el resto dentro de cada una."))
+    round(100 * .result[["parte_entre"]]), "%, y el resto dentro de cada una."))
 }
 ```
 

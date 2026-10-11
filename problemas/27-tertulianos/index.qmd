@@ -6,7 +6,7 @@ duracion: "30 min"
 lectura: "[Tetlock (2005)](https://nuevasomosaguas.github.io/biblioteca.html#tetlock2005expert)"
 dificultad: "Intermedio"
 categories: [estadística]
-description: "Tres tertulianos predicen doscientas cosas. Uno siempre dice «50 %», y aun así le gana a uno de los otros dos."
+description: "Tres tertulianos predicen doscientas cosas. Uno siempre dice «50%», y aun así le gana a uno de los otros dos."
 page-layout: full
 # Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
 engine: markdown
@@ -21,15 +21,15 @@ Para puntuar predicciones probabilísticas se usa la *puntuación de Brier*, que
 
 $$B = \frac{1}{n} \sum_i (p_i - o_i)^2.$$
 
-Cuanto más baja, mejor: 0 es la perfección, y quien dice siempre 50 % saca 0,25.
+Cuanto más baja, mejor: 0 es la perfección, y quien dice siempre 50% saca 0,25.
 
 Allan Murphy la descompuso en tres partes. Se agrupan los pronósticos por la probabilidad que dan: en el grupo $k$ hay $n_k$ pronósticos que dicen $p_k$, y el suceso ocurre en una proporción $\bar o_k$ de ellos. Si $\bar o$ es la proporción total,
 
 $$B = \underbrace{\frac{1}{n}\sum_k n_k (p_k - \bar o_k)^2}_{\text{calibración}} - \underbrace{\frac{1}{n}\sum_k n_k (\bar o_k - \bar o)^2}_{\text{resolución}} + \underbrace{\bar o (1 - \bar o)}_{\text{incertidumbre}}.$$
 
-La *calibración* mide si, cuando alguien dice 70 %, el suceso ocurre un 70 % de las veces: cuanto más baja, mejor. La *resolución* mide si sus pronósticos separan los casos en que ocurre de los que no: cuanto más alta, mejor. La *incertidumbre* depende solo de lo difícil que es el mundo, no del pronosticador.
+La *calibración* mide si, cuando alguien dice 70%, el suceso ocurre un 70% de las veces: cuanto más baja, mejor. La *resolución* mide si sus pronósticos separan los casos en que ocurre de los que no: cuanto más alta, mejor. La *incertidumbre* depende solo de lo difícil que es el mundo, no del pronosticador.
 
-En el código, tres tertulianos **inventados** ponen probabilidad a los mismos 200 sucesos: el zorro, que se aproxima a la probabilidad real con algo de ruido; el erizo, que solo dice 10 % o 90 %; y el chimpancé, que siempre dice 50 %.
+En el código, tres tertulianos **inventados** ponen probabilidad a los mismos 200 sucesos: el zorro, que se aproxima a la probabilidad real con algo de ruido; el erizo, que solo dice 10% o 90%; y el chimpancé, que siempre dice 50%.
 
 **Tu tarea.**
 
@@ -42,7 +42,7 @@ En el código, tres tertulianos **inventados** ponen probabilidad a los mismos 2
 
 El zorro gana con 0,207, el chimpancé saca 0,250 y el erizo, 0,286: peor que quien no sabe nada. La incertidumbre es la misma para los tres, 0,25, porque los sucesos ocurren justo la mitad de las veces.
 
-El chimpancé está perfectamente calibrado, porque los sucesos ocurren el 50 % de las veces que dice 50 %, y por eso mismo no tiene ninguna resolución: no distingue nada. El zorro pierde algo en calibración, 0,010, y gana mucho más en resolución, 0,054. El erizo tiene algo de resolución, 0,024, porque tiende a acertar hacia qué lado caerá cada suceso; pero cuando dice 90 % el suceso ocurre el 67 % de las veces, y cuando dice 10 %, el 36 %. Su exceso de confianza le cuesta 0,060 de calibración, más de lo que gana distinguiendo. En el gráfico, los puntos del zorro siguen la diagonal; los del erizo se quedan lejos de ella, hacia el centro.
+El chimpancé está perfectamente calibrado, porque los sucesos ocurren el 50% de las veces que dice 50%, y por eso mismo no tiene ninguna resolución: no distingue nada. El zorro pierde algo en calibración, 0,010, y gana mucho más en resolución, 0,054. El erizo tiene algo de resolución, 0,024, porque tiende a acertar hacia qué lado caerá cada suceso; pero cuando dice 90% el suceso ocurre el 67% de las veces, y cuando dice 10%, el 36%. Su exceso de confianza le cuesta 0,060 de calibración, más de lo que gana distinguiendo. En el gráfico, los puntos del zorro siguen la diagonal; los del erizo se quedan lejos de ella, hacia el centro.
 
 La descomposición separa dos virtudes que el sentido común mezcla. Estar calibrado se puede aprender, y es lo que Tetlock entrenó después en sus *superpronosticadores*. Tener resolución exige saber algo del mundo. Una tertulia premia el aplomo, y el aplomo sin resolución es exactamente lo que penaliza la calibración.
 

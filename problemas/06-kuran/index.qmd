@@ -20,7 +20,7 @@ En 1989, los regímenes comunistas de Europa del Este cayeron en cuestión de se
 
 Es el mecanismo de [los umbrales de Granovetter](../02-granovetter/index.qmd), con una pregunta nueva: qué pasa con lo que no se ve. Cada opositor se atreve a disentir en público solo cuando ve que lo hace una proporción suficiente de la población: ese es su umbral. Cuanto más fuerte es su convicción, más bajo es su umbral.
 
-En el modelo, el 70 % de la población rechaza el régimen en privado. La convicción de cada opositor es un número entre 0 y 1, la mayoría bastante convencidos, y su umbral es `1 - conviccion / coste`, donde `coste` mide lo caro que resulta disentir en solitario. Si en un periodo disiente en público una proporción S de la población, en el siguiente disienten todos los opositores con umbral menor o igual que S.
+En el modelo, el 70% de la población rechaza el régimen en privado. La convicción de cada opositor es un número entre 0 y 1, la mayoría bastante convencidos, y su umbral es `1 - conviccion / coste`, donde `coste` mide lo caro que resulta disentir en solitario. Si en un periodo disiente en público una proporción S de la población, en el siguiente disienten todos los opositores con umbral menor o igual que S.
 
 **Tu tarea.**
 
@@ -32,9 +32,9 @@ En el modelo, el 70 % de la población rechaza el régimen en privado. La convic
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La tarea 4 es el corazón del ejercicio. Desde fuera, las dos sociedades son idénticas: nadie disiente en público. Pero una es un polvorín que estalla con una chispa del 15 %, y la otra es estable. Como las preferencias privadas y los umbrales no se ven, ni los observadores ni los propios ciudadanos pueden saber en cuál viven, y por eso las revoluciones de 1989 sorprendieron a todo el mundo. Las encuestas tampoco ayudan: miden lo que la gente dice, no lo que piensa, salvo que se pregunte de forma que nadie pueda saber qué ha contestado cada cual, como en [la respuesta aleatorizada](../32-respuesta-aleatorizada/index.qmd).
+La tarea 4 es el corazón del ejercicio. Desde fuera, las dos sociedades son idénticas: nadie disiente en público. Pero una es un polvorín que estalla con una chispa del 15%, y la otra es estable. Como las preferencias privadas y los umbrales no se ven, ni los observadores ni los propios ciudadanos pueden saber en cuál viven, y por eso las revoluciones de 1989 sorprendieron a todo el mundo. Las encuestas tampoco ayudan: miden lo que la gente dice, no lo que piensa, salvo que se pregunte de forma que nadie pueda saber qué ha contestado cada cual, como en [la respuesta aleatorizada](../32-respuesta-aleatorizada/index.qmd).
 
-La tarea 3 muestra que la represión no actúa solo castigando a los disidentes: hace que la chispa necesaria sea mucho mayor, del 44 % en lugar del 15 %.
+La tarea 3 muestra que la represión no actúa solo castigando a los disidentes: hace que la chispa necesaria sea mucho mayor, del 44% en lugar del 15%.
 
 Prueba también una chispa de exactamente 0,14. El disenso ni crece ni se apaga: es un *punto de inflexión*, un equilibrio inestable entre los dos estables, el silencio y la revolución. Cualquier chispa por debajo se apaga; cualquiera por encima prende.
 
@@ -149,8 +149,8 @@ if (!is.function(f)) {
   list(correct = TRUE, message = paste0(
     "¡Correcto! ",
     if (.result[["publico"]] == 0) "Nadie disiente en público"
-    else paste0("Disiente en público el ", round(100 * .result[["publico"]]), " %"),
-    " y el ", round(100 * .result[["falsifican"]]), " % de la población calla lo que piensa. ",
+    else paste0("Disiente en público el ", round(100 * .result[["publico"]]), "%"),
+    " y el ", round(100 * .result[["falsifican"]]), "% de la población calla lo que piensa. ",
     if (is.na(.result[["chispa"]])) "Y ninguna chispa provoca la cascada."
     else paste0("Una chispa de ", coma(.result[["chispa"]]), " la lleva a un disenso de ", coma(.result[["tras_la_chispa"]]), ".")))
 }
