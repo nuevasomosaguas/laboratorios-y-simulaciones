@@ -1,0 +1,286 @@
+---
+title: "Magnasanti"
+numero: 65
+nivel: 3
+duracion: "45 min"
+lectura: "[Campbell (1979)](https://nuevasomosaguas.github.io/biblioteca.html#lohr2021sampling); Starr (1994)"
+dificultad: "Avanzado"
+categories: [efectos de segundo orden]
+description: "Dale a un optimizador una ciudad y un solo número que maximizar, y mira qué destruye por el camino."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Entre 2007 y 2009, el estudiante de arquitectura filipino Vincent Ocasla construyó en SimCity 3000 una ciudad con un único objetivo: meter el máximo número de habitantes posible. La llamó Magnasanti y la publicó en 2010, con unos seis millones de habitantes repartidos en cuadrículas idénticas de 12 × 12 parcelas, sin una sola calle. Para conseguirlo sacrificó casi todo lo demás que hace habitable una ciudad.
+
+Pero los horrores de Magnasanti no los inventó Ocasla. Eran consecuencias de las reglas que los programadores de SimCity habían escrito: cuánto contamina una fábrica, qué necesita un barrio para llenarse. Aquí las reglas están a la vista, y quien construye la ciudad no eres tú, sino un optimizador que no sabe nada salvo el número que le pides.
+
+La ciudad es una cuadrícula de 12 × 12 parcelas, como la de [Schelling](../05-schelling/index.qmd), y cada una puede ser **vivienda**, **industria**, **parque** o **servicios**. Las reglas están en el código, marcadas con `REGLA`:
+
+- Cada vivienda ofrece plazas para 1.000 personas, pero solo se llenan si hay trabajo: cada industria da 2.000 empleos, cada parcela de servicios 500, y cada empleo sostiene a dos residentes.
+- Cada industria contamina con intensidad 1 las ocho parcelas que la rodean y con intensidad 0,5 el anillo siguiente.
+- La esperanza de vida de un barrio empieza en 85 años y baja 2,5 años por cada unidad de contaminación, 8 si no hay servicios a dos parcelas o menos y 2 si no hay un parque al lado.
+
+El optimizador es un **recocido simulado**: cambia una parcela al azar, se queda con el cambio si mejora el indicador y, de vez en cuando, también si lo empeora, para no atascarse en un óptimo local. Con el tiempo se vuelve más exigente, como un metal que se enfría.
+
+**Tu tarea.**
+
+1. Completa `contaminacion()`: la contaminación que recibe cada parcela. La función `suma_vecindad(m, r)` ya está escrita: suma, para cada parcela, los valores de `m` en el cuadrado de radio `r` que la rodea, ella incluida.
+2. El resto del código construye tres ciudades, cada una maximizando un indicador distinto: la población, la esperanza de vida y las zonas verdes por habitante, en parques por cada mil habitantes. Las dibuja, con la vivienda en naranja, la industria en gris, los parques en verde y los servicios en azul, y muestra una tabla con todos los indicadores de cada una. Tarda unos segundos. Mira la tabla fila a fila: cada ciudad ha llevado al máximo su indicador. ¿Qué ha destruido cada una por el camino?
+3. Cambia `huida <- 0` por `huida <- 0.15`. Con esa regla, cada unidad de contaminación hace que una vivienda pierda el 15% de sus plazas: la gente se va de los barrios contaminados. Vuelve a ejecutar. ¿Qué indicadores recupera ahora la ciudad que maximiza la población, y cuáles no? Y fíjate en la ciudad que maximiza las zonas verdes por habitante: ¿qué ha hecho el optimizador para mejorar todavía más su marca?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La ciudad que maximiza la población llega a 112.000 habitantes, cerca del máximo que permiten las reglas, unos 115.000: 112 viviendas, 27 fábricas, 4 parcelas de servicios y un solo parque, cuatro viviendas por cada fábrica. Pero sus vecinos viven pegados a las fábricas, con una contaminación media de 2,6; solo el 38% tiene servicios cerca y el 6%, un parque, y su esperanza de vida es de 71,8 años, trece menos que el máximo. Es Magnasanti.
+
+Las otras dos tampoco salen indemnes. La que maximiza la esperanza de vida es un balneario: todos viven 85 años, pero en ella viven 40.000 personas, poco más de un tercio que en Magnasanti. La que maximiza las zonas verdes por habitante tiene una sola vivienda, con mil personas, rodeada de parques: 142 por cada mil habitantes.
+
+El optimizador no odia los parques ni a los vecinos: simplemente no los ve. Destruye todo lo que no entra en el número que se le pide. Es [la ley de Campbell](../53-lo-que-se-mide-se-corrompe/index.qmd), o de Goodhart: cuando un indicador se convierte en el objetivo, deja de medir bien lo que medía. Y no hay indicador inocente: cualquiera, optimizado sin límite, sacrifica lo que no mide.
+
+Con `huida = 0.15`, la contaminación pasa a costar población, y la ciudad que maximiza la población cambia: baja a 85.200 habitantes, su contaminación media cae de 2,6 a 0,8, el 100% de los barrios tiene servicios cerca y la esperanza de vida sube a 81,1 años. El optimizador ha cambiado la mitad de las fábricas por servicios, que dan empleo sin contaminar: de 27 fábricas y 4 parcelas de servicios pasa a 14 y 30. Nadie le ha dicho que los servicios sean empleo limpio: lo descubre a partir de las reglas. Los parques, en cambio, siguen sin entrar en el número, y desaparecen del todo: ningún barrio tiene uno al lado. Lo que el indicador no ve no se protege, ni siquiera de forma indirecta.
+
+La ciudad verde encuentra una trampa nueva. Rodea su única vivienda de nueve fábricas, con una contaminación de 6, para que la gente se vaya: de las 1.000 plazas quedan 100, y los parques por cada mil habitantes suben de 142 a 1.340. El indicador mejora porque la ciudad se vacía. Es el problema que en inteligencia artificial se llama **explotar la recompensa**: un sistema que optimiza la recompensa que se le da, no la que se quería darle.
+
+Y queda la lección de Paul Starr sobre SimCity: los desastres de esta ciudad no son leyes de la naturaleza, sino consecuencias de las reglas que alguien escribió. Cambia una línea marcada con `REGLA` y cambiará el desastre. James C. Scott contó la versión real en *Seeing Like a State*: las ciudades y los bosques planificados para que un número saliera bien, y lo que se perdió por el camino porque el plan no lo veía.
+
+Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J. y Mané, D. (2016). Concrete problems in AI safety. *arXiv*, 1606.06565.
+
+Campbell, D. T. (1979). Assessing the impact of planned social change. *Evaluation and Program Planning*, 2(1), 67–90.
+
+Kirkpatrick, S., Gelatt, C. D. y Vecchi, M. P. (1983). Optimization by simulated annealing. *Science*, 220(4598), 671–680.
+
+Scott, J. C. (1998). *Seeing Like a State: How Certain Schemes to Improve the Human Condition Have Failed*. Yale University Press.
+
+Starr, P. (1994). Seductions of Sim: Policy as a simulation game. *The American Prospect*, 17, 19–29.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: magnasanti
+#| caption: "Tu código"
+# 1. La contaminación que recibe cada parcela: 1 por cada industria a una parcela o menos,
+#    y 0,5 por cada industria en el anillo siguiente, a dos parcelas
+contaminacion <- function(ciudad) {
+  ind <- (ciudad == 2) * 1
+  cerca <- ______
+  lejos <- ______
+  cerca + 0.5 * lejos
+}
+
+huida <- 0      # 3. Prueba con 0.15
+lado <- 12      # 1 vivienda, 2 industria, 3 parque, 4 servicios
+
+# Para cada parcela, la suma de m en el cuadrado de radio r que la rodea, ella incluida
+suma_vecindad <- function(m, r) {
+  n <- nrow(m)
+  p <- matrix(0, n + 2 * r, n + 2 * r)
+  p[(r + 1):(r + n), (r + 1):(r + n)] <- m
+  s <- matrix(0, n, n)
+  for (di in -r:r) for (dj in -r:r)
+    s <- s + p[(r + 1 + di):(r + n + di), (r + 1 + dj):(r + n + dj)]
+  s
+}
+
+indicadores <- function(ciudad) {
+  viv <- ciudad == 1
+  I <- sum(ciudad == 2); P <- sum(ciudad == 3); S <- sum(ciudad == 4)
+  cont <- contaminacion(ciudad)[viv]
+  # REGLA: cada vivienda ofrece 1.000 plazas, menos si está contaminada y huida > 0
+  plazas <- pmax(0, 1 - huida * cont)
+  # REGLA: 2.000 empleos por industria y 500 por servicio; cada empleo sostiene a dos residentes
+  poblacion <- min(sum(plazas), 2 * (2 * I + 0.5 * S))       # en miles
+  if (poblacion == 0) return(c(poblacion = 0, contaminacion = NA, servicios = NA,
+                               parques = NA, esperanza = NA, verde = NA))
+  peso <- plazas / sum(plazas)
+  con_servicio <- suma_vecindad((ciudad == 4) * 1, 2)[viv] > 0
+  con_parque <- suma_vecindad((ciudad == 3) * 1, 1)[viv] > 0
+  # REGLA: la esperanza de vida baja con la contaminación y sin servicios ni parques cerca.
+  # Los paréntesis hacen falta: en R, 8 * !a - 2 se lee 8 * !(a - 2).
+  e <- 85 - 2.5 * cont - 8 * (!con_servicio) - 2 * (!con_parque)
+  c(poblacion = poblacion,
+    contaminacion = sum(peso * cont),
+    servicios = 100 * sum(peso * con_servicio),
+    parques = 100 * sum(peso * con_parque),
+    esperanza = sum(peso * e),
+    verde = P / poblacion)                                     # parques por mil habitantes
+}
+
+# El recocido simulado: cambia una parcela al azar y se queda con el cambio si mejora el
+# objetivo, o, si lo empeora, con una probabilidad que baja a medida que se enfría
+recocido <- function(objetivo, t0, pasos = 10000, semilla = 2010) {
+  set.seed(semilla)
+  ciudad <- matrix(sample(1:4, lado^2, replace = TRUE), lado)
+  valor <- objetivo(ciudad)
+  for (k in 1:pasos) {
+    t <- t0 * (1 - k / pasos) + 1e-3
+    nueva <- ciudad
+    celda <- sample.int(lado^2, 1)
+    nueva[celda] <- sample(setdiff(1:4, ciudad[celda]), 1)
+    v <- objetivo(nueva)
+    if (is.finite(v) && (v >= valor || runif(1) < exp((v - valor) / t))) {
+      ciudad <- nueva
+      valor <- v
+    }
+  }
+  ciudad
+}
+
+maximizar <- function(nombre) function(ciudad) {
+  x <- indicadores(ciudad)[[nombre]]
+  if (is.na(x)) -Inf else x
+}
+
+# 2. Tres ciudades, cada una con un indicador que maximizar. Tarda unos segundos.
+ciudades <- list(
+  poblacion = recocido(maximizar("poblacion"), t0 = 1),
+  esperanza = recocido(maximizar("esperanza"), t0 = 1),
+  verde     = recocido(maximizar("verde"),     t0 = 0.05)
+)
+
+colores <- c("#d35400", "#2c3e50", "#27ae60", "#2980b9")  # vivienda, industria, parque, servicios
+par(mfrow = c(1, 3), mar = c(1, 1, 2, 1))
+for (nombre in names(ciudades))
+  image(ciudades[[nombre]], col = colores, zlim = c(1, 4), axes = FALSE, asp = 1,
+        main = paste("Máx.", nombre))
+round(t(sapply(ciudades, indicadores)), 1)
+```
+
+```{webr}
+#| exercise: magnasanti
+#| solution: true
+# 1. La contaminación que recibe cada parcela: 1 por cada industria a una parcela o menos,
+#    y 0,5 por cada industria en el anillo siguiente, a dos parcelas
+contaminacion <- function(ciudad) {
+  ind <- (ciudad == 2) * 1
+  cerca <- suma_vecindad(ind, 1)
+  lejos <- suma_vecindad(ind, 2) - cerca
+  cerca + 0.5 * lejos
+}
+
+huida <- 0      # 3. Prueba con 0.15
+lado <- 12      # 1 vivienda, 2 industria, 3 parque, 4 servicios
+
+# Para cada parcela, la suma de m en el cuadrado de radio r que la rodea, ella incluida
+suma_vecindad <- function(m, r) {
+  n <- nrow(m)
+  p <- matrix(0, n + 2 * r, n + 2 * r)
+  p[(r + 1):(r + n), (r + 1):(r + n)] <- m
+  s <- matrix(0, n, n)
+  for (di in -r:r) for (dj in -r:r)
+    s <- s + p[(r + 1 + di):(r + n + di), (r + 1 + dj):(r + n + dj)]
+  s
+}
+
+indicadores <- function(ciudad) {
+  viv <- ciudad == 1
+  I <- sum(ciudad == 2); P <- sum(ciudad == 3); S <- sum(ciudad == 4)
+  cont <- contaminacion(ciudad)[viv]
+  # REGLA: cada vivienda ofrece 1.000 plazas, menos si está contaminada y huida > 0
+  plazas <- pmax(0, 1 - huida * cont)
+  # REGLA: 2.000 empleos por industria y 500 por servicio; cada empleo sostiene a dos residentes
+  poblacion <- min(sum(plazas), 2 * (2 * I + 0.5 * S))       # en miles
+  if (poblacion == 0) return(c(poblacion = 0, contaminacion = NA, servicios = NA,
+                               parques = NA, esperanza = NA, verde = NA))
+  peso <- plazas / sum(plazas)
+  con_servicio <- suma_vecindad((ciudad == 4) * 1, 2)[viv] > 0
+  con_parque <- suma_vecindad((ciudad == 3) * 1, 1)[viv] > 0
+  # REGLA: la esperanza de vida baja con la contaminación y sin servicios ni parques cerca.
+  # Los paréntesis hacen falta: en R, 8 * !a - 2 se lee 8 * !(a - 2).
+  e <- 85 - 2.5 * cont - 8 * (!con_servicio) - 2 * (!con_parque)
+  c(poblacion = poblacion,
+    contaminacion = sum(peso * cont),
+    servicios = 100 * sum(peso * con_servicio),
+    parques = 100 * sum(peso * con_parque),
+    esperanza = sum(peso * e),
+    verde = P / poblacion)                                     # parques por mil habitantes
+}
+
+# El recocido simulado: cambia una parcela al azar y se queda con el cambio si mejora el
+# objetivo, o, si lo empeora, con una probabilidad que baja a medida que se enfría
+recocido <- function(objetivo, t0, pasos = 10000, semilla = 2010) {
+  set.seed(semilla)
+  ciudad <- matrix(sample(1:4, lado^2, replace = TRUE), lado)
+  valor <- objetivo(ciudad)
+  for (k in 1:pasos) {
+    t <- t0 * (1 - k / pasos) + 1e-3
+    nueva <- ciudad
+    celda <- sample.int(lado^2, 1)
+    nueva[celda] <- sample(setdiff(1:4, ciudad[celda]), 1)
+    v <- objetivo(nueva)
+    if (is.finite(v) && (v >= valor || runif(1) < exp((v - valor) / t))) {
+      ciudad <- nueva
+      valor <- v
+    }
+  }
+  ciudad
+}
+
+maximizar <- function(nombre) function(ciudad) {
+  x <- indicadores(ciudad)[[nombre]]
+  if (is.na(x)) -Inf else x
+}
+
+# 2. Tres ciudades, cada una con un indicador que maximizar. Tarda unos segundos.
+ciudades <- list(
+  poblacion = recocido(maximizar("poblacion"), t0 = 1),
+  esperanza = recocido(maximizar("esperanza"), t0 = 1),
+  verde     = recocido(maximizar("verde"),     t0 = 0.05)
+)
+
+colores <- c("#d35400", "#2c3e50", "#27ae60", "#2980b9")  # vivienda, industria, parque, servicios
+par(mfrow = c(1, 3), mar = c(1, 1, 2, 1))
+for (nombre in names(ciudades))
+  image(ciudades[[nombre]], col = colores, zlim = c(1, 4), axes = FALSE, asp = 1,
+        main = paste("Máx.", nombre))
+round(t(sapply(ciudades, indicadores)), 1)
+```
+
+```{webr}
+#| exercise: magnasanti
+#| check: true
+# contaminacion() se comprueba en cuadrículas pequeñas, con una y con dos industrias, donde
+# se puede contar a mano; así no depende de lo que haya construido el optimizador.
+e <- .envir_result
+if (!is.function(e$contaminacion) || !is.function(e$suma_vecindad)) {
+  list(correct = FALSE, message = "No encuentro contaminacion() o suma_vecindad().")
+} else {
+  una <- matrix(1, 5, 5); una[3, 3] <- 2
+  esperada <- matrix(0.5, 5, 5); esperada[2:4, 2:4] <- 1
+  dos <- matrix(1, 5, 5); dos[1, 1] <- 2; dos[1, 2] <- 2
+  esperada_dos <- e$suma_vecindad((dos == 2) * 1, 1) + 0.5 * (e$suma_vecindad((dos == 2) * 1, 2) - e$suma_vecindad((dos == 2) * 1, 1))
+  c1 <- tryCatch(e$contaminacion(una), error = function(x) NULL)
+  if (!isTRUE(all.equal(c1, esperada, check.attributes = FALSE))) {
+    list(correct = FALSE, message = paste0(
+      "Con una sola industria en el centro de una cuadrícula de 5 × 5, las ocho parcelas que la rodean deberían recibir 1 ",
+      "y las del borde, 0,5. ", if (is.matrix(c1)) paste0("La tuya da ", format(c1[2, 2], decimal.mark = ","), " en una parcela vecina y ", format(c1[1, 1], decimal.mark = ","),
+      " en una esquina. ") else "",
+      "suma_vecindad(ind, 2) incluye también el cuadrado de radio 1: el anillo exterior es la diferencia."))
+  } else if (!isTRUE(all.equal(e$contaminacion(dos), esperada_dos, check.attributes = FALSE))) {
+    list(correct = FALSE, message = "Con dos industrias juntas en una esquina, la contaminación de cada una debería sumarse a la de la otra, sin salirse de la cuadrícula.")
+  } else {
+    r <- .result
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! La ciudad que maximiza la población tiene ", format(r["poblacion", "poblacion"], decimal.mark = ","),
+      " mil habitantes y una esperanza de vida de ", format(r["poblacion", "esperanza"], decimal.mark = ","),
+      " años; la que maximiza la esperanza de vida, ", format(r["esperanza", "poblacion"], decimal.mark = ","),
+      " mil y ", format(r["esperanza", "esperanza"], decimal.mark = ","), ". Cada una ha sacrificado lo que su número no veía."))
+  }
+}
+```
+
+::: {.hint exercise="magnasanti"}
+`suma_vecindad(ind, 1)` cuenta las industrias en el cuadrado de radio 1. `suma_vecindad(ind, 2)` las cuenta en el de radio 2, que incluye al de radio 1: para quedarte solo con el anillo exterior, resta lo que ya contaste.
+:::
+
+::: {.solution exercise="magnasanti"}
+`cerca <- suma_vecindad(ind, 1)` y `lejos <- suma_vecindad(ind, 2) - cerca`.
+:::
+:::
+
+::::
