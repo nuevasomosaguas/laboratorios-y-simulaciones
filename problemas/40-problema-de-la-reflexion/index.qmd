@@ -1,0 +1,168 @@
+---
+title: "El problema de la reflexión"
+numero: 40
+nivel: 2
+duracion: "30 min"
+lectura: "[Manski (1993)](https://nuevasomosaguas.github.io/biblioteca.html#angrist2009mostly)"
+dificultad: "Intermedio"
+categories: [inferencia causal, sesgo de selección]
+description: "Los amigos se parecen. Que se influyan, que se elijan o que compartan el entorno deja en los datos la misma huella."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Judith Rich Harris sostiene en [*The Nurture Assumption*](https://nuevasomosaguas.github.io/biblioteca.html#harris2009nurture) que a los niños no los socializan tanto sus padres como su grupo de iguales: se adaptan a las normas de sus amigos. La prueba parece fácil. Si un alumno estudia más cuando sus compañeros estudian más, el grupo lo está socializando.
+
+Charles Manski mostró en 1993 por qué no es tan fácil. Que un alumno se parezca a su grupo admite al menos tres explicaciones:
+
+- **contagio** (el efecto *endógeno*): la conducta del grupo cambia la del alumno, que es lo que dice Harris;
+- **contexto**: lo que influye no es lo que hacen los compañeros, sino lo que traen de casa, por ejemplo, el nivel de estudios de sus padres;
+- **afinidad** (los efectos *correlacionados*): nadie influye en nadie, pero los parecidos se juntan, o los junta el colegio.
+
+El código de la derecha inventa una clase de 2000 alumnos repartidos en 100 grupos de 20. Cada alumno trae de casa una `x`, y su conducta, `y`, por ejemplo, las horas de estudio, depende de ella. `simular()` fabrica cuatro mundos. En el de **contagio**, la conducta media del grupo pesa sobre la de cada alumno, y los grupos se forman al azar. En el de **afinidad**, nadie influye en nadie, pero los alumnos se agrupan con quienes tienen una `x` parecida. Los otros dos mundos reparten los grupos al azar: uno sin ninguna influencia y otro en el que solo pesa la `x` media de los compañeros, el **contexto**.
+
+En cada mundo, `regresion()` hace lo que haría un investigador con una encuesta: la regresión de la conducta de cada alumno sobre la conducta media de los demás miembros de su grupo.
+
+**Tu tarea.**
+
+1. Completa `media_otros()`: para cada alumno, la media de `y` entre los demás de su grupo, sin contarse a sí mismo.
+2. Completa `con_uno_mismo`, la pendiente de la regresión de `y` sobre la media de su grupo contando también al propio alumno, `ave(y, grupo)`. Mira cuánto vale en cada mundo.
+3. Compara las filas de contagio y de afinidad. ¿Distingue la regresión entre los dos mundos? ¿Qué columna sí los distingue, y podría calcularse con datos reales?
+4. Mira las dos filas en las que los grupos se reparten al azar. ¿Qué arregla el reparto al azar, y qué no?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En el mundo del contagio, la pendiente es 0,73, con una *t* de 14,03. En el de la afinidad, donde nadie influye en nadie, es 0,77, con una *t* de 16,15. La regresión no distingue la socialización de Harris de la simple selección de amigos. Lo único que separa los dos mundos es la columna `parecidos`, la correlación de la `x` de cada alumno con la de sus compañeros: 0,49 en el mundo de la afinidad, nada en el del contagio. Los alumnos ya se parecían antes de juntarse. Pero eso solo se ve porque aquí conocemos `x`; con datos reales, la afinidad se produce casi siempre por rasgos que nadie mide.
+
+La columna `con_uno_mismo` vale exactamente 1 en los cuatro mundos, y valdría 1 en cualquiera. La media del grupo es la media de las conductas de sus miembros, y una regresión de esas conductas sobre su propia media no puede dar otra cosa. Es la imagen de Manski: intentar averiguar si los movimientos de una persona causan los de su reflejo en el espejo. Por eso el efecto de pares se estima siempre con los demás, sin el propio alumno.
+
+El reparto al azar resuelve una parte del problema. Sin influencia y con grupos al azar, la pendiente cae a −0,15, con una *t* de −1,44: ya no hay nada que confundir con la influencia. Si cambias la semilla, alguna vez saldrá «significativa», con una *t* por encima de 2: es lo que hace un contraste al 5 % una de cada veinte veces cuando no hay nada. Es la idea de Sacerdote (2001), que aprovechó que Dartmouth asignaba al azar los compañeros de habitación de primer curso. Pero no lo resuelve todo. En el mundo del contexto, también con grupos al azar, nadie imita a nadie, y la pendiente es 0,55, con una *t* de 8,36: lo que pesa es lo que los compañeros traen de casa, no lo que hacen. El reparto al azar elimina la afinidad, pero no separa el contagio del contexto. Y la distinción importa: con contagio, cambiar la conducta de un alumno arrastra a todo el grupo y multiplica el efecto de cualquier política; con contexto, no.
+
+Fíjate también en que la pendiente del mundo del contagio, 0,73, exagera el contagio real, que es 0,5: la conducta de los demás también refleja la media del grupo, y con ella la del propio alumno.
+
+Es un fracaso de identificación de la misma familia que [edad, periodo y cohorte](../30-edad-periodo-cohorte/index.qmd): los datos encajan igual de bien con varias historias, y elegir entre ellas exige un supuesto o un diseño que venga de fuera.
+
+Manski, C. F. (1993). Identification of endogenous social effects: The reflection problem. *The Review of Economic Studies*, 60(3), 531–542.
+
+Sacerdote, B. (2001). Peer effects with random assignment: Results for Dartmouth roommates. *The Quarterly Journal of Economics*, 116(2), 681–704.
+
+Harris, J. R. (2009). *The Nurture Assumption: Why Children Turn Out the Way They Do* (ed. revisada). Free Press. Publicado originalmente en 1998.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: reflexion
+#| caption: "Tu código"
+# La media de y entre los demás miembros del grupo de cada alumno
+media_otros <- function(y, grupo) {
+  ______
+}
+
+# 2000 alumnos en grupos de 20 (datos inventados). x: lo que cada alumno trae de casa
+simular <- function(contagio = 0, contexto = 0, ordenados = FALSE, N = 2000, n = 20) {
+  x <- rnorm(N)
+  # Los grupos, al azar o juntando a los parecidos
+  orden <- if (ordenados) order(x + rnorm(N, 0, 1.5)) else sample(N)
+  grupo <- integer(N)
+  grupo[orden] <- rep(seq_len(N / n), each = n)
+  e <- rnorm(N)
+  # El equilibrio: cada uno hace x + e, más el contexto por la x media del grupo
+  # y el contagio por la y media del grupo
+  y_media <- ((1 + contexto) * ave(x, grupo) + ave(e, grupo)) / (1 - contagio)
+  y <- x + e + contexto * ave(x, grupo) + contagio * y_media
+  data.frame(x, y, grupo)
+}
+
+regresion <- function(d) {
+  m <- summary(lm(y ~ media_otros(y, grupo), data = d))$coefficients
+  c(pendiente = m[2, 1], t = m[2, 3],
+    con_uno_mismo = unname(coef(lm(y ~ ______, data = d))[2]),
+    parecidos = cor(d$x, media_otros(d$x, d$grupo)))
+}
+
+set.seed(1993)
+round(rbind(
+  contagio = regresion(simular(contagio = 0.5)),
+  afinidad = regresion(simular(ordenados = TRUE)),
+  afinidad_al_azar = regresion(simular()),
+  contexto_al_azar = regresion(simular(contexto = 1))), 2)
+```
+
+```{webr}
+#| exercise: reflexion
+#| solution: true
+media_otros <- function(y, grupo) {
+  (ave(y, grupo, FUN = sum) - y) / (ave(y, grupo, FUN = length) - 1)
+}
+
+simular <- function(contagio = 0, contexto = 0, ordenados = FALSE, N = 2000, n = 20) {
+  x <- rnorm(N)
+  orden <- if (ordenados) order(x + rnorm(N, 0, 1.5)) else sample(N)
+  grupo <- integer(N)
+  grupo[orden] <- rep(seq_len(N / n), each = n)
+  e <- rnorm(N)
+  y_media <- ((1 + contexto) * ave(x, grupo) + ave(e, grupo)) / (1 - contagio)
+  y <- x + e + contexto * ave(x, grupo) + contagio * y_media
+  data.frame(x, y, grupo)
+}
+
+regresion <- function(d) {
+  m <- summary(lm(y ~ media_otros(y, grupo), data = d))$coefficients
+  c(pendiente = m[2, 1], t = m[2, 3],
+    con_uno_mismo = unname(coef(lm(y ~ ave(y, grupo), data = d))[2]),
+    parecidos = cor(d$x, media_otros(d$x, d$grupo)))
+}
+
+set.seed(1993)
+round(rbind(
+  contagio = regresion(simular(contagio = 0.5)),
+  afinidad = regresion(simular(ordenados = TRUE)),
+  afinidad_al_azar = regresion(simular()),
+  contexto_al_azar = regresion(simular(contexto = 1))), 2)
+```
+
+```{webr}
+#| exercise: reflexion
+#| check: true
+# Se comprueban las funciones con datos propios: el alumno puede cambiar la semilla o los mundos.
+e <- .envir_result
+f <- e$media_otros
+r <- e$regresion
+prueba <- data.frame(x = c(0, 1, 2, 3, 4, 5), y = c(1, 2, 3, 6, 10, 20), grupo = c(1, 1, 1, 2, 2, 2))
+esperado <- c(2.5, 2, 1.5, 15, 13, 8)
+coma <- function(v) paste(format(round(v, 2), decimal.mark = ",", trim = TRUE), collapse = "; ")
+if (!is.function(f) || !is.function(r)) {
+  list(correct = FALSE, message = "No encuentro las funciones media_otros() y regresion().")
+} else if (isTRUE(all.equal(f(prueba$y, prueba$grupo), ave(prueba$y, prueba$grupo)))) {
+  list(correct = FALSE, message = "media_otros() da la media de todo el grupo, contando al propio alumno. Tiene que ser la de los demás: réstale su propia y a la suma del grupo, y divide entre los que quedan.")
+} else if (!isTRUE(all.equal(f(prueba$y, prueba$grupo), esperado))) {
+  list(correct = FALSE, message = paste0(
+    "Con y = 1, 2, 3 en un grupo y 6, 10, 20 en otro, media_otros() debería dar 2,5; 2; 1,5; 15; 13; 8, y da ",
+    coma(f(prueba$y, prueba$grupo)), "."))
+} else if (!isTRUE(all.equal(unname(r(prueba)["con_uno_mismo"]), 1))) {
+  list(correct = FALSE, message = "media_otros() está bien. Falta con_uno_mismo: la regresión de y sobre la media de su grupo contando al propio alumno, ave(y, grupo).")
+} else {
+  v <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con contagio, la pendiente es ", coma(v["contagio", "pendiente"]), "; sin que nadie influya en nadie, pero con los parecidos juntos, ",
+    coma(v["afinidad", "pendiente"]), ". Con grupos al azar y sin influencia cae a ", coma(v["afinidad_al_azar", "pendiente"]),
+    ", pero el contexto, también al azar, deja ", coma(v["contexto_al_azar", "pendiente"]), "."))
+}
+```
+
+::: {.hint exercise="reflexion"}
+`ave(y, grupo, FUN = sum)` repite en cada alumno la suma de `y` de su grupo, y `ave(y, grupo, FUN = length)`, el tamaño del grupo. Quita al alumno de los dos. Para `con_uno_mismo`, la explicativa es la media del grupo con él dentro: `ave(y, grupo)`.
+:::
+
+::: {.solution exercise="reflexion"}
+`(ave(y, grupo, FUN = sum) - y) / (ave(y, grupo, FUN = length) - 1)` en `media_otros()`, y `y ~ ave(y, grupo)` en `con_uno_mismo`.
+:::
+:::
+
+::::
