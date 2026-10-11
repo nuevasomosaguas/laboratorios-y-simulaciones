@@ -1,0 +1,191 @@
+---
+title: "Dos sueldos, un alquiler"
+numero: 44
+nivel: 2
+duracion: "30 min"
+lectura: "Greenwood, Guner, Kocharkov y Santos (2014); Eika, Mogstad y Zafar (2019)"
+dificultad: "Intermedio"
+categories: [equilibrios y dinámica, desigualdad]
+description: "Con la vivienda subiendo más que los sueldos, emparejarse es la forma más eficaz de comprar un piso. Y con quién se empareja cada cual decide quién se queda fuera."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En [La velocidad de escape](../43-velocidad-de-escape/), una persona que gana 20 000 euros netos al año y paga un alquiler no reúne nunca la entrada de un piso de 180 000: la vivienda sube al 7% y los sueldos al 4%. Pero nadie la obliga a ahorrar sola. Una pareja con dos sueldos paga un solo alquiler y, aunque gaste más que una persona sola, no gasta el doble: comparte la cocina, la luz y la lavadora.
+
+El INE y Eurostat miden esas economías de escala con la escala de equivalencia de la OCDE modificada: el primer adulto del hogar cuenta 1, y cada adulto más, 0,5. Una pareja necesita 1,5 veces lo que una persona sola para vivir igual de bien, no 2.
+
+El modelo es el del problema anterior, ahora por hogares. Cada hogar paga un piso de 600 euros al mes, viva en él una persona o dos, y gasta lo que gastaría una persona sola con la renta media del hogar, el 55%, multiplicado por la escala. Lo que sobra, con su interés, va a la entrada del mismo piso de 180 000.
+
+Con la pareja aparece una segunda pregunta. Si hay diez personas y forman cinco parejas, ¿importa quién se empareja con quién? La homogamia es emparejarse con alguien parecido, en estudios o en renta, y es lo habitual.
+
+**Tu tarea.**
+
+1. Completa el `gasto` del hogar en `ahorrar()`.
+2. Completa `homogamia`: una matriz con una pareja por fila, en la que cada cual se empareja con quien gana lo más parecido. `sort()` ordena las rentas y `matrix(..., ncol = 2, byrow = TRUE)` las coloca de dos en dos.
+3. Mira el resultado: ¿cuánto tiene que ganar una persona sola para escapar tan pronto como una pareja de dos sueldos de 20 000? Compara después los años de escape de las cinco parejas con homogamia y con la mezcla.
+4. Pon `escala <- 1`, como si dos personas gastaran el doble que una. ¿Qué parte de la ventaja de la pareja se debe al alquiler compartido?
+5. Vuelve a 0,5 y pon `gp <- 0.12`, el ritmo de 2025 y 2026. ¿Qué pareja se queda fuera?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La persona sola no escapa nunca, y la pareja con dos sueldos de 20 000 reúne la entrada en el año 4. Para escapar a la vez que la pareja, la persona sola tendría que ganar 52 000 euros, 2,6 veces su sueldo y más de lo que ganan los dos juntos. Hay dos ventajas que se suman. La pareja reparte el alquiler entre dos rentas, y gasta el 41% de lo que ingresa en lugar del 55%. Con `escala <- 1` queda solo el alquiler, y la pareja tarda 7 años en lugar de 4. La persona sola necesitaría entonces 40 000 euros, lo que ganan los dos juntos. El alquiler compartido basta para escapar, y las economías de escala adelantan la compra tres años; sin ellas, además, la pareja de las rentas más bajas ya no escapa con homogamia. La pareja de 12 000 y 14 000 euros, que juntos ganan menos que una persona de 32 000, escapa en el año 11; la persona de 32 000, sola, en el 13.
+
+Con las mismas diez personas, la forma de emparejarse decide los plazos. Con homogamia, las parejas escapan en los años 11, 6, 4, 3 y 2: la de las dos rentas más bajas espera once años, y la de las dos más altas, dos. Con la mezcla, todas escapan entre el año 3 y el 4. Al ritmo de 2025 y 2026, la diferencia deja de ser de plazo: con homogamia, la pareja de las rentas más bajas no escapa nunca, y con la mezcla todas lo hacen entre el año 4 y el 5. Las rentas individuales son las mismas en los dos casos; lo que cambia es cómo se suman en los hogares.
+
+Por eso la homogamia es una pieza del debate sobre la desigualdad, y también un ejemplo de lo fácil que es exagerarla. Greenwood, Guner, Kocharkov y Santos (2014) calcularon que, si en Estados Unidos los matrimonios de 2005 se hubieran formado al azar, el índice de Gini de la renta de los hogares habría bajado de 0,43 a 0,34. Ese resultado estaba mal: en una corrección de 2015, los propios autores reconocieron errores en el cálculo, y sus cifras corregidas encajan con las de Eika, Mogstad y Zafar (2019). Estos encuentran, con datos de cinco países, que la homogamia educativa explica una parte modesta pero no despreciable de la desigualdad entre hogares en un momento dado, y casi nada de su aumento en el tiempo. En el modelo de la derecha el efecto es grande porque la vivienda amplifica las diferencias de renta: lo que se compara no es la renta, sino si se llega a una meta.
+
+El modelo deja fuera lo que la sociología de la familia pone en el centro: que emparejarse no es una decisión de ahorro, que las parejas se rompen, y que, si la vivienda empuja a emparejarse antes o a seguir en pareja, también condiciona la nupcialidad y la fecundidad.
+
+Eika, L., Mogstad, M. y Zafar, B. (2019). Educational assortative mating and household income inequality. *Journal of Political Economy*, 127(6), 2795–2835.
+
+Greenwood, J., Guner, N., Kocharkov, G. y Santos, C. (2014). Marry your like: Assortative mating and income inequality. *American Economic Review*, 104(5), 348–353.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: parejas
+#| caption: "Tu código"
+precio <- 180000  # el piso del problema anterior
+alquiler <- 7200  # 600 euros al mes, para una persona o para dos
+consumo <- 0.55   # lo que gasta una persona sola en todo lo que no es vivienda
+escala <- 0.5     # lo que añade al gasto cada adulto más: la escala de la OCDE modificada
+k <- 0.3          # la entrada, el 20%, más un 10% de impuestos y gastos
+gp <- 0.07        # subida anual de la vivienda
+gy <- 0.04        # subida anual de los sueldos
+ga <- 0.04        # subida anual del alquiler
+r <- 0.02         # rentabilidad del ahorro
+
+# La fracción de la entrada que reúne cada año un hogar con estas rentas
+ahorrar <- function(rentas, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    gasto <- ______  # lo que gastaría una persona sola con la renta media del hogar, por la escala
+    ahorro <- ahorro * (1 + r) + sum(rentas) - gasto - alquiler
+    rentas <- rentas * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+escapa <- function(rentas) which(ahorrar(rentas) >= 1)[1]
+
+# 1. Una persona sola y una pareja, con 20 000 euros cada una
+sola <- escapa(20000)
+pareja <- escapa(c(20000, 20000))
+
+# Lo que tendría que ganar la persona sola para escapar tan pronto como la pareja
+necesaria <- 20000
+while (!is.na(pareja) && (is.na(escapa(necesaria)) || escapa(necesaria) > pareja)) necesaria <- necesaria + 1000
+
+# 2. Diez personas, cinco parejas, dos formas de emparejarse
+rentas <- c(25, 12, 40, 18, 22, 14, 32, 16, 28, 20) * 1000
+homogamia <- ______  # una pareja por fila: cada cual con quien gana lo más parecido
+mezcla <- cbind(sort(rentas)[1:5], sort(rentas, decreasing = TRUE)[1:5])  # quien menos gana, con quien más
+
+list(sola = sola, pareja = pareja, necesaria = necesaria,
+     homogamia = apply(homogamia, 1, escapa), mezcla = apply(mezcla, 1, escapa))
+```
+
+```{webr}
+#| exercise: parejas
+#| solution: true
+precio <- 180000
+alquiler <- 7200
+consumo <- 0.55
+escala <- 0.5
+k <- 0.3
+gp <- 0.07
+gy <- 0.04
+ga <- 0.04
+r <- 0.02
+
+ahorrar <- function(rentas, anios = 40) {
+  ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    gasto <- consumo * mean(rentas) * (1 + escala * (length(rentas) - 1))
+    ahorro <- ahorro * (1 + r) + sum(rentas) - gasto - alquiler
+    rentas <- rentas * (1 + gy)
+    precio <- precio * (1 + gp)
+    alquiler <- alquiler * (1 + ga)
+    x[t] <- ahorro / (k * precio)
+  }
+  x
+}
+escapa <- function(rentas) which(ahorrar(rentas) >= 1)[1]
+
+sola <- escapa(20000)
+pareja <- escapa(c(20000, 20000))
+
+necesaria <- 20000
+while (!is.na(pareja) && (is.na(escapa(necesaria)) || escapa(necesaria) > pareja)) necesaria <- necesaria + 1000
+
+rentas <- c(25, 12, 40, 18, 22, 14, 32, 16, 28, 20) * 1000
+homogamia <- matrix(sort(rentas), ncol = 2, byrow = TRUE)
+mezcla <- cbind(sort(rentas)[1:5], sort(rentas, decreasing = TRUE)[1:5])
+
+list(sola = sola, pareja = pareja, necesaria = necesaria,
+     homogamia = apply(homogamia, 1, escapa), mezcla = apply(mezcla, 1, escapa))
+```
+
+```{webr}
+#| exercise: parejas
+#| check: true
+# Se comprueban ahorrar() y homogamia con los parámetros del alumno: las tareas 4 y 5 los cambian.
+e <- .envir_result
+referencia <- function(rentas, anios = 40) {
+  precio <- e$precio; alquiler <- e$alquiler; ahorro <- 0
+  x <- numeric(anios)
+  for (t in 1:anios) {
+    gasto <- e$consumo * mean(rentas) * (1 + e$escala * (length(rentas) - 1))
+    ahorro <- ahorro * (1 + e$r) + sum(rentas) - gasto - alquiler
+    rentas <- rentas * (1 + e$gy); precio <- precio * (1 + e$gp); alquiler <- alquiler * (1 + e$ga)
+    x[t] <- ahorro / (e$k * precio)
+  }
+  x
+}
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+bien <- function(rentas) isTRUE(all.equal(e$ahorrar(rentas), referencia(rentas), tolerance = 1e-6))
+# Cada pareja con sus rentas en orden, y las parejas ordenadas, para comparar sin importar el orden
+ordenar <- function(m) { m <- t(apply(m, 1, sort)); m[order(m[, 1]), , drop = FALSE] }
+if (!is.function(e$ahorrar)) {
+  list(correct = FALSE, message = "No encuentro la función ahorrar().")
+} else if (!bien(20000)) {
+  list(correct = FALSE, message = "ahorrar() no da el ahorro bueno ni para una persona sola: ella gasta el 55% de su renta, consumo * renta, y la escala no cuenta.")
+} else if (!bien(c(10000, 30000))) {
+  list(correct = FALSE, message = paste0(
+    "ahorrar() está bien para una persona sola, pero no para una pareja. Una pareja con 10 000 y 30 000 euros gasta lo que una persona con la renta media, 20 000, multiplicado por 1 + escala: el primer año debería reunir el ",
+    coma(100 * referencia(c(10000, 30000))[1]), "% de la entrada, y reúne el ", coma(100 * e$ahorrar(c(10000, 30000))[1]), "%."))
+} else if (!is.matrix(e$homogamia) || ncol(e$homogamia) != 2 || length(e$homogamia) != length(e$rentas)) {
+  list(correct = FALSE, message = "homogamia tiene que ser una matriz de dos columnas, con una pareja por fila y cada persona una sola vez.")
+} else if (!isTRUE(all.equal(ordenar(e$homogamia), ordenar(matrix(sort(e$rentas), ncol = 2, byrow = TRUE)), check.attributes = FALSE))) {
+  list(correct = FALSE, message = "homogamia no empareja a cada cual con quien gana lo más parecido: ordena las rentas y júntalas de dos en dos, la primera con la segunda, la tercera con la cuarta. Sin byrow = TRUE, matrix() las reparte por columnas.")
+} else {
+  sola <- if (is.na(.result$sola)) "no escapa nunca" else paste("escapa en el año", .result$sola)
+  anios <- function(v) paste(ifelse(is.na(v), "nunca", v), collapse = ", ")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Sola, con 20 000 euros, ", sola, "; en pareja, en el año ", .result$pareja,
+    ". Las cinco parejas escapan en los años: ", anios(.result$homogamia),
+    " con homogamia, y en los años ", anios(.result$mezcla), " con la mezcla."))
+}
+```
+
+::: {.hint exercise="parejas"}
+Una persona sola gasta `consumo * renta`. Un hogar gasta lo mismo que una persona con la renta media, `mean(rentas)`, multiplicado por la escala: 1 más `escala` por cada adulto además del primero, `length(rentas) - 1`. Para la homogamia, ordena las rentas con `sort()` y repártelas de dos en dos con `matrix()`.
+:::
+
+::: {.solution exercise="parejas"}
+`gasto <- consumo * mean(rentas) * (1 + escala * (length(rentas) - 1))` en `ahorrar()`, y `homogamia <- matrix(sort(rentas), ncol = 2, byrow = TRUE)`.
+:::
+:::
+
+::::
