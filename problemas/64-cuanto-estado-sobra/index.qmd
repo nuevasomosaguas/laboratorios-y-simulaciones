@@ -1,0 +1,326 @@
+---
+title: "¿Cuánto Estado sobra?"
+numero: 64
+nivel: 2
+duracion: "35 min"
+lectura: "[Preston, Heuveline y Guillot (2001)](https://nuevasomosaguas.github.io/biblioteca.html#preston2001demography)"
+dificultad: "Intermedio"
+categories: [demografía, paradojas de agregación]
+description: "El gasto público español frente al de la Unión Europea, con la edad descontada: cuánto explica la demografía, cuánto no, y por qué la respuesta depende de con qué población se compare."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos, en esta carpeta y copiados tal cual en el código del ejercicio:
+
+- cofog2024.csv (SHA-256 5b59aa0bcd05c609009e3a05f3e7bf49a5793fe0a8707b2d2ab9030518c714e4): gasto de las administraciones
+  públicas en 2024, en % del PIB, de los 27 países de la UE y del agregado UE27_2020. Eurostat, tabla gov_10a_exp
+  (unit = PC_GDP, sector = S13, na_item = TE), https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/gov_10a_exp?unit=PC_GDP&sector=S13&na_item=TE&sinceTimePeriod=2019&format=JSON&lang=EN
+  (descargada el 11 de octubre de 2026, actualizada por Eurostat el 16 de septiembre de 2026,
+  SHA-256 5504b45212b1d1a16e1c190db3d3c46a19ccc7d5c34145bee195eb2b0df99b0b). Columnas: total (TOTAL), sanidad (GF07),
+  educacion (GF09), vejez (GF1002, vejez, más GF1003, supervivencia: las pensiones de viudedad), familia (GF1004),
+  desempleo (GF1005) e intereses (GF0107, transacciones de la deuda pública).
+- poblacion2024.csv (SHA-256 244b78fbf760cb569829ea332f7e737a00463b5a56be4759349e08a63a984601): población a 1 de enero de
+  2024, en miles, por grupos de cinco años hasta 85 y más. Eurostat, tabla demo_pjangroup (sex = T),
+  https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjangroup?sex=T&unit=NR&sinceTimePeriod=2019&format=JSON&lang=EN
+  (descargada el 11 de octubre de 2026, SHA-256 b5724a58c72773b312a5d6bb84d9c7352c0dbef1f8fa7d08af0ccdd716dd8a4c).
+  Lituania no tiene en 2024 los grupos de 30-34 y 45-49 años: se toma la media de 2023 y 2025. La UE es la suma de los 27.
+- perfil_sanidad.csv (SHA-256 cb1f2bdb627054366d201aa3291ef9a663657ea87a1bc9c5560b34e90b051b13): gasto sanitario público
+  per cápita por edad en España, ambos sexos, en euros. Es el gráfico 10 de AIReF (2023), Documento técnico sobre la
+  metodología de los modelos de sanidad, educación y cuidados a largo plazo, p. 24,
+  https://www.airef.es/wp-content/uploads/2023/03/OPINI%C3%93N-SOSTENIBILIDAD/230324.-DT.3.23_-Metodologi%CC%81a-modelos-sanidad-educacio%CC%81n-y-cuidados-a-largo-plazo.pdf
+  (SHA-256 583bda28fd2b6bea1be27114ef9bbf0d5a67d12d76f9cfc483a2c8a7a328cd3d). El gráfico solo da la línea, sin cifras: se
+  leyó de los vértices de la línea «Ambos sexos» en el SVG de la página (pdftocairo -svg -f 24 -l 24), con el eje entre
+  y = 1849,33 (0 euros) y y = 3473,75 (4.500 euros), con un error de lectura de unos 10 euros. Los grupos de 85-89, 90-94 y
+  95 y más se juntan en 85 y más, ponderados por la población española de esas edades a 1 de enero de 2025 (INE, tabla 56934,
+  la de ../59-cuantos-bits-te-delatan/edades.csv).
+
+Los CSV se hicieron con R y jsonlite, con las respuestas guardadas como gov.json y pop.json, y la misma función lee() de
+../63-la-pobreza-que-baja:
+
+ue <- c("BE","BG","CZ","DK","DE","EE","IE","EL","ES","FR","HR","IT","CY","LV","LT","LU","HU","MT","NL","AT","PL","PT","RO","SI","SK","FI","SE")
+geos <- c(ue, "EU27_2020")
+g <- lee("gov"); p <- lee("pop")
+gv <- function(c) g$valor[match(paste(geos, c, "2024"), paste(g$geo, g$cofog99, g$time))]
+gasto <- data.frame(pais = geos, total = gv("TOTAL"), sanidad = gv("GF07"), educacion = gv("GF09"),
+                    vejez = gv("GF1002") + gv("GF1003"), familia = gv("GF1004"), desempleo = gv("GF1005"), intereses = gv("GF0107"))
+grupos <- c("Y_LT5","Y5-9","Y10-14","Y15-19","Y20-24","Y25-29","Y30-34","Y35-39","Y40-44","Y45-49","Y50-54","Y55-59",
+            "Y60-64","Y65-69","Y70-74","Y75-79","Y80-84","Y_GE85")
+pob <- t(sapply(geos, function(c) p$valor[match(paste(c, grupos, "2024"), paste(p$geo, p$age, p$time))]))
+colnames(pob) <- grupos
+for (a in c("Y30-34", "Y45-49")) pob["LT", a] <- round(mean(p$valor[p$geo == "LT" & p$age == a & p$time %in% c("2023", "2025")]))
+pob["EU27_2020", ] <- colSums(pob[ue, ])
+pob <- round(pob / 1000)
+gasto$pais[gasto$pais == "EU27_2020"] <- "UE27"; rownames(pob)[rownames(pob) == "EU27_2020"] <- "UE27"
+write.csv(gasto, "cofog2024.csv", row.names = FALSE, quote = FALSE)
+write.csv(data.frame(pais = rownames(pob), pob, check.names = FALSE), "poblacion2024.csv", row.names = FALSE, quote = FALSE)
+
+Con la población sin redondear a miles, las cifras de «Qué está pasando» no cambian en la segunda decimal.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+«El Estado está inflado» y «el Estado se queda corto» son dos frases que se dicen con la misma cifra: el gasto público en porcentaje del PIB. En 2024 fue del 45,5% en España y del 48,9% en el conjunto de la Unión Europea. Pero comparar esas cifras tal cual es comparar las tasas brutas de mortalidad de [España y México](../22-espana-muere-mas/index.qmd): una parte del gasto depende de la edad de la población. Un país con más jubilados gasta más en pensiones y en sanidad sin que su Estado sea más generoso, y uno con más niños gasta más en educación.
+
+La solución es la de los demógrafos: la **estandarización directa**. Se calcula cuánto gasta cada país por unidad de «necesidad» y se aplica a una misma población de referencia. Solo tiene sentido con las funciones que dependen de la edad, que son cuatro, cada una con sus pesos por grupo de edad:
+
+- **vejez**, incluidas las pensiones de viudedad: las personas de 65 años o más;
+- **educación**: las de 5 a 24;
+- **familia** e hijos: las de 0 a 19;
+- **sanidad**: todos, pero con el perfil de gasto por edad de AIReF para España, que va de unos 1.000 euros al año entre los 5 y los 24 años a unos 4.000 a partir de los 80.
+
+Si $p_a$ es la población del grupo de edad $a$ y $w_a$ su peso, la necesidad de un país es $\sum_a w_a p_a / \sum_a p_a$: la proporción de jubilados, de estudiantes o de niños, o el gasto sanitario por habitante que tendría con el perfil de AIReF. El gasto estandarizado es el gasto del país multiplicado por la necesidad de la población de referencia y dividido por la suya. El resto del gasto, de la defensa a la administración general, no depende de la edad y se compara tal cual. Dentro de él se separan dos partidas que dependen de otras cosas: el desempleo, del ciclo económico, y los intereses, de la deuda acumulada.
+
+**Tu tarea.**
+
+1. Completa `necesidad()`: la media de los pesos `pesos` en una población `pob` por grupos de edad.
+2. Completa `estandariza()`: el gasto de un país con su población `pob`, llevado a la población de referencia `ref`.
+3. Mira `funciones`: el gasto de España sin estandarizar, el de España con la población de la UE y el de la UE. ¿En qué función gasta España más que la UE, una vez descontada la edad?
+4. Mira `diferencia`: el gasto total de España y de la UE con cinco poblaciones de referencia distintas, y la diferencia entre los dos. ¿Cuánto se mueve la conclusión?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin estandarizar, España gasta 3,4 puntos del PIB menos que la UE. La población española es algo más joven, con un 20,4% de mayores de 65 años frente al 21,6%, así que descontar la edad no da la vuelta a la comparación: con la población de la UE como referencia, España gastaría el 46,46% del PIB, y la UE el 48,90%. La diferencia se reduce a 2,44 puntos. España pasa del puesto 17 al 16 de los 27 países, y el que más sube es Luxemburgo, con una población muy joven: del 46,8% al 51,35%.
+
+La diferencia depende de la referencia. Con la población de Italia, la más vieja de la UE con un 24,3% de mayores de 65 años, es de 2,14 puntos; con la de Irlanda, una de las dos más jóvenes, con un 15,5% (la otra es Luxemburgo, con un 15,1%), de 3,10. Es el mismo problema que con las tasas de mortalidad estandarizadas: el número depende de la población estándar, porque cada una pondera de forma distinta las funciones en las que los dos países se diferencian. Lo que no cambia con ninguna de las cinco es el signo.
+
+El desglose por funciones es más interesante que el total. Con la población de la UE, España gasta en **vejez** el 13,35% del PIB, frente al 12,20% de la UE: 1,15 puntos más por persona mayor, en relación con su PIB por habitante. En las otras tres gasta menos: sanidad, 6,56 frente a 7,30; educación, 4,19 frente a 4,70; y familia, 1,07 frente a 2,00, casi la mitad. En desempleo gasta 0,3 puntos más, con una tasa de paro que dobla la europea, y en intereses 0,6 más, por la deuda. El resto del gasto, lo que no explican ni la edad ni el paro ni la deuda, es el 17,3% del PIB en España y el 19,6% en la UE.
+
+Ese resto es lo más parecido a una medida honesta de «inflado», y cada cual puede leerlo según su punto de partida. Quien cree que el Estado español gasta de más puede señalar las pensiones por persona mayor, por encima de la media, y los intereses de la deuda. Quien cree que gasta de menos puede señalar el gasto en familia y el total, por debajo de la media con cualquier referencia. Las dos lecturas usan los mismos números.
+
+Lo que la cuenta no puede decir es cuánto «sobra». La media de la UE no es un óptimo, sino una convención, y el porcentaje del PIB mide el esfuerzo, no la eficiencia: un Estado que gasta poco puede despilfarrar, y uno que gasta mucho puede hacerlo bien. Tampoco ve los beneficios fiscales, que son gasto que no pasa por el presupuesto, ni las regulaciones. Y tiene supuestos que conviene recordar: el perfil sanitario es el español, aplicado a todos los países; las clasificaciones de la COFOG no son idénticas en todos ellos; y el PIB de Irlanda, inflado por las multinacionales, hace que su gasto en porcentaje parezca la mitad del resto.
+
+AIReF (2023). *Documento técnico sobre la metodología de los modelos de sanidad, educación y cuidados a largo plazo*. Autoridad Independiente de Responsabilidad Fiscal.
+
+Eurostat (2019). *Manual on Sources and Methods for the Compilation of COFOG Statistics: Classification of the Functions of Government* (ed. 2019). Oficina de Publicaciones de la Unión Europea.
+
+Kitagawa, E. M. (1955). Components of a difference between two rates. *Journal of the American Statistical Association*, 50(272), 1168–1194.
+
+Preston, S. H., Heuveline, P. y Guillot, M. (2001). *Demography: Measuring and Modeling Population Processes*. Blackwell, cap. 2.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: estado
+#| caption: "Tu código"
+# Gasto público en 2024, % del PIB. Eurostat, COFOG.
+gasto <- data.frame(
+  pais      = c("BE", "BG", "CZ", "DK", "DE", "EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV",
+                "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE", "UE27"),
+  total     = c(54.1, 39.2, 42.9, 47.3, 49.4, 44.0, 22.4, 48.2, 45.5, 57.3, 48.0, 50.4, 38.3, 45.6, 39.4, 46.8, 47.1, 37.3, 44.4, 55.2, 49.4, 42.4, 43.3, 46.5, 47.5, 57.7, 50.5, 48.9),
+  sanidad   = c(8.0, 5.4, 9.0, 8.3, 7.6, 6.3, 5.2, 5.7, 6.5, 8.9, 9.0, 6.6, 6.1, 5.4, 5.8, 5.6, 4.7, 5.0, 7.3, 9.5, 6.1, 6.8, 5.2, 8.0, 6.9, 7.7, 7.4, 7.3),
+  educacion = c(6.3, 4.3, 4.5, 5.6, 4.5, 6.3, 2.7, 3.9, 4.1, 5.1, 5.0, 4.0, 5.0, 6.1, 5.5, 5.0, 4.9, 4.7, 5.1, 5.3, 5.6, 4.3, 4.0, 5.5, 5.1, 6.3, 7.3, 4.7),
+  vejez     = c(11.6, 10.6, 8.5, 7.2, 11.8, 8.2, 3.3, 13.9, 12.6, 14.8, 9.5, 16.3, 9.0, 8.3, 7.2, 10.4, 7.6, 6.8, 6.1, 15.7, 12.4, 12.5, 9.9, 11.4, 10.0, 16.2, 11.1, 12.2),
+  familia   = c(2.2, 2.1, 1.4, 4.1, 1.9, 2.4, 1.5, 0.9, 1.0, 2.3, 1.8, 1.5, 1.8, 1.4, 1.8, 3.7, 1.6, 0.9, 2.4, 2.1, 3.1, 1.8, 1.6, 1.8, 3.5, 3.5, 2.3, 2.0),
+  desempleo = c(1.1, 0.4, 0.2, 1.4, 1.7, 0.9, 0.6, 0.7, 1.5, 1.7, 0.2, 0.9, 0.3, 0.5, 1.0, 1.1, 0.3, 0.1, 0.7, 1.2, 0.2, 0.5, 0.0, 0.3, 0.4, 1.6, 1.1, 1.2),
+  intereses = c(2.3, 0.5, 1.4, 0.8, 1.1, 0.6, 0.6, 3.6, 2.5, 2.0, 1.7, 4.0, 1.2, 1.2, 0.8, 0.4, 5.0, 1.3, 0.7, 1.7, 2.4, 2.2, 2.5, 1.3, 1.5, 1.6, 0.8, 1.9)
+)
+poblacion <- rbind(
+  BE    = c(590, 643, 692, 691, 691, 736, 790, 770, 775, 745, 780, 792, 766, 670, 567, 469, 300, 350),
+  BG    = c(287, 305, 318, 313, 279, 271, 364, 429, 452, 506, 487, 446, 456, 450, 421, 324, 193, 143),
+  CZ    = c(540, 592, 596, 593, 516, 546, 706, 744, 800, 946, 790, 683, 610, 638, 612, 496, 288, 204),
+  DK    = c(307, 311, 321, 351, 376, 410, 404, 358, 340, 377, 391, 417, 368, 327, 296, 289, 180, 140),
+  DE    = c(3791, 4024, 3822, 3946, 4396, 4906, 5363, 5585, 5378, 4897, 5574, 6720, 6345, 5181, 4389, 3098, 3197, 2844),
+  EE    = c(66, 76, 79, 76, 66, 70, 96, 108, 99, 94, 93, 83, 87, 82, 70, 50, 40, 39),
+  IE    = c(294, 338, 381, 356, 320, 316, 338, 383, 432, 391, 362, 321, 293, 250, 214, 167, 105, 91),
+  EL    = c(395, 448, 513, 546, 530, 517, 545, 620, 766, 802, 788, 778, 702, 648, 554, 492, 330, 401),
+  ES    = c(1746, 2196, 2489, 2645, 2603, 2624, 2838, 3069, 3638, 4100, 3867, 3644, 3234, 2730, 2276, 1972, 1353, 1597),
+  FR    = c(3444, 3897, 4260, 4232, 3966, 3867, 4101, 4302, 4373, 4177, 4560, 4448, 4264, 3933, 3695, 2968, 1835, 2346),
+  HR    = c(172, 177, 193, 193, 200, 226, 225, 251, 270, 263, 254, 271, 279, 278, 239, 160, 118, 94),
+  IT    = c(2031, 2410, 2745, 2921, 2950, 3012, 3213, 3357, 3681, 4381, 4771, 4849, 4293, 3672, 3254, 2887, 2223, 2320),
+  CY    = c(51, 47, 49, 47, 53, 68, 78, 81, 77, 65, 62, 59, 58, 51, 44, 36, 23, 18),
+  LV    = c(84, 107, 98, 100, 88, 85, 125, 145, 131, 124, 129, 125, 135, 121, 97, 71, 62, 52),
+  LT    = c(119, 149, 150, 139, 136, 159, 203, 219, 196, 191, 205, 206, 221, 180, 141, 103, 87, 76),
+  LU    = c(34, 36, 36, 35, 39, 51, 55, 53, 51, 48, 47, 46, 39, 31, 25, 19, 13, 13),
+  HU    = c(459, 471, 455, 492, 517, 555, 618, 622, 684, 856, 710, 618, 544, 627, 531, 382, 258, 186),
+  MT    = c(22, 24, 23, 23, 32, 51, 57, 52, 46, 39, 32, 29, 31, 30, 27, 25, 11, 11),
+  NL    = c(864, 899, 952, 1019, 1183, 1172, 1204, 1137, 1073, 1052, 1244, 1265, 1202, 1048, 921, 808, 487, 414),
+  AT    = c(424, 454, 438, 450, 501, 587, 638, 630, 621, 582, 650, 713, 653, 520, 413, 340, 317, 228),
+  PL    = c(1630, 1943, 1965, 1823, 1762, 2047, 2472, 2843, 3013, 2819, 2373, 2130, 2301, 2492, 2097, 1315, 782, 814),
+  PT    = c(430, 448, 486, 528, 571, 570, 596, 626, 726, 820, 783, 755, 737, 685, 619, 517, 364, 379),
+  RO    = c(920, 1046, 1068, 1096, 985, 971, 1121, 1332, 1337, 1512, 1472, 1310, 1081, 1259, 1060, 662, 446, 390),
+  SI    = c(93, 106, 114, 104, 103, 112, 122, 144, 159, 160, 148, 152, 145, 138, 121, 81, 64, 59),
+  SK    = c(278, 299, 291, 270, 261, 300, 377, 415, 436, 447, 375, 342, 340, 338, 283, 181, 111, 82),
+  FI    = c(236, 278, 318, 315, 308, 343, 379, 369, 367, 347, 316, 360, 359, 346, 337, 294, 170, 163),
+  SE    = c(558, 615, 631, 613, 592, 643, 780, 716, 655, 644, 661, 683, 587, 544, 515, 505, 329, 282),
+  UE27  = c(19865, 22339, 23482, 23917, 24023, 25214, 27807, 29361, 30576, 31387, 31922, 32244, 30132, 27266, 23818, 18709, 13687, 13737)
+)
+# Gasto sanitario público per cápita por edad en España, en euros. AIReF (2023), gráfico 10.
+perfil_sanidad <- c(2530, 995, 954, 975, 1037, 1369, 1369, 1555, 1431, 1618, 1721, 2094, 2219, 2696, 2945, 3276, 4002, 3891)
+
+# Los pesos de cada función por grupo de edad: 0-4, 5-9, ..., 80-84, 85+
+pesos <- list(
+  sanidad   = perfil_sanidad,
+  educacion = c(0, 1, 1, 1, 1, rep(0, 13)),   # de 5 a 24 años
+  vejez     = c(rep(0, 13), 1, 1, 1, 1, 1),   # 65 y más
+  familia   = c(1, 1, 1, 1, rep(0, 14))       # de 0 a 19
+)
+
+# 1. La necesidad de una población: la media de los pesos
+necesidad <- function(pob, pesos) {
+  ______
+}
+
+# 2. El gasto de un país con población pob, llevado a la población de referencia ref
+estandariza <- function(gasto, pesos, pob, ref) {
+  ______
+}
+
+# El gasto de un país por funciones: las ligadas a la edad, estandarizadas, y el resto, tal cual
+desglose <- function(pais, ref) {
+  g <- gasto[gasto$pais == pais, ]
+  edad <- sapply(names(pesos), function(f) estandariza(g[[f]], pesos[[f]], poblacion[pais, ], ref))
+  c(edad, desempleo = g$desempleo, intereses = g$intereses,
+    otros = g$total - sum(g[names(pesos)]) - g$desempleo - g$intereses)
+}
+
+# 3. España sin estandarizar, España con la población de la UE, y la UE
+ue <- poblacion["UE27", ]
+funciones <- rbind(espana_sin_estandarizar = desglose("ES", poblacion["ES", ]),
+                   espana = desglose("ES", ue), ue = desglose("UE27", ue))
+
+# Los 27 países, con la población de la UE
+estandarizado <- sapply(gasto$pais, function(p) sum(desglose(p, ue)))
+puesto <- rank(-estandarizado[gasto$pais != "UE27"])["ES"]
+dotchart(sort(estandarizado), pch = 19, xlab = "Gasto público estandarizado por edad (% del PIB, población de la UE)")
+
+# 4. España y la UE con cinco referencias: la población de cada uno, la de la UE, la de España,
+#    la de Irlanda (de las más jóvenes) y la de Italia (la más vieja)
+diferencia <- sapply(c("propia", "UE27", "ES", "IE", "IT"), function(r) {
+  es <- sum(desglose("ES", poblacion[if (r == "propia") "ES" else r, ]))
+  eu <- sum(desglose("UE27", poblacion[if (r == "propia") "UE27" else r, ]))
+  c(espana = es, ue = eu, diferencia = es - eu)
+})
+print(round(funciones, 2))
+print(puesto)
+round(diferencia, 2)
+```
+
+```{webr}
+#| exercise: estado
+#| solution: true
+gasto <- data.frame(
+  pais      = c("BE", "BG", "CZ", "DK", "DE", "EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV",
+                "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE", "UE27"),
+  total     = c(54.1, 39.2, 42.9, 47.3, 49.4, 44.0, 22.4, 48.2, 45.5, 57.3, 48.0, 50.4, 38.3, 45.6, 39.4, 46.8, 47.1, 37.3, 44.4, 55.2, 49.4, 42.4, 43.3, 46.5, 47.5, 57.7, 50.5, 48.9),
+  sanidad   = c(8.0, 5.4, 9.0, 8.3, 7.6, 6.3, 5.2, 5.7, 6.5, 8.9, 9.0, 6.6, 6.1, 5.4, 5.8, 5.6, 4.7, 5.0, 7.3, 9.5, 6.1, 6.8, 5.2, 8.0, 6.9, 7.7, 7.4, 7.3),
+  educacion = c(6.3, 4.3, 4.5, 5.6, 4.5, 6.3, 2.7, 3.9, 4.1, 5.1, 5.0, 4.0, 5.0, 6.1, 5.5, 5.0, 4.9, 4.7, 5.1, 5.3, 5.6, 4.3, 4.0, 5.5, 5.1, 6.3, 7.3, 4.7),
+  vejez     = c(11.6, 10.6, 8.5, 7.2, 11.8, 8.2, 3.3, 13.9, 12.6, 14.8, 9.5, 16.3, 9.0, 8.3, 7.2, 10.4, 7.6, 6.8, 6.1, 15.7, 12.4, 12.5, 9.9, 11.4, 10.0, 16.2, 11.1, 12.2),
+  familia   = c(2.2, 2.1, 1.4, 4.1, 1.9, 2.4, 1.5, 0.9, 1.0, 2.3, 1.8, 1.5, 1.8, 1.4, 1.8, 3.7, 1.6, 0.9, 2.4, 2.1, 3.1, 1.8, 1.6, 1.8, 3.5, 3.5, 2.3, 2.0),
+  desempleo = c(1.1, 0.4, 0.2, 1.4, 1.7, 0.9, 0.6, 0.7, 1.5, 1.7, 0.2, 0.9, 0.3, 0.5, 1.0, 1.1, 0.3, 0.1, 0.7, 1.2, 0.2, 0.5, 0.0, 0.3, 0.4, 1.6, 1.1, 1.2),
+  intereses = c(2.3, 0.5, 1.4, 0.8, 1.1, 0.6, 0.6, 3.6, 2.5, 2.0, 1.7, 4.0, 1.2, 1.2, 0.8, 0.4, 5.0, 1.3, 0.7, 1.7, 2.4, 2.2, 2.5, 1.3, 1.5, 1.6, 0.8, 1.9)
+)
+poblacion <- rbind(
+  BE    = c(590, 643, 692, 691, 691, 736, 790, 770, 775, 745, 780, 792, 766, 670, 567, 469, 300, 350),
+  BG    = c(287, 305, 318, 313, 279, 271, 364, 429, 452, 506, 487, 446, 456, 450, 421, 324, 193, 143),
+  CZ    = c(540, 592, 596, 593, 516, 546, 706, 744, 800, 946, 790, 683, 610, 638, 612, 496, 288, 204),
+  DK    = c(307, 311, 321, 351, 376, 410, 404, 358, 340, 377, 391, 417, 368, 327, 296, 289, 180, 140),
+  DE    = c(3791, 4024, 3822, 3946, 4396, 4906, 5363, 5585, 5378, 4897, 5574, 6720, 6345, 5181, 4389, 3098, 3197, 2844),
+  EE    = c(66, 76, 79, 76, 66, 70, 96, 108, 99, 94, 93, 83, 87, 82, 70, 50, 40, 39),
+  IE    = c(294, 338, 381, 356, 320, 316, 338, 383, 432, 391, 362, 321, 293, 250, 214, 167, 105, 91),
+  EL    = c(395, 448, 513, 546, 530, 517, 545, 620, 766, 802, 788, 778, 702, 648, 554, 492, 330, 401),
+  ES    = c(1746, 2196, 2489, 2645, 2603, 2624, 2838, 3069, 3638, 4100, 3867, 3644, 3234, 2730, 2276, 1972, 1353, 1597),
+  FR    = c(3444, 3897, 4260, 4232, 3966, 3867, 4101, 4302, 4373, 4177, 4560, 4448, 4264, 3933, 3695, 2968, 1835, 2346),
+  HR    = c(172, 177, 193, 193, 200, 226, 225, 251, 270, 263, 254, 271, 279, 278, 239, 160, 118, 94),
+  IT    = c(2031, 2410, 2745, 2921, 2950, 3012, 3213, 3357, 3681, 4381, 4771, 4849, 4293, 3672, 3254, 2887, 2223, 2320),
+  CY    = c(51, 47, 49, 47, 53, 68, 78, 81, 77, 65, 62, 59, 58, 51, 44, 36, 23, 18),
+  LV    = c(84, 107, 98, 100, 88, 85, 125, 145, 131, 124, 129, 125, 135, 121, 97, 71, 62, 52),
+  LT    = c(119, 149, 150, 139, 136, 159, 203, 219, 196, 191, 205, 206, 221, 180, 141, 103, 87, 76),
+  LU    = c(34, 36, 36, 35, 39, 51, 55, 53, 51, 48, 47, 46, 39, 31, 25, 19, 13, 13),
+  HU    = c(459, 471, 455, 492, 517, 555, 618, 622, 684, 856, 710, 618, 544, 627, 531, 382, 258, 186),
+  MT    = c(22, 24, 23, 23, 32, 51, 57, 52, 46, 39, 32, 29, 31, 30, 27, 25, 11, 11),
+  NL    = c(864, 899, 952, 1019, 1183, 1172, 1204, 1137, 1073, 1052, 1244, 1265, 1202, 1048, 921, 808, 487, 414),
+  AT    = c(424, 454, 438, 450, 501, 587, 638, 630, 621, 582, 650, 713, 653, 520, 413, 340, 317, 228),
+  PL    = c(1630, 1943, 1965, 1823, 1762, 2047, 2472, 2843, 3013, 2819, 2373, 2130, 2301, 2492, 2097, 1315, 782, 814),
+  PT    = c(430, 448, 486, 528, 571, 570, 596, 626, 726, 820, 783, 755, 737, 685, 619, 517, 364, 379),
+  RO    = c(920, 1046, 1068, 1096, 985, 971, 1121, 1332, 1337, 1512, 1472, 1310, 1081, 1259, 1060, 662, 446, 390),
+  SI    = c(93, 106, 114, 104, 103, 112, 122, 144, 159, 160, 148, 152, 145, 138, 121, 81, 64, 59),
+  SK    = c(278, 299, 291, 270, 261, 300, 377, 415, 436, 447, 375, 342, 340, 338, 283, 181, 111, 82),
+  FI    = c(236, 278, 318, 315, 308, 343, 379, 369, 367, 347, 316, 360, 359, 346, 337, 294, 170, 163),
+  SE    = c(558, 615, 631, 613, 592, 643, 780, 716, 655, 644, 661, 683, 587, 544, 515, 505, 329, 282),
+  UE27  = c(19865, 22339, 23482, 23917, 24023, 25214, 27807, 29361, 30576, 31387, 31922, 32244, 30132, 27266, 23818, 18709, 13687, 13737)
+)
+perfil_sanidad <- c(2530, 995, 954, 975, 1037, 1369, 1369, 1555, 1431, 1618, 1721, 2094, 2219, 2696, 2945, 3276, 4002, 3891)
+
+pesos <- list(
+  sanidad   = perfil_sanidad,
+  educacion = c(0, 1, 1, 1, 1, rep(0, 13)),
+  vejez     = c(rep(0, 13), 1, 1, 1, 1, 1),
+  familia   = c(1, 1, 1, 1, rep(0, 14))
+)
+
+necesidad <- function(pob, pesos) {
+  sum(pob * pesos) / sum(pob)
+}
+
+estandariza <- function(gasto, pesos, pob, ref) {
+  gasto * necesidad(ref, pesos) / necesidad(pob, pesos)
+}
+
+desglose <- function(pais, ref) {
+  g <- gasto[gasto$pais == pais, ]
+  edad <- sapply(names(pesos), function(f) estandariza(g[[f]], pesos[[f]], poblacion[pais, ], ref))
+  c(edad, desempleo = g$desempleo, intereses = g$intereses,
+    otros = g$total - sum(g[names(pesos)]) - g$desempleo - g$intereses)
+}
+
+ue <- poblacion["UE27", ]
+funciones <- rbind(espana_sin_estandarizar = desglose("ES", poblacion["ES", ]),
+                   espana = desglose("ES", ue), ue = desglose("UE27", ue))
+
+estandarizado <- sapply(gasto$pais, function(p) sum(desglose(p, ue)))
+puesto <- rank(-estandarizado[gasto$pais != "UE27"])["ES"]
+dotchart(sort(estandarizado), pch = 19, xlab = "Gasto público estandarizado por edad (% del PIB, población de la UE)")
+
+diferencia <- sapply(c("propia", "UE27", "ES", "IE", "IT"), function(r) {
+  es <- sum(desglose("ES", poblacion[if (r == "propia") "ES" else r, ]))
+  eu <- sum(desglose("UE27", poblacion[if (r == "propia") "UE27" else r, ]))
+  c(espana = es, ue = eu, diferencia = es - eu)
+})
+print(round(funciones, 2))
+print(puesto)
+round(diferencia, 2)
+```
+
+```{webr}
+#| exercise: estado
+#| check: true
+# Las dos funciones se comprueban con una población de dos grupos, en la que todo se hace a mano.
+e <- .envir_result
+coma <- function(x, d = 2) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+if (!is.function(e$necesidad) || !is.function(e$estandariza)) {
+  list(correct = FALSE, message = "No encuentro necesidad() o estandariza().")
+} else if (!isTRUE(all.equal(e$necesidad(c(10, 30), c(1, 0)), 0.25)) || !isTRUE(all.equal(e$necesidad(c(10, 30), c(4, 2)), 2.5))) {
+  list(correct = FALSE, message = paste0(
+    "En una población de 10 mayores y 30 jóvenes, la necesidad con pesos c(1, 0) es la proporción de mayores, 0,25, y ",
+    "necesidad() da ", coma(e$necesidad(c(10, 30), c(1, 0))), ". Es la media de los pesos ponderada por la población: ",
+    "suma de población por peso, dividida por la población total."))
+} else if (!isTRUE(all.equal(e$estandariza(10, c(1, 0), c(10, 30), c(30, 10)), 30))) {
+  list(correct = FALSE, message = paste0(
+    "Un país con un 25% de mayores gasta en pensiones el 10% del PIB. Con un 75% de mayores, como la referencia, gastaría el 30%, ",
+    "y estandariza(10, c(1, 0), c(10, 30), c(30, 10)) da ", coma(e$estandariza(10, c(1, 0), c(10, 30), c(30, 10))),
+    ". El gasto por unidad de necesidad del país, multiplicado por la necesidad de la referencia."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con la población de la UE, España gastaría el ", coma(r["espana", "UE27"]), "% del PIB y la UE el ",
+    coma(r["ue", "UE27"]), "%. La diferencia va de ", coma(max(r["diferencia", ])), " a ", coma(min(r["diferencia", ])),
+    " puntos según la referencia."))
+}
+```
+
+::: {.hint exercise="estado"}
+`necesidad()` es una media ponderada: `sum(pob * pesos)` entre `sum(pob)`. En `estandariza()`, divide el gasto entre la necesidad del país, para tener el gasto por unidad de necesidad, y multiplícalo por la de la referencia.
+:::
+
+::: {.solution exercise="estado"}
+`sum(pob * pesos) / sum(pob)` en `necesidad()`, y `gasto * necesidad(ref, pesos) / necesidad(pob, pesos)` en `estandariza()`.
+:::
+:::
+
+::::
