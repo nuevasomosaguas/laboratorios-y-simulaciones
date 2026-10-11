@@ -9,7 +9,8 @@ lectura: "Autor (año)"  # si la obra está en la biblioteca, enlázala a su fic
 # semana: "[Semana N](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-NN/)"  # solo si encaja de verdad
 # Una a tres de las etiquetas que ya existen; una nueva solo si la van a compartir varios problemas:
 # paradojas de agregación, inferencia causal, sesgo de selección, estadística, modelos de agentes,
-# equilibrios y dinámica, DBO, biología, demografía, juegos y votación, desigualdad
+# equilibrios y dinámica, DBO, biología, demografía, juegos y votación, desigualdad,
+# efectos de segundo orden
 categories: [paradojas de agregación, estadística]
 description: "Una frase que dé ganas de abrirlo."
 page-layout: full

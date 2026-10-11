@@ -1,0 +1,177 @@
+---
+title: "La inmunidad que no se ve"
+numero: 56
+nivel: 2
+duracion: "30 min"
+lectura: "[Smaldino (2023)](https://nuevasomosaguas.github.io/biblioteca.html#smaldino2023modeling)"
+dificultad: "Intermedio"
+categories: [efectos de segundo orden, equilibrios y dinámica]
+description: "Vacunar al 60% no evita el 60% de los contagios: protege también a quien no se vacuna, y puede evitarlos todos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Una vacuna protege a quien se la pone. La cuenta de la vieja dice entonces que vacunar al 60% de la población evita el 60% de los contagios: los de los vacunados. Pero cada vacunado es también alguien que no contagiará a nadie, y una epidemia que encuentra menos gente a la que pasar se apaga antes. La protección llega también a quien no se ha vacunado, y no se ve: nadie sabe de qué contagio se ha librado.
+
+En el modelo **SIR** de Kermack y McKendrick, cada persona está susceptible (S), infectada (I) o recuperada (R), y una persona infectada, en una población toda susceptible, contagia de media a $R_0$ antes de recuperarse. Si una fracción $s_0$ es susceptible al empezar (el resto, vacunado), la fracción $z$ de los susceptibles que acaba infectándose cumple la **relación del tamaño final**:
+
+$$z = 1 - e^{-R_0\,s_0\,z}.$$
+
+No tiene solución con una fórmula, pero se encuentra por **iteración de punto fijo**: se empieza con $z = 1$, se calcula el lado derecho, se pone el resultado en $z$ y se repite hasta que deja de cambiar. Cuando $R_0\,s_0 < 1$, cada infectado contagia a menos de una persona, la única solución es $z = 0$ y no hay epidemia: la **inmunidad de grupo** empieza en una cobertura de $1 - 1/R_0$. Aquí $R_0 = 2$, un valor ilustrativo.
+
+**Tu tarea.** Es el guion de la serie de efectos de segundo orden, en cuatro pasos:
+
+1. **La cuenta de la vieja.** Vacunar a una fracción de la población evita esa misma fracción de los contagios. Está en la columna `evitados_estatico`.
+2. **El modelo completo.** Completa `tamano_final()`: el paso de la iteración. `infectados()` lo usa para calcular la fracción de toda la población que se infecta, con cuatro coberturas.
+3. **La diferencia.** Completa `evitados_real`: la fracción de los contagios sin vacuna que la vacunación evita de verdad. La columna `diferencia` la compara con la cuenta de la vieja.
+4. **El eslabón.** Mira la columna `riesgo_no_vacunado`, la probabilidad de infectarse de quien no se vacuna, y el gráfico, con los infectados según la cobertura en el modelo y en la cuenta de la vieja. ¿Dónde está el umbral de inmunidad de grupo? ¿Quién ha cambiado de conducta para que el riesgo de los no vacunados baje?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin vacuna, con $R_0 = 2$, se infecta el 79,7% de la población. Vacunando al 20%, se infecta el 51,4%: se evita el 35,5% de los contagios, no el 20%. Vacunando al 40%, el 18,8%: se evita el 76,4%, casi el doble de lo que dice la cuenta de la vieja. Y vacunando al 60% o al 80% no hay epidemia: se evitan todos. El umbral es $1 - 1/R_0 = 0{,}5$, y allí la diferencia con la cuenta estática es la mayor posible, 50 puntos: el gráfico muestra la curva del modelo cayendo a cero mientras la recta de la cuenta de la vieja sigue bajando despacio.
+
+La diferencia está en los no vacunados. Su riesgo de infectarse baja del 79,7% al 64,2% con un 20% de vacunados, al 31,4% con un 40% y a cero con un 60%, sin que hayan hecho nada. Nadie ha cambiado de conducta: el eslabón es la **agregación**, el segundo de la cadena micro-macro de Hedström. Cada vacunado toma una decisión sobre sí mismo, pero la suma de esas decisiones cambia el entorno de todos, porque reduce los contactos por los que puede pasar el virus. La cuenta de la vieja suma protecciones individuales; el modelo suma también lo que cada una hace por las demás.
+
+Es el caso de la serie en el que el segundo orden juega a favor: el cálculo estático **subestima** el beneficio, en lugar de sobrestimarlo. El modelo es el más sencillo posible (mezcla homogénea, una vacuna que protege del todo, una población cerrada y tan grande que el azar no cuenta), y con un $R_0$ como el del sarampión, de más de 10, el umbral pasaría del 90%. Y tiene un tercer eslabón esperando: si la protección de los demás es visible, a cada cual le compensa dejar que se vacunen los otros, y la cobertura puede quedarse por debajo del umbral, que es la **retroalimentación** que estudian Bauch y Earn con teoría de juegos. La lección de la serie es que el cálculo estático se equivoca, y lo hace en cualquiera de las dos direcciones: con el rebote de Jevons promete más de lo que se consigue; con la vacuna, menos.
+
+Anderson, R. M. y May, R. M. (1991). *Infectious Diseases of Humans: Dynamics and Control*. Oxford University Press.
+
+Bauch, C. T. y Earn, D. J. D. (2004). Vaccination and the theory of games. *Proceedings of the National Academy of Sciences*, 101(36), 13391–13394.
+
+Fine, P., Eames, K. y Heymann, D. L. (2011). "Herd immunity": A rough guide. *Clinical Infectious Diseases*, 52(7), 911–916.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Kermack, W. O. y McKendrick, A. G. (1927). A contribution to the mathematical theory of epidemics. *Proceedings of the Royal Society of London. Series A*, 115(772), 700–721.
+
+Smaldino, P. E. (2023). *Modeling Social Behavior: Mathematical and Agent-Based Models of Social Dynamics and Cultural Evolution*. Princeton University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: inmunidad
+#| caption: "Tu código"
+# 2. La fracción de los susceptibles que acaba infectada: z = 1 - exp(-R0 * s0 * z)
+tamano_final <- function(R0, s0) {
+  z <- 1
+  for (i in 1:10000) {  # un tope: cerca del umbral, la iteración se arrastra
+    nuevo <- ______
+    if (abs(nuevo - z) < 1e-10) break
+    z <- nuevo
+  }
+  z
+}
+
+# La fracción de toda la población que se infecta: solo los no vacunados pueden
+infectados <- function(R0, cobertura) (1 - cobertura) * tamano_final(R0, 1 - cobertura)
+
+R0 <- 2
+sin_vacuna <- infectados(R0, 0)
+casos <- data.frame(cobertura = c(0.2, 0.4, 0.6, 0.8))
+casos$evitados_estatico <- casos$cobertura                           # 1. la cuenta de la vieja
+casos$infectados <- sapply(casos$cobertura, infectados, R0 = R0)     # 2. el modelo completo
+casos$riesgo_no_vacunado <- sapply(1 - casos$cobertura, tamano_final, R0 = R0)
+casos$evitados_real <- ______                                        # 3. los contagios evitados de verdad
+casos$diferencia <- casos$evitados_real - casos$evitados_estatico
+
+# 4. Los infectados según la cobertura, en el modelo y en la cuenta de la vieja
+cobertura <- seq(0, 1, by = 0.01)
+plot(cobertura, sapply(cobertura, infectados, R0 = R0), type = "l", lwd = 2,
+     xlab = "Cobertura de vacunación", ylab = "Fracción de la población infectada")
+lines(cobertura, sin_vacuna * (1 - cobertura), lty = 2, lwd = 2, col = "grey40")
+abline(v = 1 - 1 / R0, lty = 3, col = "grey")
+legend("topright", c("modelo SIR", "cuenta de la vieja"), lty = 1:2, lwd = 2, col = c("black", "grey40"), bty = "n")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: inmunidad
+#| solution: true
+tamano_final <- function(R0, s0) {
+  z <- 1
+  for (i in 1:10000) {
+    nuevo <- 1 - exp(-R0 * s0 * z)
+    if (abs(nuevo - z) < 1e-10) break
+    z <- nuevo
+  }
+  z
+}
+
+infectados <- function(R0, cobertura) (1 - cobertura) * tamano_final(R0, 1 - cobertura)
+
+R0 <- 2
+sin_vacuna <- infectados(R0, 0)
+casos <- data.frame(cobertura = c(0.2, 0.4, 0.6, 0.8))
+casos$evitados_estatico <- casos$cobertura
+casos$infectados <- sapply(casos$cobertura, infectados, R0 = R0)
+casos$riesgo_no_vacunado <- sapply(1 - casos$cobertura, tamano_final, R0 = R0)
+casos$evitados_real <- 1 - casos$infectados / sin_vacuna
+casos$diferencia <- casos$evitados_real - casos$evitados_estatico
+
+cobertura <- seq(0, 1, by = 0.01)
+plot(cobertura, sapply(cobertura, infectados, R0 = R0), type = "l", lwd = 2,
+     xlab = "Cobertura de vacunación", ylab = "Fracción de la población infectada")
+lines(cobertura, sin_vacuna * (1 - cobertura), lty = 2, lwd = 2, col = "grey40")
+abline(v = 1 - 1 / R0, lty = 3, col = "grey")
+legend("topright", c("modelo SIR", "cuenta de la vieja"), lty = 1:2, lwd = 2, col = c("black", "grey40"), bty = "n")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: inmunidad
+#| check: true
+# tamano_final() se comprueba con casos propios (sin vacuna, con la mitad susceptible y por
+# debajo del umbral), y evitados_real, con los infectados del propio alumno: así puede cambiar R0.
+e <- .envir_result
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+pc <- function(x) paste0(format(round(100 * x, 1), nsmall = 1, decimal.mark = ","), "%")
+z1 <- 0.7968121  # z = 1 - exp(-2 z)
+z2 <- 0.5828116  # z = 1 - exp(-1.5 z)
+if (!is.function(e$tamano_final) || !is.function(e$infectados) || !is.data.frame(e$casos)) {
+  list(correct = FALSE, message = "No encuentro tamano_final(), infectados() o la tabla casos.")
+} else if (abs(e$tamano_final(2, 1) - z1) > 1e-6) {
+  list(correct = FALSE, message = paste0(
+    "Sin vacuna (s0 = 1) y con R0 = 2, tamano_final(2, 1) debería dar ", coma(z1), ", y da ", coma(e$tamano_final(2, 1)),
+    ". En cada paso, el z nuevo es 1 - exp(-R0 * s0 * z) con el z anterior."))
+} else if (abs(e$tamano_final(3, 0.5) - z2) > 1e-6) {
+  list(correct = FALSE, message = paste0(
+    "Con R0 = 3 y la mitad de la población susceptible, tamano_final(3, 0.5) debería dar ", coma(z2), ", y da ",
+    coma(e$tamano_final(3, 0.5)), ". Los contagios dependen de cuántos susceptibles quedan: falta s0 en el exponente."))
+} else if (abs(e$tamano_final(2, 0.4)) > 1e-6) {
+  list(correct = FALSE, message = paste0(
+    "Con R0 = 2 y un 40% susceptible, cada infectado contagia a 0,8 personas y no hay epidemia: tamano_final(2, 0.4) ",
+    "debería dar 0, y da ", coma(e$tamano_final(2, 0.4)), "."))
+} else if (length(e$casos$evitados_real) != nrow(e$casos) ||
+           !isTRUE(all.equal(e$casos$evitados_real, 1 - e$casos$infectados / e$infectados(e$R0, 0)))) {
+  list(correct = FALSE, message = paste0(
+    "evitados_real debería ser la fracción de los contagios sin vacuna (sin_vacuna) que ya no ocurren: ",
+    "con una cobertura que no evite ninguno, 0, y con una que los evite todos, 1. Con la primera cobertura da ",
+    coma(e$casos$evitados_real[1]), "."))
+} else {
+  r <- e$casos
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Vacunando al ", round(100 * r$cobertura[2]), "% se evita el ", pc(r$evitados_real[2]),
+    " de los contagios, no el ", round(100 * r$cobertura[2]), "%: el riesgo de los no vacunados baja al ",
+    pc(r$riesgo_no_vacunado[2]), ". El umbral de inmunidad de grupo, 1 - 1/R0, está en ",
+    coma(1 - 1 / e$R0, 2), "."))
+}
+```
+
+::: {.hint exercise="inmunidad"}
+El paso de la iteración es la relación del tamaño final tal cual, con el `z` de la vuelta anterior a la derecha: `exp()` da la exponencial, y en el exponente van `R0`, `s0` y `z`. Para los evitados, compara `casos$infectados` con `sin_vacuna`: ¿qué fracción de los contagios sin vacuna ya no ocurre?
+:::
+
+::: {.solution exercise="inmunidad"}
+`1 - exp(-R0 * s0 * z)` en `tamano_final()`, y `1 - casos$infectados / sin_vacuna` en `evitados_real`.
+:::
+:::
+
+::::

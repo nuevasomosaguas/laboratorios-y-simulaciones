@@ -1,0 +1,162 @@
+---
+title: "El rebote de Jevons"
+numero: 49
+nivel: 1
+duracion: "20 min"
+lectura: "[Wrigley (2010)](https://nuevasomosaguas.github.io/biblioteca.html#wrigley2010energy)"
+dificultad: "Iniciación"
+categories: [efectos de segundo orden]
+description: "Una máquina un 20% más eficiente no ahorra un 20% de energía: si el servicio se abarata lo bastante, se gasta más que antes."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 1865, la Inglaterra victoriana temía quedarse sin carbón, y muchos confiaban en que las máquinas de vapor cada vez más eficientes estirarían las reservas. William Stanley Jevons, con 29 años, sostuvo en *The Coal Question* lo contrario: «es una completa confusión de ideas suponer que el uso económico del combustible equivale a un consumo menor. La verdad es justo la contraria». Cada mejora de la máquina de vapor había abaratado su trabajo, y el carbón había entrado en industrias donde antes no compensaba. Hoy se llama **efecto rebote**, y cuando se come todo el ahorro, *backfire*: la paradoja de Jevons.
+
+Nadie quiere energía, sino lo que hace: calor en casa, kilómetros, luz. Una mejora de eficiencia $e$ reduce la energía que cuesta cada unidad de servicio de 1 a $1 - e$, y si la energía es todo su coste, el precio del servicio baja en la misma proporción. Con una demanda de **elasticidad constante** $\varepsilon$ (negativa: si el precio baja un 1%, el consumo sube un $|\varepsilon|$%), el servicio pasa de 1 a $(1-e)^{\varepsilon}$, y la energía, de 1 a
+
+$$E = (1-e)^{\varepsilon}\,(1-e).$$
+
+**Tu tarea.** Es el guion de la serie de efectos de segundo orden, en cuatro pasos:
+
+1. **La cuenta de la vieja.** Si nadie cambia lo que consume, una mejora del 20% ahorra un 20% de energía. En `rebote()` es `ahorro_estatico`, y ya está escrito.
+2. **El modelo completo.** Completa `energia()`: el servicio que se consume al nuevo precio. El ahorro real es lo que baja la energía.
+3. **La diferencia.** Completa `rebote()`: la parte del ahorro estático que se come el aumento del consumo, 0 si no se come nada y 1 si se lo come entero.
+4. **El eslabón.** Mira la tabla, con una mejora del 20% y cinco elasticidades, y el gráfico, con tres mejoras distintas. ¿A partir de qué elasticidad la mejora hace gastar más energía que antes? ¿Depende de lo grande que sea la mejora? ¿Quién ha reaccionado, y a qué?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La cuenta de la vieja solo acierta si el consumo no responde al precio (elasticidad 0): entonces la mejora del 20% ahorra el 20%. Con una elasticidad de −0,2, el servicio sube un 4,6% y el ahorro baja al 16,4%: el rebote se come el 18%. Con −0,5, el servicio sube un 11,8%, el ahorro se queda en el 10,6% y el rebote se come el 47%. Con −1, el servicio sube un 25%, justo lo que bajó la energía por unidad, y el ahorro es cero. Y con −1,5 la mejora hace gastar un 11,8% **más** energía que antes: el rebote es del 159%.
+
+El umbral está en $|\varepsilon| = 1$, y no depende del tamaño de la mejora: las tres curvas del gráfico cruzan el 100% en el mismo punto. Con elasticidad constante, la energía es $(1-e)^{1+\varepsilon}$, que baja si $1 + \varepsilon > 0$ y sube si $1 + \varepsilon < 0$. Cuando la demanda es inelástica, la mejora ahorra energía, aunque menos de lo que dice la cuenta estática; cuando es elástica, la aumenta.
+
+El eslabón que falla en la cuenta de la vieja es el primero de la cadena micro-macro de Hedström, la **respuesta individual**: la mejora no cambia lo que la gente quiere, sino el precio de conseguirlo, y cada cual vuelve a decidir cuánto consume con el precio nuevo. No hace falta nada más: un solo hogar, sin vecinos ni mercado, ya rebota. Lo que el modelo deja fuera son los eslabones siguientes, que también empujan: lo que se ahorra en calefacción se gasta en otras cosas que también consumen energía, y una energía más productiva hace crecer la economía, que fue el argumento de Jevons para el carbón. Cuánto pesa cada parte es una pregunta empírica, y muy discutida.
+
+La misma estructura aparece en la carretera. Sam Peltzman sostuvo en 1975 que los dispositivos de seguridad obligatorios en los coches de Estados Unidos apenas habían reducido las muertes, porque los conductores, más protegidos, conducían con menos cuidado: la **compensación del riesgo**, con el riesgo en el papel del precio. La lección de la serie no es que las mejoras salgan mal, sino que el cálculo estático se equivoca, y puede hacerlo en cualquiera de las dos direcciones: aquí sobrestima el ahorro, y en otros casos lo subestima.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+Jevons, W. S. (1865). *The Coal Question: An Inquiry Concerning the Progress of the Nation, and the Probable Exhaustion of Our Coal-Mines*. Macmillan.
+
+Peltzman, S. (1975). The effects of automobile safety regulation. *Journal of Political Economy*, 83(4), 677–725.
+
+Sorrell, S. (2009). Jevons' paradox revisited: The evidence for backfire from improved energy efficiency. *Energy Policy*, 37(4), 1456–1469.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: jevons
+#| caption: "Tu código"
+# 2. La energía tras una mejora de eficiencia e (antes, 1), con demanda de elasticidad constante
+energia <- function(e, elasticidad) {
+  servicio <- ______  # el servicio que se consume cuando su precio pasa de 1 a (1 - e)
+  servicio * (1 - e)  # cada unidad de servicio gasta (1 - e) de energía
+}
+
+rebote <- function(e, elasticidad) {
+  ahorro_estatico <- e                        # 1. la cuenta de la vieja: nadie reacciona
+  ahorro_real <- 1 - energia(e, elasticidad)  # 2. el modelo completo
+  ______                                      # 3. la parte del ahorro estático que se pierde
+}
+
+# Una mejora del 20%, con cinco elasticidades
+casos <- data.frame(elasticidad = c(0, -0.2, -0.5, -1, -1.5))
+casos$servicio <- energia(0.2, casos$elasticidad) / 0.8
+casos$ahorro_estatico <- 0.2
+casos$ahorro_real <- 1 - energia(0.2, casos$elasticidad)
+casos$rebote <- rebote(0.2, casos$elasticidad)
+
+# 4. El rebote según la elasticidad, con mejoras del 10%, el 20% y el 50%
+x <- seq(0, -2, by = -0.02)
+curvas <- sapply(c(0.1, 0.2, 0.5), rebote, elasticidad = x)
+matplot(x, curvas, type = "l", lty = 1, lwd = 2, col = 1:3,
+        xlab = "Elasticidad de la demanda del servicio", ylab = "Rebote (parte del ahorro que se pierde)")
+abline(h = 1, v = -1, lty = 2, col = "grey")
+legend("topleft", c("mejora del 10%", "mejora del 20%", "mejora del 50%"), col = 1:3, lwd = 2, bty = "n")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: jevons
+#| solution: true
+energia <- function(e, elasticidad) {
+  servicio <- (1 - e)^elasticidad
+  servicio * (1 - e)
+}
+
+rebote <- function(e, elasticidad) {
+  ahorro_estatico <- e
+  ahorro_real <- 1 - energia(e, elasticidad)
+  1 - ahorro_real / ahorro_estatico
+}
+
+casos <- data.frame(elasticidad = c(0, -0.2, -0.5, -1, -1.5))
+casos$servicio <- energia(0.2, casos$elasticidad) / 0.8
+casos$ahorro_estatico <- 0.2
+casos$ahorro_real <- 1 - energia(0.2, casos$elasticidad)
+casos$rebote <- rebote(0.2, casos$elasticidad)
+
+x <- seq(0, -2, by = -0.02)
+curvas <- sapply(c(0.1, 0.2, 0.5), rebote, elasticidad = x)
+matplot(x, curvas, type = "l", lty = 1, lwd = 2, col = 1:3,
+        xlab = "Elasticidad de la demanda del servicio", ylab = "Rebote (parte del ahorro que se pierde)")
+abline(h = 1, v = -1, lty = 2, col = "grey")
+legend("topleft", c("mejora del 10%", "mejora del 20%", "mejora del 50%"), col = 1:3, lwd = 2, bty = "n")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: jevons
+#| check: true
+# Las dos funciones se comprueban con casos propios: sin respuesta (elasticidad 0), con la
+# mitad de precio, y con mejoras distintas, para que el alumno pueda cambiar la tabla.
+e <- .envir_result
+coma <- function(x, d = 3) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$energia) || !is.function(e$rebote)) {
+  list(correct = FALSE, message = "No encuentro energia() o rebote().")
+} else if (!isTRUE(all.equal(e$energia(0.2, 0), 0.8))) {
+  list(correct = FALSE, message = paste0(
+    "Si el consumo no responde al precio (elasticidad 0), el servicio se queda en 1 y la energía baja a 0,8: ",
+    "energia(0.2, 0) debería dar 0,800, y da ", coma(e$energia(0.2, 0)), "."))
+} else if (!isTRUE(all.equal(e$energia(c(0.5, 0.2), c(-0.5, -1.5)), c(0.5^0.5, 0.8^-0.5)))) {
+  list(correct = FALSE, message = paste0(
+    "Con e = 0,5, el servicio cuesta la mitad, y con elasticidad -0,5 su consumo sube: energia(0.5, -0.5) debería dar ",
+    coma(0.5^0.5), ", y da ", coma(e$energia(0.5, -0.5)), ". El servicio es el precio nuevo, (1 - e), ",
+    "elevado a la elasticidad: con elasticidad negativa, un precio menor da más servicio."))
+} else if (!isTRUE(all.equal(e$rebote(0.2, 0), 0))) {
+  list(correct = FALSE, message = paste0(
+    "Sin respuesta al precio, el ahorro real es el estático y no hay rebote: rebote(0.2, 0) debería dar 0, y da ",
+    coma(e$rebote(0.2, 0)), "."))
+} else if (!isTRUE(all.equal(e$rebote(c(0.5, 0.1), c(-0.5, -1.5)), 1 - (1 - c(0.5^0.5, 0.9^-0.5)) / c(0.5, 0.1)))) {
+  list(correct = FALSE, message = paste0(
+    "rebote(0.5, -0.5) debería dar ", coma(1 - (1 - 0.5^0.5) / 0.5), ", y da ", coma(e$rebote(0.5, -0.5)),
+    ". El rebote es la parte del ahorro estático que no llega a ahorrarse, medida como fracción del ahorro estático: ",
+    "1 si el ahorro real es 0, y más de 1 si es negativo."))
+} else {
+  r <- e$casos
+  pc <- function(x) paste0(format(round(100 * x, 1), nsmall = 1, decimal.mark = ","), "%")
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con una mejora del 20% y elasticidad -0,5, el ahorro real es del ", pc(r$ahorro_real[3]),
+    ": el rebote se come el ", round(100 * r$rebote[3]), "%. Con -1 el ahorro desaparece, y con -1,5 la energía sube un ",
+    pc(-r$ahorro_real[5]), ". El umbral, |elasticidad| = 1, es el mismo para cualquier mejora."))
+}
+```
+
+::: {.hint exercise="jevons"}
+El precio del servicio pasa de 1 a `(1 - e)`, y con elasticidad constante el consumo es el precio elevado a la elasticidad, con `^`. Para el rebote, compara `ahorro_real` con `ahorro_estatico`: ¿qué fracción del segundo no llega a ahorrarse?
+:::
+
+::: {.solution exercise="jevons"}
+`(1 - e)^elasticidad` en `energia()`, y `1 - ahorro_real / ahorro_estatico` en `rebote()`.
+:::
+:::
+
+::::
