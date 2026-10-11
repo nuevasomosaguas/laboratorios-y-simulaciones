@@ -1,0 +1,184 @@
+---
+title: "Cuando el azar puede más que la selección"
+numero: 46
+nivel: 2
+duracion: "30 min"
+lectura: "[Gillespie (2004)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2007mathematical)"
+dificultad: "Intermedio"
+categories: [biología, equilibrios y dinámica]
+description: "En una población pequeña, un alelo mejor se pierde casi siempre y uno peor a veces se impone, sin que nadie elija nada."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Una población de $N$ individuos lleva $2N$ copias de un gen, y una fracción $p$ de ellas es el alelo $A$. Cada generación nace de la anterior por sorteo: cada una de las $2N$ copias nuevas sale de una copia de los padres elegida al azar. Aunque ningún alelo sea mejor que otro, la frecuencia cambia de generación en generación, como cambia la proporción de caras en tandas de monedas, y tarde o temprano el alelo se fija o desaparece. Es la **deriva genética**, el modelo de Wright y Fisher, y el resultado más contraintuitivo de la genética de poblaciones.
+
+Si el alelo $A$ da una ventaja $s$ a quien lo lleva, antes del sorteo su frecuencia sube a
+
+$$p_s = \frac{p\,(1+s)}{1 + s\,p},$$
+
+y luego se sortean las $2N$ copias con esa probabilidad. Motoo Kimura calculó en 1962 la probabilidad de que un alelo que empieza con frecuencia $p_0$ acabe fijado:
+
+$$u = \frac{1 - e^{-4Nsp_0}}{1 - e^{-4Ns}}.$$
+
+Sin selección, $u = p_0$: un alelo neutro se fija con la misma probabilidad con la que está presente. Lo que decide si manda la selección o el azar no es $s$, sino $4Ns$.
+
+**Tu tarea.**
+
+1. Completa `generacion()`: el número de copias de $A$ en la generación siguiente, sorteadas entre las $2N$ con probabilidad `p_sel`. Recibe un vector `n`, una población por elemento.
+2. Completa `kimura()`: la probabilidad de fijación.
+3. Mira la tabla: cinco casos, con el alelo en el 10% de las copias, cada uno repetido en 2.000 poblaciones hasta que se fija o se pierde. ¿Qué le pasa a un alelo un 1% mejor en una población de 50 personas, y en una de 500?
+4. El gráfico sigue 20 poblaciones de 50 personas sin ninguna selección, con el alelo en la mitad de las copias al empezar.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin selección, el alelo se fija en torno al 10% de las veces, en las poblaciones de 50 y en las de 500, como predice Kimura: la deriva no tiene dirección, y cada copia tiene la misma probabilidad de acabar siendo la antepasada de todas. El gráfico lo muestra: las 20 poblaciones empiezan igual, se separan por puro azar, y en pocos cientos de generaciones casi todas han fijado o perdido el alelo.
+
+Con una ventaja del 1%, el resultado depende del tamaño. En una población de 50, $4Ns = 2$ y el alelo mejor se fija solo en el 21% de las poblaciones: casi cuatro de cada cinco veces se pierde, a pesar de ser mejor. En una de 500, $4Ns = 20$ y se fija en el 85%. Y un alelo un 1% peor, que en una población grande no tendría ninguna posibilidad, en una de 50 se impone en el 3% de los casos. Cuando $4Ns$ está cerca de 1 o por debajo, el azar puede más que la selección.
+
+Por eso la deriva importa fuera de la biología. Las poblaciones pequeñas y aisladas pierden variación y acumulan rasgos por azar, y lo mismo vale para la cultura: en un grupo pequeño, una innovación útil puede perderse porque nadie la copió a tiempo, que es parte del argumento de Henrich sobre Tasmania. Y no todo lo que se impone en una población tiene que ser una adaptación: antes de buscar la función de un rasgo, hay que descartar que lo haya fijado el azar.
+
+Gillespie, J. H. (2004). *Population Genetics: A Concise Guide* (2.ª ed.). Johns Hopkins University Press.
+
+Kimura, M. (1962). On the probability of fixation of mutant genes in a population. *Genetics*, 47(6), 713–719.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: deriva
+#| caption: "Tu código"
+# 1. Una generación: n copias de A entre N2 = 2N, con ventaja s
+generacion <- function(n, N2, s) {
+  p <- n / N2
+  p_sel <- p * (1 + s) / (1 + s * p)  # la selección
+  ______                              # la deriva: el sorteo de las N2 copias nuevas
+}
+
+# 2. La probabilidad de que el alelo se fije
+kimura <- function(p0, N, s) {
+  ______
+}
+
+# La fracción de poblaciones en la que el alelo acaba fijado, con un tope de 10.000 generaciones
+fijacion <- function(N, s, p0 = 0.1, reps = 2000) {
+  n <- rep(round(2 * N * p0), reps)
+  for (t in 1:10000) {
+    if (!any(n > 0 & n < 2 * N)) break
+    siguiente <- generacion(n, 2 * N, s)
+    if (identical(siguiente, n)) break  # sin deriva, nada cambiaría ya
+    n <- siguiente
+  }
+  mean(n == 2 * N)
+}
+
+# 3. Cinco casos
+set.seed(1930)
+casos <- data.frame(N = c(50, 50, 50, 500, 500), s = c(0, 0.01, -0.01, 0, 0.01))
+casos$cuatro_N_s <- 4 * casos$N * casos$s
+casos$simulada <- mapply(fijacion, casos$N, casos$s)
+casos$kimura <- ifelse(casos$s == 0, 0.1, kimura(0.1, casos$N, casos$s))  # sin selección, u = p0
+
+# 4. Veinte poblaciones de 50 personas, sin selección, durante 300 generaciones
+frecuencia <- matrix(NA, 300, 20)
+n <- rep(50, 20)
+for (t in 1:300) {
+  n <- generacion(n, 100, 0)
+  frecuencia[t, ] <- n / 100
+}
+matplot(frecuencia, type = "l", lty = 1, col = "grey30", ylim = c(0, 1),
+        xlab = "Generación", ylab = "Frecuencia del alelo A")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: deriva
+#| solution: true
+generacion <- function(n, N2, s) {
+  p <- n / N2
+  p_sel <- p * (1 + s) / (1 + s * p)
+  rbinom(length(n), N2, p_sel)
+}
+
+kimura <- function(p0, N, s) {
+  (1 - exp(-4 * N * s * p0)) / (1 - exp(-4 * N * s))
+}
+
+fijacion <- function(N, s, p0 = 0.1, reps = 2000) {
+  n <- rep(round(2 * N * p0), reps)
+  for (t in 1:10000) {
+    if (!any(n > 0 & n < 2 * N)) break
+    siguiente <- generacion(n, 2 * N, s)
+    if (identical(siguiente, n)) break  # sin deriva, nada cambiaría ya
+    n <- siguiente
+  }
+  mean(n == 2 * N)
+}
+
+set.seed(1930)
+casos <- data.frame(N = c(50, 50, 50, 500, 500), s = c(0, 0.01, -0.01, 0, 0.01))
+casos$cuatro_N_s <- 4 * casos$N * casos$s
+casos$simulada <- mapply(fijacion, casos$N, casos$s)
+casos$kimura <- ifelse(casos$s == 0, 0.1, kimura(0.1, casos$N, casos$s))
+
+frecuencia <- matrix(NA, 300, 20)
+n <- rep(50, 20)
+for (t in 1:300) {
+  n <- generacion(n, 100, 0)
+  frecuencia[t, ] <- n / 100
+}
+matplot(frecuencia, type = "l", lty = 1, col = "grey30", ylim = c(0, 1),
+        xlab = "Generación", ylab = "Frecuencia del alelo A")
+
+round(casos, 3)
+```
+
+```{webr}
+#| exercise: deriva
+#| check: true
+# generacion() se comprueba por su media y su varianza, con muchas poblaciones a la vez:
+# sin deriva la varianza es 0, y sin selección la media no se mueve.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+if (!is.function(e$generacion) || !is.function(e$kimura)) {
+  list(correct = FALSE, message = "No encuentro generacion() o kimura().")
+} else if (length(g <- e$generacion(rep(30, 20000), 100, 0)) != 20000) {
+  list(correct = FALSE, message = "generacion() debe devolver un número de copias por población: con un vector n de 20.000 poblaciones, 20.000 números.")
+} else if (var(g) < 15) {
+  list(correct = FALSE, message = paste0(
+    "Con 30 copias de 100 y sin selección, la generación siguiente debería variar de una población a otra ",
+    "(varianza de unas 21 copias), y con tu generacion() la varianza es ", coma(var(g)), ". Falta el sorteo: rbinom()."))
+} else if (abs(mean(g) - 30) > 0.3 || abs(mean(e$generacion(rep(30, 20000), 100, 0.5)) - 39.13) > 0.3) {
+  list(correct = FALSE, message = paste0(
+    "Con 30 copias de 100 y s = 0,5, la media de la generación siguiente debería ser unas 39,1 copias, y con tu generacion() es ",
+    coma(mean(e$generacion(rep(30, 20000), 100, 0.5)), 1), ". Sortea las N2 copias con la probabilidad tras la selección, p_sel."))
+} else if (!isTRUE(all.equal(e$kimura(c(0.1, 0.5), c(50, 20), c(0.01, -0.02)),
+                             c((1 - exp(-0.2)) / (1 - exp(-2)), (1 - exp(0.8)) / (1 - exp(1.6)))))) {
+  list(correct = FALSE, message = paste0(
+    "kimura(0.1, N = 50, s = 0.01) debería dar ", coma((1 - exp(-0.2)) / (1 - exp(-2)), 3), ", y da ",
+    coma(e$kimura(0.1, 50, 0.01), 3), ". Revisa el 4 de 4Ns y los signos de los exponentes."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con 50 personas, el alelo un 1% mejor se fija solo en el ", round(100 * r$simulada[2]),
+    "% de las poblaciones (Kimura: ", round(100 * r$kimura[2]), "%); con 500, en el ", round(100 * r$simulada[5]),
+    "%. Y el peor se impone en el ", round(100 * r$simulada[3]), "% de las pequeñas."))
+}
+```
+
+::: {.hint exercise="deriva"}
+`rbinom(cuantos, tamaño, probabilidad)` saca `cuantos` números al azar, cada uno el número de éxitos en `tamaño` intentos: aquí, uno por población, `length(n)`, con `N2` copias y probabilidad `p_sel`. Para Kimura, escribe la fórmula del enunciado con `exp()`.
+:::
+
+::: {.solution exercise="deriva"}
+`rbinom(length(n), N2, p_sel)` en `generacion()`, y `(1 - exp(-4 * N * s * p0)) / (1 - exp(-4 * N * s))` en `kimura()`.
+:::
+:::
+
+::::
