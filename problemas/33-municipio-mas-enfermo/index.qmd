@@ -19,7 +19,7 @@ Cada cierto tiempo aparece un mapa de España con la incidencia de una enfermeda
 
 En un municipio de 200 habitantes, un solo caso más sube la tasa en 5 por mil. Las tasas de los municipios pequeños bailan mucho por puro azar, y los extremos del mapa se llenan de ellos. Howard Wainer llamó a la fórmula del error típico de una media, $\sigma/\sqrt{n}$, «la ecuación más peligrosa»: quien la ignora acaba buscando causas donde solo hay ruido.
 
-Los datos son inventados: 500 municipios, de 100 a 200 000 habitantes, cada uno con su tasa real, de media 5 por mil. Como los inventamos, sabemos la tasa real de cada uno, y podemos ver quién acierta.
+Los datos son inventados: 500 municipios, de 100 a 200 000 habitantes, cada uno con su tasa real, de media 5 por mil. Como los inventamos, sabemos la tasa real de cada uno, y podemos ver quién acierta.
 
 La solución es la de Efron y Hastie con los bateadores de béisbol: *contraer* cada tasa hacia la media $m$, tanto más cuanto menos fiable sea. La tasa suavizada es $m + B\,(\text{tasa} - m)$, con
 
@@ -37,7 +37,7 @@ donde $\tau^2$ es la varianza de las tasas reales entre municipios y $1000\,m/n$
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Los diez municipios más enfermos según la tasa bruta tienen una mediana de 270 habitantes, y su tasa real media es 5,4 por mil, como la de cualquiera: el primero de la lista, con 245 habitantes y una tasa de 20,4, tiene en realidad 5,9. Con la tasa suavizada, la mediana de los diez primeros sube a 46 110 habitantes, y su tasa real media, a 7,2: ahora sí son los enfermos de verdad.
+Los diez municipios más enfermos según la tasa bruta tienen una mediana de 270 habitantes, y su tasa real media es 5,4 por mil, como la de cualquiera: el primero de la lista, con 245 habitantes y una tasa de 20,4, tiene en realidad 5,9. Con la tasa suavizada, la mediana de los diez primeros sube a 46 110 habitantes, y su tasa real media, a 7,2: ahora sí son los enfermos de verdad.
 
 La varianza estimada de las tasas reales es 0,81, cerca del 1 con el que se generaron los datos. Con ella, el error cuadrático medio baja de 5,50 a 0,49: once veces menos. Es el resultado de Stein, y por eso sorprende: para estimar cada municipio conviene mirar a todos los demás. Ningún municipio aislado da información sobre otro, y sin embargo juntos se estiman mejor que por separado.
 
@@ -58,7 +58,7 @@ Efron, B. y Hastie, T. (2016). *Computer Age Statistical Inference: Algorithms, 
 #| exercise: municipios
 #| caption: "Tu código"
 set.seed(2016)
-poblacion <- round(10^runif(500, 2, 5.3))           # de 100 a 200 000 habitantes
+poblacion <- round(10^runif(500, 2, 5.3))           # de 100 a 200 000 habitantes
 real <- rgamma(500, shape = 25, rate = 5)           # tasa real por mil: media 5, varianza 1
 casos <- rpois(500, poblacion * real / 1000)
 tasa <- 1000 * casos / poblacion
@@ -136,7 +136,7 @@ if (!is.numeric(e$tau2) || length(e$tau2) != 1) {
   list(correct = TRUE, message = paste0(
     "¡Correcto! Los diez más enfermos según la tasa bruta tienen una mediana de ", round(.result[["habitantes_bruta"]]),
     " habitantes y una tasa real de ", coma(.result[["real_bruta"]], 1), "; según la suavizada, ",
-    format(round(.result[["habitantes_suavizada"]]), big.mark = " "), " habitantes y ", coma(.result[["real_suavizada"]], 1),
+    format(round(h <- .result[["habitantes_suavizada"]]), big.mark = if (h >= 1e4) "\u202f" else ""), " habitantes y ", coma(.result[["real_suavizada"]], 1),
     ". El error cuadrático medio baja de ", coma(.result[["error_bruta"]]), " a ", coma(.result[["error_suavizada"]]), "."))
 }
 ```

@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Gregory Clark abre *A Farewell to Alms* con una afirmación incómoda: en 1800, un inglés medio no vivía mejor que un cazador-recolector de hace 100 000 años. Hubo arados, molinos, imprenta y barcos que cruzaban el océano, y el nivel de vida apenas se movió. Para Clark, la explicación es la de Malthus: antes de la Revolución Industrial, cada mejora técnica acababa en más gente, no en gente más rica.
+Gregory Clark abre *A Farewell to Alms* con una afirmación incómoda: en 1800, un inglés medio no vivía mejor que un cazador-recolector de hace 100 000 años. Hubo arados, molinos, imprenta y barcos que cruzaban el océano, y el nivel de vida apenas se movió. Para Clark, la explicación es la de Malthus: antes de la Revolución Industrial, cada mejora técnica acababa en más gente, no en gente más rica.
 
 El modelo tiene tres piezas, con números inventados pero de un orden razonable:
 

@@ -30,7 +30,7 @@ Vale 0 si todos ganan lo mismo y se acerca a 1 si un hogar se lo lleva todo. Y e
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El Gini del pueblo es 0,34, y el cálculo por el área da exactamente lo mismo. Los dos hogares más ricos, el 10 %, se llevan el 28,5 % de la renta: más que los diez más pobres, que reúnen el 27,4 %. La media, 21 900 euros, queda muy por encima de la mediana, 16 500: unos pocos hogares de renta alta tiran de ella hacia arriba.
+El Gini del pueblo es 0,34, y el cálculo por el área da exactamente lo mismo. Los dos hogares más ricos, el 10 %, se llevan el 28,5 % de la renta: más que los diez más pobres, que reúnen el 27,4 %. La media, 21 900 euros, queda muy por encima de la mediana, 16 500: unos pocos hogares de renta alta tiran de ella hacia arriba.
 
 El Gini resume toda la curva en un número, y en ese resumen se pierde información: dos curvas muy distintas pueden tener el mismo Gini, como se ve en [el problema siguiente](../19-mismo-gini/index.qmd).
 

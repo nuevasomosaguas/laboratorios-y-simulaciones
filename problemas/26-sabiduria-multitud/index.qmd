@@ -36,7 +36,7 @@ En el código, un tarro tiene **1000 garbanzos**, y dos multitudes **inventadas*
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41 % de sus miembros acierta mejor que ella.
+La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien personas lo hace mejor. Su error medio es enorme, 93 564 garbanzos al cuadrado, pero la diversidad lo anula casi entero: el error colectivo es 1,1. La multitud sesgada estima 1219: su diversidad es menor, 69 946, y no alcanza a cubrir el error medio, 118 028, así que el error colectivo es de 48 082, unos 219 garbanzos. El 41 % de sus miembros acierta mejor que ella.
 
 El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
 
@@ -120,7 +120,7 @@ rbind(al_azar = errores(al_azar, verdad), sesgados = errores(sesgados, verdad))
 #| exercise: multitud
 #| check: true
 f <- .envir_result$errores
-coma <- function(v, d = 0) format(round(v, d), nsmall = d, big.mark = " ", decimal.mark = ",")
+coma <- function(v, d = 0) format(round(v, d), nsmall = d, big.mark = if (all(abs(v) >= 1e4)) "\u202f" else "", decimal.mark = ",")
 if (!is.function(f)) {
   list(correct = FALSE, message = "No encuentro la función errores().")
 } else if (!isTRUE(all.equal(unname(f(c(1, 2, 9), 6)[c("colectivo", "medio", "diversidad")]), c(4, 50/3, 38/3)))) {

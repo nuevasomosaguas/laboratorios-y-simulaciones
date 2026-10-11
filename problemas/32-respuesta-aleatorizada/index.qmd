@@ -35,7 +35,7 @@ El encuestador no sabe quién contestó a qué, pero conoce $p$, y de ahí puede
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-El dado funciona: la media de las 2000 estimaciones es 0,699, y el 70 % que la encuesta directa no vería aparece. Pero sale caro. El error típico pasa de 0,015 a 0,047, y la varianza se multiplica por 10,1: para saber lo mismo que con 1000 respuestas sinceras, hacen falta unas 10 000 con el dado.
+El dado funciona: la media de las 2000 estimaciones es 0,699, y el 70 % que la encuesta directa no vería aparece. Pero sale caro. El error típico pasa de 0,015 a 0,047, y la varianza se multiplica por 10,1: para saber lo mismo que con 1000 respuestas sinceras, hacen falta unas 10 000 con el dado.
 
 La tarea 3 muestra el dilema. Con `p <- 0.9` el coste baja a 1,7, pero un «sí» ya casi delata: el 95 % de quienes lo dicen son opositores, frente al 70 % de cualquiera, y la gente vuelve a tener motivos para mentir. Con `p <- 0.5`, una moneda, nadie queda delatado porque la respuesta no dice nada: $\lambda$ vale 0,5 sea cual sea $\pi$, el denominador de `estimar()` es cero y no hay estimación posible. La privacidad y la información son la misma cosa vista desde dos lados.
 

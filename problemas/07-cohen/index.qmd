@@ -26,7 +26,7 @@ donde $s$ es la desviación típica combinada de los dos grupos. Como no depende
 
 1. Completa `cohen_d(x, y)` con la desviación típica combinada. Con los datos de prueba debe dar 1,633.
 2. Traduce la d a algo intuitivo. `superioridad(d)` es la probabilidad de que un miembro al azar del primer grupo supere a uno al azar del segundo, $\Phi(d/\sqrt{2})$. `solapamiento(d)` es la proporción en que se solapan las dos distribuciones, $2\Phi(-|d|/2)$. En R, $\Phi$ es `pnorm()`.
-3. El resto ya está escrito; léelo y fíjate en lo que devuelve. Dos grupos de 100 000 personas cuyas medias difieren en 0,02 desviaciones típicas: ¿qué dice el valor p? ¿Y la d?
+3. El resto ya está escrito; léelo y fíjate en lo que devuelve. Dos grupos de 100 000 personas cuyas medias difieren en 0,02 desviaciones típicas: ¿qué dice el valor p? ¿Y la d?
 4. Diez mil estudios con un efecto real de d = 0,2 y 20 personas por grupo, de los que solo se publican los que salen significativos (p < 0,05) y a favor. ¿Qué proporción se publica, y cuál es la d media de lo publicado? La simulación tarda unos segundos.
 
 ::: {.callout-note collapse="true"}
