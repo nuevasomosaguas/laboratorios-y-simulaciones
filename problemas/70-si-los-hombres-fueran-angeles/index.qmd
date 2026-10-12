@@ -1,0 +1,408 @@
+---
+title: "¿Quién escribió «si los hombres fueran ángeles»?"
+numero: 70
+nivel: 2
+duracion: "30 min"
+lectura: "Mosteller y Wallace (1964); [Grimmer, Roberts y Stewart (2022)](https://nuevasomosaguas.github.io/biblioteca.html#grimmer2022text)"
+dificultad: "Intermedio"
+categories: [texto como dato, estadística]
+description: "Doce artículos de El Federalista los firmó Publius y los reclaman dos autores. La distancia entre textos decide, según qué palabras se cuenten."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: federalist.csv, en esta carpeta (SHA-256 1a22cf91cbbe7b004fe2b787493d99a381615cb80ca9faf395c1d8a9d10a93d1),
+copiado tal cual en el código del ejercicio: para los 77 artículos de Hamilton, de Madison y disputados, el número de
+palabras y cuántas veces sale cada una de veinte palabras. Faltan los cinco de Jay (2-5 y 64) y los tres conjuntos (18-20).
+
+Salen del texto de El Federalista del Proyecto Gutenberg, libro 1404, https://www.gutenberg.org/cache/epub/1404/pg1404.txt
+(descargado el 12 de octubre de 2026, SHA-256 0b92fadc9d7afd767eefd27805a20e44417ff26d1fb2f964229f39dcc7b2a65d). La autoría
+es la de Mosteller y Wallace, no la del archivo, que da a Madison los doce disputados: Hamilton, 1, 6-9, 11-13, 15-17, 21-36,
+59-61 y 65-85; Madison, 10, 14 y 37-48; disputados, 49-58, 62 y 63.
+
+De cada artículo se cuenta el cuerpo, desde la línea siguiente a «To the People of the State of New York» hasta el
+siguiente artículo, sin la firma PUBLIUS: en minúsculas y cortado por todo lo que no es una letra de la a a la z. Las
+palabras de estilo son marcadores conocidos de los dos autores, empezando por los de Mosteller y Wallace, upon, whilst y
+while; las de tema son las diez más frecuentes en los disputados que no están entre las cien más frecuentes de los 85.
+El CSV se hizo con R, en la carpeta de pg1404.txt:
+
+l <- readLines("pg1404.txt", encoding = "UTF-8")
+ini <- grep("^FEDERALIST No\\. [0-9]+$", l); fin <- grep("^\\*\\*\\* END OF THE PROJECT", l)
+H <- c(1, 6:9, 11:13, 15:17, 21:36, 59:61, 65:85); M <- c(10, 14, 37:48); D <- c(49:58, 62, 63)
+autor <- rep(NA, 85); autor[H] <- "Hamilton"; autor[M] <- "Madison"; autor[D] <- "Disputado"
+tok <- lapply(1:85, function(i) {
+  b <- l[ini[i]:(if (i < 85) ini[i + 1] - 1 else fin - 1)]
+  b <- b[(grep("^To the People of the State of New York", b)[1] + 1):length(b)]
+  w <- strsplit(tolower(paste(b[!grepl("^PUBLIUS\\.?$", trimws(b))], collapse = " ")), "[^a-z]+")[[1]]
+  w[w != ""]
+})
+voc <- names(sort(table(unlist(tok)), decreasing = TRUE))
+tema <- setdiff(names(sort(table(unlist(tok[D])), decreasing = TRUE)), voc[1:100])[1:10]
+estilo <- c("upon", "whilst", "while", "there", "on", "by", "although", "consequently", "enough", "kind")
+sel <- which(!is.na(autor))
+cuenta <- t(sapply(tok[sel], function(x) as.integer(table(factor(x, levels = c(estilo, tema))))))
+colnames(cuenta) <- c(estilo, tema)
+write.csv(data.frame(numero = sel, autor = autor[sel], palabras = lengths(tok)[sel], cuenta, check.names = FALSE),
+          "federalist.csv", row.names = FALSE, quote = FALSE)
+
+Los recuentos de palabras por autor son 112.907 de Hamilton, 38.772 de Madison y 24.072 de los disputados.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Entre octubre de 1787 y mayo de 1788, los periódicos de Nueva York publicaron 85 artículos en defensa de la nueva Constitución de los Estados Unidos, todos firmados por «Publius». Eran de Alexander Hamilton, James Madison y John Jay, y se reunieron como *El Federalista*. Antes de morir en su duelo con Aaron Burr, en 1804, Hamilton dejó una lista con el autor de cada uno; Madison dio la suya para la edición de 1818. Las dos listas no coinciden en doce artículos, el 49 al 58, el 62 y el 63, y uno de ellos, el 51, tiene la frase más citada de la serie: «si los hombres fueran ángeles, ningún gobierno sería necesario».
+
+Los historiadores no lograron zanjarlo, porque Hamilton y Madison escribían de forma muy parecida, hasta en la longitud media de sus frases. En 1963, Frederick Mosteller y David Wallace lo zanjaron contando palabras pequeñas. Hamilton escribe *upon* donde Madison escribe *on*, y Madison escribe *whilst* donde Hamilton escribe *while*. Nadie elige esas palabras a propósito, y por eso delatan.
+
+Para decir a quién se parece más un texto hacen falta dos decisiones. Una, **qué se cuenta**: aquí, la frecuencia por mil palabras de veinte palabras, diez de **estilo**, las palabras funcionales que separan a los dos autores, y diez de **tema**, las más características de los artículos disputados, como *representatives*, *senate* o *house*. Otra, **cómo se compara**. La **distancia del coseno** mira el ángulo entre los dos vectores de frecuencias:
+
+$$d_{\cos}(a, b) = 1 - \frac{\sum_i a_i b_i}{\sqrt{\sum_i a_i^2}\,\sqrt{\sum_i b_i^2}},$$
+
+que vale 0 si las frecuencias son proporcionales. La **Delta de Burrows**, la medida clásica de la estilometría, tipifica antes cada palabra, restándole su media y dividiendo por su desviación típica en los artículos de autor conocido, para que una palabra rara pese lo mismo que una común, y luego promedia las diferencias absolutas:
+
+$$\Delta(a, b) = \frac{1}{n} \sum_{i=1}^{n} |z_i(a) - z_i(b)|.$$
+
+Para cada artículo disputado, el código busca el artículo de autor conocido más cercano, con cada vocabulario y cada distancia.
+
+**Tu tarea.**
+
+1. Completa `coseno()` y `delta()`.
+2. Mira el gráfico. ¿Dónde caen los artículos disputados?
+3. Mira la tabla y el recuento final: ¿cuántos disputados van a Madison según cada vocabulario y cada distancia? ¿Qué pesa más, el vocabulario o la distancia?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con las palabras de estilo, el vecino más cercano de los doce disputados es un artículo de Madison con la distancia del coseno, y de once con la Delta. Con las de tema, solo de tres con el coseno y de cinco con la Delta. Elegir un artículo conocido al azar daría a Madison 2,6 de cada doce, porque 51 de los 65 son de Hamilton: las palabras de tema no saben nada del autor. Lo que cambia el resultado es el vocabulario, no la distancia.
+
+El gráfico dice por qué. Hamilton escribe *upon* en sus 51 artículos, entre 1,0 y 7,5 veces por mil palabras, 3,31 en el conjunto; Madison no la escribe en 11 de sus 14 artículos, y nunca más de 1,2 veces por mil. En diez de los doce disputados no sale ni una vez. Con *whilst* pasa lo contrario: 0,31 por mil en Madison y 0,01 en Hamilton, que solo la escribe en un artículo, mientras que *while* sale 0,32 veces por mil en Hamilton y ninguna en Madison. Los disputados se quedan con *whilst*, y no escriben *while*.
+
+Las palabras de tema encuentran otra cosa: quién escribió sobre lo mismo. El 58, sobre si la Cámara de Representantes crecerá con la población, cae con la Delta junto al 59 de Hamilton, sobre la regulación de las elecciones al Congreso; con el coseno, el 62 y el 63, sobre el Senado, caen junto al 75, sobre el poder de firmar tratados que comparten el presidente y el Senado. Son vecinos de verdad, pero por el asunto, no por la mano. Una distancia entre textos no mide el parecido en general, sino el parecido en lo que se cuenta, y Grimmer, Roberts y Stewart insisten en que la representación del texto se elige para cada pregunta: no hay una que sirva para todas.
+
+La excepción es el 55, el que Mosteller y Wallace dieron por el caso menos claro. Con la Delta su vecino es el 79, de Hamilton, y con el coseno, el 10, de Madison. La Delta da a *enough*, *although* o *consequently*, que salen pocas veces, el mismo voto que a *on* o *by*, y en un artículo corto una sola aparición de más o de menos lo mueve mucho. Burrows no compara con el vecino más cercano, sino con el conjunto de los textos de cada autor, que promedia ese ruido, y Mosteller y Wallace no dieron una respuesta de sí o no, sino unas probabilidades, con un modelo bayesiano de la frecuencia de cada palabra.
+
+Las palabras de estilo de este problema se eligieron sabiendo ya la respuesta, entre las que separan a los dos autores en sus artículos conocidos. En un caso abierto, el vocabulario se elige solo con los textos de autoría segura y se comprueba con otros que no se usaron para elegirlo: si no, es [el jardín de senderos que se bifurcan](../66-el-jardin-de-senderos/index.qmd) con palabras en lugar de variables.
+
+R tiene una distancia para cada escala. Para cadenas cortas, `adist()`, en la base de R, da la distancia de Levenshtein, el número de letras que hay que cambiar: entre «Unidos Podemos», de 2016, y «Unidas Podemos», de 2019, 1, y entre «UNIDOS PODEMOS» y «PODEMOS-IU-EQUO», las siglas con las que la misma coalición de 2016 figura en los resultados del Ministerio del Interior, 12. El paquete stringdist añade Jaro-Winkler y los q-gramas; quanteda calcula el coseno, Jaccard y otras sobre la matriz de documentos y términos; stylo, la Delta y sus variantes; y text2vec, las distancias entre *embeddings*, que acercan sinónimos que no comparten ninguna letra. Cada una responde a la misma pregunta con otra respuesta, porque cada una cuenta otra cosa.
+
+Burrows, J. (2002). «Delta»: A measure of stylistic difference and a guide to likely authorship. *Literary and Linguistic Computing*, 17(3), 267–287.
+
+Grimmer, J., Roberts, M. E. y Stewart, B. M. (2022). *Text as Data: A New Framework for Machine Learning and the Social Sciences*. Princeton University Press.
+
+Mosteller, F. y Wallace, D. L. (1963). Inference in an authorship problem. *Journal of the American Statistical Association*, 58(302), 275–309.
+
+Mosteller, F. y Wallace, D. L. (1964). *Inference and Disputed Authorship: The Federalist*. Addison-Wesley.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: federalista
+#| caption: "Tu código"
+# Cuántas veces sale cada palabra en cada artículo de El Federalista, con el autor según
+# Mosteller y Wallace, y los doce disputados. Texto del Proyecto Gutenberg.
+federalist <- read.csv(check.names = FALSE, text = "
+numero,autor,palabras,upon,whilst,while,there,on,by,although,consequently,enough,kind,representatives,very,senate,legislative,two,house,within,years,different,legislature
+1,Hamilton,1610,6,0,0,2,9,14,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+6,Hamilton,2215,4,0,1,8,5,12,0,0,1,2,2,1,0,0,2,1,1,1,1,1
+7,Hamilton,2301,11,0,0,9,14,28,0,0,0,1,0,0,0,0,2,0,3,0,5,1
+8,Hamilton,2050,3,0,0,2,11,11,0,0,2,0,1,2,0,1,2,0,3,0,1,0
+9,Hamilton,1985,4,0,1,3,9,13,0,0,1,4,0,3,1,1,2,0,2,0,1,1
+10,Madison,2999,0,0,0,6,18,39,0,1,0,0,5,0,0,1,7,0,4,0,12,0
+11,Hamilton,2500,6,0,0,8,5,20,0,0,0,3,0,1,0,0,1,0,1,0,4,0
+12,Hamilton,2159,7,0,0,8,12,15,0,0,1,2,0,2,0,0,1,0,1,0,1,0
+13,Hamilton,960,2,0,0,9,3,5,0,0,1,0,0,1,0,0,1,0,0,0,3,0
+14,Madison,2150,0,1,0,0,17,18,0,2,0,0,5,0,0,0,1,0,2,1,1,0
+15,Hamilton,3083,10,0,1,18,10,32,0,0,0,6,0,1,0,0,1,0,1,0,2,0
+16,Hamilton,2037,6,0,0,4,4,13,0,0,3,5,1,2,0,0,0,0,2,0,0,2
+17,Hamilton,1565,6,0,0,4,2,9,0,0,0,1,1,0,0,0,0,0,2,0,1,0
+21,Hamilton,1994,6,0,3,8,6,22,0,0,0,8,0,0,0,0,3,0,1,0,1,0
+22,Hamilton,3548,13,0,4,14,9,30,0,0,1,5,0,1,0,1,4,1,0,0,6,0
+23,Hamilton,1797,7,0,0,4,2,11,0,0,0,0,0,1,0,0,0,0,2,0,1,0
+24,Hamilton,2000,7,0,1,6,11,14,0,0,0,1,1,0,0,3,8,0,0,1,1,8
+25,Hamilton,1982,2,0,0,2,11,22,0,0,0,4,0,1,0,2,2,0,1,0,2,1
+26,Hamilton,2375,6,0,0,8,7,21,0,0,7,1,2,3,1,3,6,1,2,3,1,9
+27,Hamilton,1448,4,0,0,8,4,14,0,0,0,1,0,2,1,1,0,0,1,0,1,0
+28,Hamilton,1597,3,0,0,7,1,7,0,0,0,1,2,0,0,0,2,0,1,0,6,0
+29,Hamilton,2240,10,0,2,13,3,10,0,0,0,1,0,3,0,0,0,0,0,0,2,2
+30,Hamilton,1965,13,0,0,5,8,14,0,0,0,3,0,2,0,0,2,0,1,0,1,0
+31,Hamilton,1730,13,0,0,6,5,9,0,0,0,2,0,0,0,0,2,0,0,0,0,1
+32,Hamilton,1483,2,0,0,8,14,10,1,0,0,2,0,1,0,0,0,0,0,0,2,2
+33,Hamilton,1684,9,0,0,2,5,14,0,0,0,1,0,3,0,3,1,0,0,0,0,4
+34,Hamilton,2210,10,0,1,9,11,4,0,0,0,0,0,2,0,2,8,0,2,0,2,1
+35,Hamilton,2251,9,0,0,5,8,10,0,0,0,0,2,1,2,0,1,1,0,0,5,1
+36,Hamilton,2962,7,0,0,19,6,21,0,0,1,5,1,1,0,0,4,0,2,0,7,8
+37,Madison,2709,1,1,0,2,19,30,1,2,0,0,0,6,0,2,1,0,0,0,8,0
+38,Madison,3319,4,2,0,3,15,37,2,1,0,0,2,3,5,2,3,2,0,2,2,1
+39,Madison,2606,0,0,0,0,25,33,0,0,0,0,4,1,6,2,4,3,3,6,3,4
+40,Madison,3021,0,0,0,4,13,55,0,0,0,0,0,2,0,0,3,0,2,0,2,1
+41,Madison,3542,0,1,0,1,27,32,0,0,0,1,3,5,0,0,6,1,2,5,3,3
+42,Madison,2774,2,0,0,3,22,31,1,1,0,0,0,7,0,4,2,0,11,1,3,0
+43,Madison,3427,0,1,0,2,33,47,1,1,0,0,1,2,1,2,4,0,2,0,1,6
+44,Madison,2896,0,2,0,4,28,28,0,1,0,0,4,2,1,3,1,1,1,0,1,0
+45,Madison,2116,0,2,0,3,10,11,1,3,0,0,1,8,1,1,0,1,3,0,3,0
+46,Madison,2614,0,2,0,0,32,21,0,0,0,0,3,4,0,1,0,0,1,0,6,1
+47,Madison,2739,0,0,0,3,20,42,0,0,0,0,0,3,4,45,5,1,1,0,3,13
+48,Madison,1860,0,0,0,2,16,28,1,0,0,0,0,2,0,20,2,0,2,1,0,3
+49,Disputado,1646,0,1,0,2,16,15,0,1,0,0,0,2,0,5,3,0,2,0,2,3
+50,Disputado,1101,1,0,0,0,11,11,1,0,0,0,0,3,0,6,3,0,6,2,1,1
+51,Disputado,1914,0,2,0,4,21,23,0,2,0,0,0,4,0,3,3,0,2,0,7,3
+52,Disputado,1844,0,0,0,0,18,22,0,0,0,0,10,6,0,4,1,4,2,9,3,4
+53,Disputado,2165,0,1,0,2,8,31,1,0,0,0,6,9,1,7,2,3,4,3,7,2
+54,Disputado,1996,2,0,0,1,19,26,1,2,0,0,7,6,0,0,2,1,0,0,1,4
+55,Disputado,2043,0,0,0,5,9,14,0,0,0,0,15,7,2,2,3,4,5,8,2,4
+56,Disputado,1651,0,1,0,4,11,10,0,0,0,1,13,10,0,3,3,3,7,0,8,5
+57,Disputado,2206,0,3,0,4,19,25,0,0,0,0,20,7,0,0,4,7,0,0,0,4
+58,Disputado,2080,0,0,0,2,18,22,1,1,0,0,20,2,6,3,3,9,1,2,0,2
+59,Hamilton,1907,3,0,0,7,6,17,0,0,0,1,4,1,3,0,3,3,0,3,0,3
+60,Hamilton,2248,8,0,0,8,6,21,0,0,0,1,3,1,6,0,0,2,0,0,10,3
+61,Hamilton,1516,3,0,0,5,6,5,0,0,0,1,5,0,4,1,3,2,0,0,2,3
+62,Disputado,2387,0,0,0,0,19,28,0,3,0,0,3,0,10,2,4,1,1,4,1,0
+63,Disputado,3039,0,1,0,8,20,51,0,0,0,0,14,3,23,4,7,5,4,6,1,1
+65,Hamilton,2016,10,0,1,5,5,16,0,0,1,0,4,0,6,2,0,3,0,0,1,0
+66,Hamilton,2259,11,0,1,5,7,13,0,0,1,0,5,2,23,2,6,6,0,0,1,4
+67,Hamilton,1645,6,0,0,3,3,14,0,0,0,0,0,0,15,0,3,0,1,1,0,4
+68,Hamilton,1516,2,0,0,1,3,12,0,0,0,1,4,0,4,0,1,2,1,0,1,0
+69,Hamilton,2985,12,0,1,9,6,22,0,0,0,1,0,1,5,2,6,1,3,5,1,9
+70,Hamilton,3348,7,0,2,15,15,15,0,0,3,0,0,1,0,0,11,0,0,0,4,3
+71,Hamilton,1744,3,0,1,3,7,15,0,0,3,1,1,6,0,6,1,3,1,4,0,4
+72,Hamilton,2040,5,0,2,9,6,17,0,0,2,0,0,2,0,1,0,0,1,0,2,1
+73,Hamilton,2363,13,0,0,5,5,27,0,0,0,1,0,5,0,14,6,1,1,1,0,5
+74,Hamilton,1000,3,0,0,4,4,2,0,0,0,2,0,0,0,1,0,0,0,0,1,2
+75,Hamilton,1942,5,0,5,3,5,16,0,0,0,1,4,4,12,4,7,3,1,1,2,0
+76,Hamilton,1931,8,0,1,6,4,20,0,0,0,1,0,1,9,1,0,2,0,0,1,1
+77,Hamilton,1988,10,0,1,3,3,16,0,0,1,0,2,1,14,1,2,4,0,1,4,3
+78,Hamilton,3057,9,0,0,12,10,25,0,0,0,1,4,2,0,13,6,0,1,0,2,6
+79,Hamilton,1028,2,0,0,3,5,4,0,0,0,0,1,1,1,2,0,1,0,1,0,1
+80,Hamilton,2451,6,0,0,7,9,13,0,0,0,2,0,0,0,1,4,0,2,0,9,1
+81,Hamilton,3913,13,1,2,19,16,32,0,0,0,0,1,3,2,8,2,1,2,0,3,13
+82,Hamilton,1536,4,0,0,0,0,4,0,0,0,0,0,0,0,1,0,0,1,0,0,3
+83,Hamilton,5839,20,0,4,22,18,82,0,2,0,2,0,2,0,3,1,0,2,0,8,7
+84,Hamilton,4200,13,0,1,17,21,31,0,1,1,3,8,3,3,3,5,2,1,0,2,3
+85,Hamilton,2704,12,0,0,10,18,11,0,1,2,0,0,2,0,0,4,0,0,0,2,0
+")
+
+estilo <- c("upon", "whilst", "while", "there", "on", "by", "although", "consequently", "enough", "kind")
+tema <- c("representatives", "very", "senate", "legislative", "two", "house", "within", "years", "different",
+          "legislature")
+
+tasas <- as.matrix(1000 * federalist[, c(estilo, tema)] / federalist$palabras)  # por mil palabras
+conocidos <- federalist$autor != "Disputado"
+
+# 1. La distancia del coseno: 0 si las dos frecuencias son proporcionales, 1 si no comparten palabras
+coseno <- function(a, b) {
+  ______
+}
+
+# 2. La Delta de Burrows: la diferencia media, en valor absoluto, entre dos perfiles tipificados
+delta <- function(a, b) {
+  ______
+}
+
+# Cada palabra, tipificada con la media y la desviación típica de los artículos de autor conocido
+tipificar <- function(x) {
+  x <- sweep(x, 2, colMeans(x[conocidos, ]))
+  sweep(x, 2, apply(x[conocidos, ], 2, sd), "/")
+}
+
+# Para cada disputado, el artículo de autor conocido más cercano
+vecino <- function(x, distancia) {
+  candidatos <- which(conocidos)
+  sapply(which(!conocidos), function(i) {
+    candidatos[which.min(sapply(candidatos, function(j) distancia(x[i, ], x[j, ])))]
+  })
+}
+cercanos <- list(
+  tema_coseno = vecino(tasas[, tema], coseno),
+  tema_delta = vecino(tipificar(tasas[, tema]), delta),
+  estilo_coseno = vecino(tasas[, estilo], coseno),
+  estilo_delta = vecino(tipificar(tasas[, estilo]), delta)
+)
+
+# 3. «upon» frente a «on»: cada punto es un artículo
+color <- c(Hamilton = "firebrick", Madison = "steelblue", Disputado = "black")
+plot(tasas[, "upon"], tasas[, "on"], col = color[federalist$autor], pch = ifelse(conocidos, 1, 19),
+     xlab = "«upon» por mil palabras", ylab = "«on» por mil palabras")
+legend("topright", names(color), col = color, pch = c(1, 1, 19), bty = "n")
+
+# 4. El artículo más cercano a cada disputado, y su autor, según el vocabulario y la distancia
+data.frame(disputado = federalist$numero[!conocidos],
+           lapply(cercanos, function(k) paste(federalist$numero[k], federalist$autor[k])))
+sapply(cercanos, function(k) sum(federalist$autor[k] == "Madison"))  # cuántos van a Madison, de 12
+```
+
+```{webr}
+#| exercise: federalista
+#| solution: true
+# Cuántas veces sale cada palabra en cada artículo de El Federalista, con el autor según
+# Mosteller y Wallace, y los doce disputados. Texto del Proyecto Gutenberg.
+federalist <- read.csv(check.names = FALSE, text = "
+numero,autor,palabras,upon,whilst,while,there,on,by,although,consequently,enough,kind,representatives,very,senate,legislative,two,house,within,years,different,legislature
+1,Hamilton,1610,6,0,0,2,9,14,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+6,Hamilton,2215,4,0,1,8,5,12,0,0,1,2,2,1,0,0,2,1,1,1,1,1
+7,Hamilton,2301,11,0,0,9,14,28,0,0,0,1,0,0,0,0,2,0,3,0,5,1
+8,Hamilton,2050,3,0,0,2,11,11,0,0,2,0,1,2,0,1,2,0,3,0,1,0
+9,Hamilton,1985,4,0,1,3,9,13,0,0,1,4,0,3,1,1,2,0,2,0,1,1
+10,Madison,2999,0,0,0,6,18,39,0,1,0,0,5,0,0,1,7,0,4,0,12,0
+11,Hamilton,2500,6,0,0,8,5,20,0,0,0,3,0,1,0,0,1,0,1,0,4,0
+12,Hamilton,2159,7,0,0,8,12,15,0,0,1,2,0,2,0,0,1,0,1,0,1,0
+13,Hamilton,960,2,0,0,9,3,5,0,0,1,0,0,1,0,0,1,0,0,0,3,0
+14,Madison,2150,0,1,0,0,17,18,0,2,0,0,5,0,0,0,1,0,2,1,1,0
+15,Hamilton,3083,10,0,1,18,10,32,0,0,0,6,0,1,0,0,1,0,1,0,2,0
+16,Hamilton,2037,6,0,0,4,4,13,0,0,3,5,1,2,0,0,0,0,2,0,0,2
+17,Hamilton,1565,6,0,0,4,2,9,0,0,0,1,1,0,0,0,0,0,2,0,1,0
+21,Hamilton,1994,6,0,3,8,6,22,0,0,0,8,0,0,0,0,3,0,1,0,1,0
+22,Hamilton,3548,13,0,4,14,9,30,0,0,1,5,0,1,0,1,4,1,0,0,6,0
+23,Hamilton,1797,7,0,0,4,2,11,0,0,0,0,0,1,0,0,0,0,2,0,1,0
+24,Hamilton,2000,7,0,1,6,11,14,0,0,0,1,1,0,0,3,8,0,0,1,1,8
+25,Hamilton,1982,2,0,0,2,11,22,0,0,0,4,0,1,0,2,2,0,1,0,2,1
+26,Hamilton,2375,6,0,0,8,7,21,0,0,7,1,2,3,1,3,6,1,2,3,1,9
+27,Hamilton,1448,4,0,0,8,4,14,0,0,0,1,0,2,1,1,0,0,1,0,1,0
+28,Hamilton,1597,3,0,0,7,1,7,0,0,0,1,2,0,0,0,2,0,1,0,6,0
+29,Hamilton,2240,10,0,2,13,3,10,0,0,0,1,0,3,0,0,0,0,0,0,2,2
+30,Hamilton,1965,13,0,0,5,8,14,0,0,0,3,0,2,0,0,2,0,1,0,1,0
+31,Hamilton,1730,13,0,0,6,5,9,0,0,0,2,0,0,0,0,2,0,0,0,0,1
+32,Hamilton,1483,2,0,0,8,14,10,1,0,0,2,0,1,0,0,0,0,0,0,2,2
+33,Hamilton,1684,9,0,0,2,5,14,0,0,0,1,0,3,0,3,1,0,0,0,0,4
+34,Hamilton,2210,10,0,1,9,11,4,0,0,0,0,0,2,0,2,8,0,2,0,2,1
+35,Hamilton,2251,9,0,0,5,8,10,0,0,0,0,2,1,2,0,1,1,0,0,5,1
+36,Hamilton,2962,7,0,0,19,6,21,0,0,1,5,1,1,0,0,4,0,2,0,7,8
+37,Madison,2709,1,1,0,2,19,30,1,2,0,0,0,6,0,2,1,0,0,0,8,0
+38,Madison,3319,4,2,0,3,15,37,2,1,0,0,2,3,5,2,3,2,0,2,2,1
+39,Madison,2606,0,0,0,0,25,33,0,0,0,0,4,1,6,2,4,3,3,6,3,4
+40,Madison,3021,0,0,0,4,13,55,0,0,0,0,0,2,0,0,3,0,2,0,2,1
+41,Madison,3542,0,1,0,1,27,32,0,0,0,1,3,5,0,0,6,1,2,5,3,3
+42,Madison,2774,2,0,0,3,22,31,1,1,0,0,0,7,0,4,2,0,11,1,3,0
+43,Madison,3427,0,1,0,2,33,47,1,1,0,0,1,2,1,2,4,0,2,0,1,6
+44,Madison,2896,0,2,0,4,28,28,0,1,0,0,4,2,1,3,1,1,1,0,1,0
+45,Madison,2116,0,2,0,3,10,11,1,3,0,0,1,8,1,1,0,1,3,0,3,0
+46,Madison,2614,0,2,0,0,32,21,0,0,0,0,3,4,0,1,0,0,1,0,6,1
+47,Madison,2739,0,0,0,3,20,42,0,0,0,0,0,3,4,45,5,1,1,0,3,13
+48,Madison,1860,0,0,0,2,16,28,1,0,0,0,0,2,0,20,2,0,2,1,0,3
+49,Disputado,1646,0,1,0,2,16,15,0,1,0,0,0,2,0,5,3,0,2,0,2,3
+50,Disputado,1101,1,0,0,0,11,11,1,0,0,0,0,3,0,6,3,0,6,2,1,1
+51,Disputado,1914,0,2,0,4,21,23,0,2,0,0,0,4,0,3,3,0,2,0,7,3
+52,Disputado,1844,0,0,0,0,18,22,0,0,0,0,10,6,0,4,1,4,2,9,3,4
+53,Disputado,2165,0,1,0,2,8,31,1,0,0,0,6,9,1,7,2,3,4,3,7,2
+54,Disputado,1996,2,0,0,1,19,26,1,2,0,0,7,6,0,0,2,1,0,0,1,4
+55,Disputado,2043,0,0,0,5,9,14,0,0,0,0,15,7,2,2,3,4,5,8,2,4
+56,Disputado,1651,0,1,0,4,11,10,0,0,0,1,13,10,0,3,3,3,7,0,8,5
+57,Disputado,2206,0,3,0,4,19,25,0,0,0,0,20,7,0,0,4,7,0,0,0,4
+58,Disputado,2080,0,0,0,2,18,22,1,1,0,0,20,2,6,3,3,9,1,2,0,2
+59,Hamilton,1907,3,0,0,7,6,17,0,0,0,1,4,1,3,0,3,3,0,3,0,3
+60,Hamilton,2248,8,0,0,8,6,21,0,0,0,1,3,1,6,0,0,2,0,0,10,3
+61,Hamilton,1516,3,0,0,5,6,5,0,0,0,1,5,0,4,1,3,2,0,0,2,3
+62,Disputado,2387,0,0,0,0,19,28,0,3,0,0,3,0,10,2,4,1,1,4,1,0
+63,Disputado,3039,0,1,0,8,20,51,0,0,0,0,14,3,23,4,7,5,4,6,1,1
+65,Hamilton,2016,10,0,1,5,5,16,0,0,1,0,4,0,6,2,0,3,0,0,1,0
+66,Hamilton,2259,11,0,1,5,7,13,0,0,1,0,5,2,23,2,6,6,0,0,1,4
+67,Hamilton,1645,6,0,0,3,3,14,0,0,0,0,0,0,15,0,3,0,1,1,0,4
+68,Hamilton,1516,2,0,0,1,3,12,0,0,0,1,4,0,4,0,1,2,1,0,1,0
+69,Hamilton,2985,12,0,1,9,6,22,0,0,0,1,0,1,5,2,6,1,3,5,1,9
+70,Hamilton,3348,7,0,2,15,15,15,0,0,3,0,0,1,0,0,11,0,0,0,4,3
+71,Hamilton,1744,3,0,1,3,7,15,0,0,3,1,1,6,0,6,1,3,1,4,0,4
+72,Hamilton,2040,5,0,2,9,6,17,0,0,2,0,0,2,0,1,0,0,1,0,2,1
+73,Hamilton,2363,13,0,0,5,5,27,0,0,0,1,0,5,0,14,6,1,1,1,0,5
+74,Hamilton,1000,3,0,0,4,4,2,0,0,0,2,0,0,0,1,0,0,0,0,1,2
+75,Hamilton,1942,5,0,5,3,5,16,0,0,0,1,4,4,12,4,7,3,1,1,2,0
+76,Hamilton,1931,8,0,1,6,4,20,0,0,0,1,0,1,9,1,0,2,0,0,1,1
+77,Hamilton,1988,10,0,1,3,3,16,0,0,1,0,2,1,14,1,2,4,0,1,4,3
+78,Hamilton,3057,9,0,0,12,10,25,0,0,0,1,4,2,0,13,6,0,1,0,2,6
+79,Hamilton,1028,2,0,0,3,5,4,0,0,0,0,1,1,1,2,0,1,0,1,0,1
+80,Hamilton,2451,6,0,0,7,9,13,0,0,0,2,0,0,0,1,4,0,2,0,9,1
+81,Hamilton,3913,13,1,2,19,16,32,0,0,0,0,1,3,2,8,2,1,2,0,3,13
+82,Hamilton,1536,4,0,0,0,0,4,0,0,0,0,0,0,0,1,0,0,1,0,0,3
+83,Hamilton,5839,20,0,4,22,18,82,0,2,0,2,0,2,0,3,1,0,2,0,8,7
+84,Hamilton,4200,13,0,1,17,21,31,0,1,1,3,8,3,3,3,5,2,1,0,2,3
+85,Hamilton,2704,12,0,0,10,18,11,0,1,2,0,0,2,0,0,4,0,0,0,2,0
+")
+
+estilo <- c("upon", "whilst", "while", "there", "on", "by", "although", "consequently", "enough", "kind")
+tema <- c("representatives", "very", "senate", "legislative", "two", "house", "within", "years", "different",
+          "legislature")
+
+tasas <- as.matrix(1000 * federalist[, c(estilo, tema)] / federalist$palabras)  # por mil palabras
+conocidos <- federalist$autor != "Disputado"
+
+# 1. La distancia del coseno: 0 si las dos frecuencias son proporcionales, 1 si no comparten palabras
+coseno <- function(a, b) {
+  1 - sum(a * b) / sqrt(sum(a^2) * sum(b^2))
+}
+
+# 2. La Delta de Burrows: la diferencia media, en valor absoluto, entre dos perfiles tipificados
+delta <- function(a, b) {
+  mean(abs(a - b))
+}
+
+# Cada palabra, tipificada con la media y la desviación típica de los artículos de autor conocido
+tipificar <- function(x) {
+  x <- sweep(x, 2, colMeans(x[conocidos, ]))
+  sweep(x, 2, apply(x[conocidos, ], 2, sd), "/")
+}
+
+# Para cada disputado, el artículo de autor conocido más cercano
+vecino <- function(x, distancia) {
+  candidatos <- which(conocidos)
+  sapply(which(!conocidos), function(i) {
+    candidatos[which.min(sapply(candidatos, function(j) distancia(x[i, ], x[j, ])))]
+  })
+}
+cercanos <- list(
+  tema_coseno = vecino(tasas[, tema], coseno),
+  tema_delta = vecino(tipificar(tasas[, tema]), delta),
+  estilo_coseno = vecino(tasas[, estilo], coseno),
+  estilo_delta = vecino(tipificar(tasas[, estilo]), delta)
+)
+
+# 3. «upon» frente a «on»: cada punto es un artículo
+color <- c(Hamilton = "firebrick", Madison = "steelblue", Disputado = "black")
+plot(tasas[, "upon"], tasas[, "on"], col = color[federalist$autor], pch = ifelse(conocidos, 1, 19),
+     xlab = "«upon» por mil palabras", ylab = "«on» por mil palabras")
+legend("topright", names(color), col = color, pch = c(1, 1, 19), bty = "n")
+
+# 4. El artículo más cercano a cada disputado, y su autor, según el vocabulario y la distancia
+data.frame(disputado = federalist$numero[!conocidos],
+           lapply(cercanos, function(k) paste(federalist$numero[k], federalist$autor[k])))
+sapply(cercanos, function(k) sum(federalist$autor[k] == "Madison"))  # cuántos van a Madison, de 12
+```
+
+```{webr}
+#| exercise: federalista
+#| check: true
+# coseno() y delta() se comprueban con vectores pequeños, en los que cada error da otra cifra.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+if (!is.function(e$coseno) || !is.function(e$delta)) {
+  list(correct = FALSE, message = "No encuentro las funciones coseno() y delta().")
+} else if (!isTRUE(all.equal(e$coseno(c(1, 2), c(2, 4)), 0)) || !isTRUE(all.equal(e$coseno(c(1, 0), c(0, 1)), 1)) ||
+           !isTRUE(all.equal(e$coseno(c(1, 1), c(1, 0)), 1 - 1 / sqrt(2)))) {
+  list(correct = FALSE, message = paste0(
+    "coseno(c(1, 2), c(2, 4)) debería dar 0, porque las frecuencias son proporcionales, y da ", coma(e$coseno(c(1, 2), c(2, 4))),
+    "; coseno(c(1, 1), c(1, 0)), 1 - 1/√2 = 0,293, y da ", coma(e$coseno(c(1, 1), c(1, 0))),
+    ". Es una distancia, uno menos el coseno, y el denominador es el producto de las dos normas, cada una con su raíz."))
+} else if (!isTRUE(all.equal(e$delta(c(0, 0), c(1, -3)), 2)) || !isTRUE(all.equal(e$delta(c(1, 2, 3), c(1, 2, 3)), 0))) {
+  list(correct = FALSE, message = paste0(
+    "delta(c(0, 0), c(1, -3)) debería dar 2, la media de |1| y |-3|, y da ", coma(e$delta(c(0, 0), c(1, -3))),
+    ". Es la media de las diferencias en valor absoluto: ni su suma, ni las diferencias con signo, ni al cuadrado."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con las palabras de estilo, el vecino de ", r["estilo_coseno"], " disputados con el coseno y de ",
+    r["estilo_delta"], " con la Delta es de Madison; con las de tema, solo de ", r["tema_coseno"], " y de ",
+    r["tema_delta"], ". Decide lo que se cuenta, no cómo se compara."))
+}
+```
+
+::: {.hint exercise="federalista"}
+Escribe las fórmulas tal cual, con `sum()`, `sqrt()`, `mean()` y `abs()`. El coseno es una distancia: uno menos el producto escalar dividido por las dos normas.
+:::
+
+::: {.solution exercise="federalista"}
+`1 - sum(a * b) / sqrt(sum(a^2) * sum(b^2))` en `coseno()`, y `mean(abs(a - b))` en `delta()`.
+:::
+:::
+
+::::
