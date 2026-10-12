@@ -1,0 +1,195 @@
+---
+title: "El umbral de la revolución"
+numero: 72
+nivel: 2
+duracion: "35 min"
+lectura: "[Acemoglu y Robinson (2006)](https://nuevasomosaguas.github.io/biblioteca.html#scheidel2017great)"
+dificultad: "Intermedio"
+categories: [juegos y votación, desigualdad]
+description: "Una élite compra la paz con promesas mientras sean creíbles. Cuando dejan de serlo, le queda ceder el voto o reprimir, y lo que elige depende de cuánta desigualdad haya."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+La mayoría de las democratizaciones de la Europa del siglo XIX y de la América Latina del siglo XX llegaron en medio de protestas. Daron Acemoglu y James Robinson propusieron un modelo para explicarlo. Una élite gobierna, y la mayoría solo puede amenazar con una revolución, pero no siempre: la amenaza aparece cuando consigue organizarse, y se disuelve después. Mientras dura, la élite puede ofrecer redistribución. El problema es que su promesa no es creíble: cuando la amenaza se disuelva, nada le obliga a cumplirla. El voto, en cambio, es para siempre. La democracia es la forma de hacer creíble la promesa.
+
+En el modelo, la élite es el 20% de la población y se lleva una parte `theta` de la renta, y la mayoría, el resto, `1 - theta`. Todo se mide por periodo y en proporción de la renta nacional. En cada periodo, con probabilidad `q`, la mayoría puede hacer una revolución que destruye una parte `mu` de la renta y le deja el resto, `1 - mu`, para siempre. Un impuesto `t`, repartido a partes iguales y con un coste de eficiencia, da a la mayoría `gana_pueblo(t, theta)` y le cuesta a la élite `pierde_elite(t, theta)`. Cuando hay amenaza, la élite tiene tres salidas:
+
+* **Prometer redistribución:** solo la cobrará la mayoría en los periodos de amenaza, y algo que solo ocurre en esos periodos pesa `k = 1 - beta * (1 - q)` veces lo que ocurre en todos, donde `beta` es cuánto pesa el futuro.
+* **Democratizar:** la mayoría vota para siempre el impuesto que prefiere, `impuesto_pueblo(theta)`.
+* **Reprimir:** la élite pierde una parte `kappa` de su renta en cada periodo de amenaza.
+
+**Tu tarea.**
+
+1. Completa `promesa_basta`: la mayoría acepta la promesa si lo que ya tiene, más lo que gana con el impuesto que más le conviene, `tp`, cobrado solo en los periodos de amenaza, iguala al menos lo que le da la revolución.
+2. Completa `democratizar_mejor`: la élite prefiere democratizar si lo que le queda con el impuesto de la mayoría, cobrado siempre, es al menos lo que le queda reprimiendo.
+3. Mira los tramos de desigualdad. ¿Qué hace la élite cuando la desigualdad es baja, media y alta?
+4. Baja la probabilidad de amenaza a `q <- 0.5` y vuelve a ejecutar. Después déjala en 0.9 y sube el coste de reprimir a `kappa <- 0.8`. ¿Qué cambia en cada caso?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Hasta una desigualdad de 0,30, la élite no hace nada: la revolución destruye más de lo que la mayoría ganaría con ella. Esa es la *restricción de la revolución* de Acemoglu y Robinson: solo hay amenaza cuando `theta > mu`. Entre 0,31 y 0,35, a la élite le basta con prometer redistribución, y el impuesto que fija es el justo para que la revolución no compense. Entre 0,36 y 0,39, la promesa ya no alcanza: aunque la élite ofreciera el impuesto que más conviene a la mayoría, solo lo cobraría en los periodos de amenaza. La élite cede el voto, porque la democracia convierte la promesa en un compromiso. Y a partir de 0,40 reprime: la democracia todavía evitaría la revolución, pero con tanta desigualdad votaría un impuesto que le cuesta a la élite más que reprimir. La democracia sale solo con una desigualdad intermedia: con poca, la élite no la necesita, y con mucha, le sale demasiado cara.
+
+La tarea 4 separa los dos mecanismos. Con `q <- 0.5`, la amenaza vuelve menos a menudo, la promesa vale menos y la élite tiene que democratizar antes, entre 0,32 y 0,34, y reprime desde 0,35. Con `kappa <- 0.8`, reprimir sale más caro, y la democracia ocupa un tramo mucho más ancho, de 0,36 a 0,64.
+
+El modelo simplifica: el de Acemoglu y Robinson tiene además una franja en la que la élite democratiza o no al azar, y otra en la que la democracia no basta para evitar la revolución. Su contrapeso es empírico. Haggard y Kaufman revisaron una a una las transiciones de 1980 a 2000: el conflicto distributivo aparece en poco más de la mitad, muchas de ellas en países muy desiguales, y menos de un tercio de los retrocesos democráticos se deben a un conflicto entre élites y mayoría.
+
+Acemoglu, D. y Robinson, J. A. (2001). A theory of political transitions. *American Economic Review*, 91(4), 938–963.
+
+Acemoglu, D. y Robinson, J. A. (2006). *Economic Origins of Dictatorship and Democracy*. Cambridge University Press.
+
+Haggard, S. y Kaufman, R. R. (2012). Inequality and regime change: Democratic transitions and the stability of democratic rule. *American Political Science Review*, 106(3), 495–516.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: revolucion
+#| caption: "Tu código"
+delta <- 0.2   # la élite es el 20% de la población
+beta <- 0.9    # cuánto pesa el futuro
+q <- 0.9       # probabilidad de que haya amenaza de revolución en un periodo
+mu <- 0.3      # parte de la renta que destruye una revolución
+kappa <- 0.6   # parte de su renta que pierde la élite en cada periodo en que reprime
+k <- 1 - beta * (1 - q)  # lo que pesa algo que solo ocurre en los periodos de amenaza
+
+coste_fiscal <- function(t) t^2 / 8
+gana_pueblo <- function(t, theta) t * (theta - delta) - (1 - delta) * coste_fiscal(t)
+pierde_elite <- function(t, theta) t * (theta - delta) + delta * coste_fiscal(t)
+impuesto_pueblo <- function(theta) min(1, 4 * (theta - delta) / (1 - delta))  # el que votaría la mayoría
+
+# Lo que hace la élite cuando hay amenaza, según la desigualdad theta
+regimen <- function(theta) {
+  tp <- impuesto_pueblo(theta)
+  if (1 - theta >= 1 - mu) return("nada")  # la revolución no compensa: no hay amenaza
+  reprimir <- theta - k * kappa * theta     # lo que le queda a la élite si reprime
+  promesa_basta <- ______
+  if (promesa_basta) {
+    # el impuesto justo para que la revolución no compense
+    t <- tryCatch(uniroot(function(t) (1 - theta) + k * gana_pueblo(t, theta) - (1 - mu), c(0, tp), tol = 1e-12)$root,
+                  error = function(err) stop("promesa_basta dice que la promesa basta, pero ni el impuesto tp la hace bastar: revísala"))
+    return(if (theta - k * pierde_elite(t, theta) >= reprimir) "redistribuye" else "reprime")
+  }
+  democracia_basta <- (1 - theta) + gana_pueblo(tp, theta) >= 1 - mu
+  democratizar_mejor <- ______
+  if (democracia_basta && democratizar_mejor) "democratiza" else "reprime"
+}
+
+# Los tramos de desigualdad en los que la élite hace lo mismo
+tramos <- function(thetas) {
+  r <- rle(sapply(thetas, regimen))
+  fin <- cumsum(r$lengths)
+  data.frame(regimen = r$values, desde = thetas[fin - r$lengths + 1], hasta = thetas[fin])
+}
+tramos(seq(0.21, 0.80, by = 0.01))
+```
+
+```{webr}
+#| exercise: revolucion
+#| solution: true
+delta <- 0.2
+beta <- 0.9
+q <- 0.9
+mu <- 0.3
+kappa <- 0.6
+k <- 1 - beta * (1 - q)
+
+coste_fiscal <- function(t) t^2 / 8
+gana_pueblo <- function(t, theta) t * (theta - delta) - (1 - delta) * coste_fiscal(t)
+pierde_elite <- function(t, theta) t * (theta - delta) + delta * coste_fiscal(t)
+impuesto_pueblo <- function(theta) min(1, 4 * (theta - delta) / (1 - delta))
+
+regimen <- function(theta) {
+  tp <- impuesto_pueblo(theta)
+  if (1 - theta >= 1 - mu) return("nada")
+  reprimir <- theta - k * kappa * theta
+  promesa_basta <- (1 - theta) + k * gana_pueblo(tp, theta) >= 1 - mu
+  if (promesa_basta) {
+    t <- tryCatch(uniroot(function(t) (1 - theta) + k * gana_pueblo(t, theta) - (1 - mu), c(0, tp), tol = 1e-12)$root,
+                  error = function(err) stop("promesa_basta dice que la promesa basta, pero ni el impuesto tp la hace bastar: revísala"))
+    return(if (theta - k * pierde_elite(t, theta) >= reprimir) "redistribuye" else "reprime")
+  }
+  democracia_basta <- (1 - theta) + gana_pueblo(tp, theta) >= 1 - mu
+  democratizar_mejor <- theta - pierde_elite(tp, theta) >= reprimir
+  if (democracia_basta && democratizar_mejor) "democratiza" else "reprime"
+}
+
+tramos <- function(thetas) {
+  r <- rle(sapply(thetas, regimen))
+  fin <- cumsum(r$lengths)
+  data.frame(regimen = r$values, desde = thetas[fin - r$lengths + 1], hasta = thetas[fin])
+}
+tramos(seq(0.21, 0.80, by = 0.01))
+```
+
+```{webr}
+#| exercise: revolucion
+#| check: true
+# Se compara regimen() con el modelo en tres juegos de parámetros: los de partida y los de la
+# tarea 4. Se prueban en el entorno del alumno y se restauran después.
+e <- .envir_result
+thetas <- seq(0.21, 0.80, by = 0.01)
+referencia <- function(theta, p) {
+  k <- 1 - p$beta * (1 - p$q)
+  gana <- function(t) t * (theta - p$delta) - (1 - p$delta) * t^2 / 8
+  pierde <- function(t) t * (theta - p$delta) + p$delta * t^2 / 8
+  tp <- min(1, 4 * (theta - p$delta) / (1 - p$delta))
+  if (theta <= p$mu) return("nada")
+  reprimir <- theta - k * p$kappa * theta
+  if ((1 - theta) + k * gana(tp) >= 1 - p$mu) {
+    t <- uniroot(function(t) (1 - theta) + k * gana(t) - (1 - p$mu), c(0, tp), tol = 1e-12)$root
+    return(if (theta - k * pierde(t) >= reprimir) "redistribuye" else "reprime")
+  }
+  if ((1 - theta) + gana(tp) >= 1 - p$mu && theta - pierde(tp) >= reprimir) "democratiza" else "reprime"
+}
+nombres <- c("delta", "beta", "q", "mu", "kappa", "k")
+if (!is.function(e$regimen) || !all(nombres %in% ls(e))) {
+  list(correct = FALSE, message = "No encuentro regimen() o alguno de los parámetros.")
+} else {
+  guardado <- mget(nombres, envir = e)
+  casos <- list(list(q = 0.9, kappa = 0.6), list(q = 0.5, kappa = 0.6), list(q = 0.9, kappa = 0.8))
+  fallo <- NULL
+  for (caso in casos) {
+    p <- list(delta = 0.2, beta = 0.9, mu = 0.3, q = caso$q, kappa = caso$kappa)
+    assign("delta", p$delta, e); assign("beta", p$beta, e); assign("mu", p$mu, e)
+    assign("q", p$q, e); assign("kappa", p$kappa, e); assign("k", 1 - p$beta * (1 - p$q), e)
+    obtenido <- tryCatch(sapply(thetas, e$regimen), error = function(err) rep("error", length(thetas)))
+    esperado <- sapply(thetas, referencia, p = p)
+    if (!identical(unname(obtenido), esperado)) {
+      fallo <- list(caso = caso, obtenido = obtenido, esperado = esperado)
+      break
+    }
+  }
+  for (n in nombres) assign(n, guardado[[n]], e)
+  if (is.null(fallo)) {
+    list(correct = TRUE, message = "¡Correcto! Con poca desigualdad no hay amenaza; con algo más, la élite la compra con promesas; cuando dejan de ser creíbles, cede el voto; y con mucha desigualdad, la democracia le sale tan cara que reprime.")
+  } else {
+    i <- which(fallo$obtenido != fallo$esperado)[1]
+    pista <- if (fallo$obtenido[i] == "redistribuye")
+      " ¿Cuentas la promesa como si se cobrara siempre? Solo se cobra en los periodos de amenaza: pesa k."
+    else if (fallo$esperado[i] == "redistribuye" || fallo$obtenido[i] == "error")
+      " Revisa promesa_basta: lo que tiene la mayoría más lo que gana con tp, que pesa k, frente a lo que le da la revolución."
+    else " Revisa democratizar_mejor: compara lo que le queda a la élite con el impuesto de la mayoría, cobrado siempre, con lo que le queda reprimiendo."
+    list(correct = FALSE, message = paste0(
+      "Con q = ", fallo$caso$q, " y kappa = ", fallo$caso$kappa, ", con una desigualdad de ",
+      format(thetas[i], decimal.mark = ","), " la élite debería elegir «", fallo$esperado[i],
+      "», y regimen() dice «", fallo$obtenido[i], "».", pista))
+  }
+}
+```
+
+::: {.hint exercise="revolucion"}
+Lo que la mayoría tiene sin revolución es `1 - theta`, y la promesa le añade `gana_pueblo(tp, theta)`, pero solo en los periodos de amenaza: multiplícalo por `k`. Compáralo con `1 - mu`. A la élite, la democracia le deja `theta - pierde_elite(tp, theta)` en todos los periodos; reprimir le deja `reprimir`.
+:::
+
+::: {.solution exercise="revolucion"}
+`promesa_basta <- (1 - theta) + k * gana_pueblo(tp, theta) >= 1 - mu` y `democratizar_mejor <- theta - pierde_elite(tp, theta) >= reprimir`.
+:::
+:::
+
+::::

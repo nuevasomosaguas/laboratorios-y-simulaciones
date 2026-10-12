@@ -1,0 +1,188 @@
+---
+title: "¿Quién trabaja para quién?"
+numero: 71
+nivel: 2
+duracion: "35 min"
+lectura: "[Roemer (1982)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
+dificultad: "Intermedio"
+categories: [desigualdad, equilibrios y dinámica]
+description: "Cien familias, una sola manera de cultivar maíz y la simiente repartida de forma desigual: las clases y la explotación salen solas del reparto."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Para Marx, el obrero trabaja una parte de la jornada para sí y otra para el capitalista, y la explotación nace en la fábrica. En 1982, John Roemer se preguntó si eso se podía demostrar en lugar de suponerse: si, partiendo de personas que solo quieren trabajar lo menos posible y de un reparto desigual de la propiedad, las clases y la explotación salen solas. Su respuesta es, con las de Cohen y Elster, una de las obras fundacionales del *marxismo analítico*.
+
+El modelo es una economía de maíz con una sola técnica. Cosechar una fanega exige un día de trabajo y media fanega de simiente, que se siembra y se gasta. Una familia con una fanega de simiente cosecha dos, repone la simiente y se queda con una, lo que necesita para vivir una semana, y le cuesta dos días: es el *valor* de una fanega neta, `valor = 2` días. Pero la simiente está repartida de forma desigual entre cien familias, y hay un mercado de trabajo: quien no tiene simiente puede trabajar para otros por un salario de `w` fanegas al día, y quien tiene de sobra puede contratar. Cada fanega de simiente que se adelanta para pagar trabajo ajeno rinde un beneficio `r`.
+
+Cada familia trabaja los días justos para reunir su fanega. Su simiente le rinde `r * W`, la contrate o la trabaje ella, porque trabajarla ella vale lo mismo que el salario que se ahorra, y cada día de trabajo le rinde `w`. Si el beneficio de su simiente ya le da la fanega, no trabaja, y solo usa la simiente que necesita. Una familia es *explotada* si trabaja más días que los que cuesta su sustento, y *explotadora* si trabaja menos. Y Roemer distingue cinco clases por su posición en el mercado de trabajo: el gran capitalista, que solo contrata; el pequeño capitalista, que trabaja su simiente y además contrata; el pequeño burgués, que solo trabaja la suya; el semiproletario, que trabaja la suya y además vende su trabajo; y el proletario, que solo lo vende. El salario no lo fija nadie: es el que iguala los días que se contratan y los que se venden.
+
+**Tu tarea.**
+
+1. Completa `trabaja` en `plan()`: los días que trabaja una familia con simiente `W`, el mínimo que le da `b` fanegas, y nunca menos de cero.
+2. Completa `explotacion`: los días que trabaja cada familia menos los que cuesta su sustento.
+3. Mira la tabla. ¿Hay alguna familia que contrate y sea explotada, o que venda su trabajo y sea explotadora? ¿Dónde está la frontera?
+4. Reparte la simiente a partes iguales: añade `capital <- rep(mean(capital), 100)` justo debajo de la línea de `capital` y vuelve a ejecutar. ¿Qué pasa con el salario, el beneficio, las clases y la explotación?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El mercado de trabajo se vacía con un salario de 0,357 fanegas al día, y la simiente rinde un beneficio del 28,6%. Las cinco clases aparecen en orden de riqueza. El proletario, sin simiente, trabaja 2,8 días por un sustento que cuesta 2: trabaja 0,8 días para otros. El semiproletario, con media fanega, trabaja 2,4. El pequeño burgués, con una fanega, trabaja exactamente 2 y ni explota ni es explotado. Los pequeños capitalistas trabajan 1,2 y 0,4 días, y los grandes, ninguno. La tarea 3 es el *principio de correspondencia entre clase y explotación* de Roemer: todo el que contrata es explotador, y todo el que vende su trabajo, explotado. La frontera es la fanega de simiente que basta para producir el propio sustento, y no depende del salario. Y la explotación suma cero: se trabajan en total 200 días, dos por familia, y los 38 días de más de los que venden su trabajo son los 38 que dejan de trabajar los que contratan.
+
+La tarea 4 es la conclusión de Roemer. Con la simiente repartida por igual, nadie necesita vender su trabajo, el salario sube hasta el valor de lo que produce un día, 0,5 fanegas, el beneficio cae a cero, y todos son pequeños burgueses que trabajan sus 2 días. Las clases y la explotación no necesitaban la fábrica ni la coacción: salen de mercados competitivos y de un reparto desigual de la propiedad. Roemer demostró además que se repiten igual con un mercado de crédito en lugar de uno de trabajo: los ricos prestan su simiente y los pobres se endeudan.
+
+**Para ir más allá:** concentra la simiente en cinco familias, `capital <- c(rep(0, 95), rep(24.5, 5))`. El salario *sube*, a 0,475, y cada proletario trabaja solo 0,105 días de más. En esta economía nadie acumula: los cinco ricos solo quieren su sustento, y sus 10 días de ocio se reparten entre 95 trabajadores. El modelo explica de dónde sale la explotación, no cuánta hay en una economía que crece.
+
+El contrapeso lo puso el propio Roemer: si las familias difieren en sus preferencias por el ocio, una familia rica que prefiere trabajar puede resultar explotada, y una pobre que prefiere descansar, explotadora. Por eso concluyó que lo que importa no es el intercambio desigual de trabajo, sino la desigualdad de la propiedad de la que sale, y Veneziani discute si una definición solo distributiva puede prescindir de la dominación.
+
+Roemer, J. E. (1982). *A General Theory of Exploitation and Class*. Harvard University Press.
+
+Roemer, J. E. (1994). Should Marxists be interested in exploitation? En *Egalitarian Perspectives: Essays in Philosophical Economics* (pp. 65–96). Cambridge University Press.
+
+Veneziani, R. (2008). *Exploitation, inequality, and power*. MPRA Paper 30288.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: roemer
+#| caption: "Tu código"
+# La economía del maíz de Roemer: una sola técnica y cien familias
+a <- 0.5   # fanegas de simiente que se gastan por cada fanega cosechada
+l <- 1     # días de trabajo por cada fanega cosechada
+b <- 1     # fanegas netas que necesita cada familia para vivir una semana
+valor <- l / (1 - a)   # días de trabajo que cuesta una fanega neta: 2
+capital <- c(rep(0, 35), rep(0.5, 25), rep(1, 10), rep(2, 15), rep(3, 10), rep(8, 5))  # simiente de cada familia
+
+# Lo que hace una familia con simiente W cuando el salario es w fanegas al día
+plan <- function(W, w) {
+  r <- (1 - a - w * l) / a   # beneficio por fanega de simiente adelantada
+  trabaja <- ______          # días de trabajo: el mínimo que le da b fanegas
+  usa <- if (r > 0) ifelse(trabaja == 0, b / r, W) else trabaja * a / l  # simiente que pone a producir
+  propio <- pmin(trabaja, l * usa / a)                                     # días con su propia simiente
+  data.frame(capital = W, trabaja, vende = trabaja - propio, contrata = l * usa / a - propio)
+}
+
+# El salario que vacía el mercado de trabajo: tantos días contratados como vendidos
+exceso <- function(w) with(plan(capital, w), sum(contrata) - sum(vende))
+salario <- if (exceso(0.001) * exceso(1 / valor - 1e-9) < 0) {
+  uniroot(exceso, c(0.001, 1 / valor - 1e-9), tol = 1e-10)$root
+} else 1 / valor  # si nadie tiene que vender su trabajo, el salario es todo lo que produce un día
+
+# Las cinco clases de Roemer, por su posición en el mercado de trabajo
+clase <- function(p) with(p, ifelse(trabaja == 0, "1 gran capitalista",
+                          ifelse(contrata > 1e-6, "2 pequeño capitalista",
+                          ifelse(vende < 1e-6, "3 pequeño burgués",
+                          ifelse(capital > 0, "4 semiproletario", "5 proletario")))))
+
+p <- plan(capital, salario)
+p$clase <- clase(p)
+p$explotacion <- ______  # días de más (+) o de menos (−) respecto a lo que cuesta su sustento
+coma <- function(x, d) format(round(x, d), decimal.mark = ",")
+cat("Salario: ", coma(salario, 3), " fanegas al día. Beneficio: ",
+    coma(100 * (1 - a - salario * l) / a, 1), "%\n", sep = "")
+tabla <- unique(p)
+tabla[, c("trabaja", "vende", "contrata", "explotacion")] <- round(tabla[, c("trabaja", "vende", "contrata", "explotacion")], 3)
+tabla
+```
+
+```{webr}
+#| exercise: roemer
+#| solution: true
+a <- 0.5
+l <- 1
+b <- 1
+valor <- l / (1 - a)
+capital <- c(rep(0, 35), rep(0.5, 25), rep(1, 10), rep(2, 15), rep(3, 10), rep(8, 5))
+
+plan <- function(W, w) {
+  r <- (1 - a - w * l) / a
+  trabaja <- pmax(0, (b - r * W) / w)
+  usa <- if (r > 0) ifelse(trabaja == 0, b / r, W) else trabaja * a / l
+  propio <- pmin(trabaja, l * usa / a)
+  data.frame(capital = W, trabaja, vende = trabaja - propio, contrata = l * usa / a - propio)
+}
+
+exceso <- function(w) with(plan(capital, w), sum(contrata) - sum(vende))
+salario <- if (exceso(0.001) * exceso(1 / valor - 1e-9) < 0) {
+  uniroot(exceso, c(0.001, 1 / valor - 1e-9), tol = 1e-10)$root
+} else 1 / valor
+
+clase <- function(p) with(p, ifelse(trabaja == 0, "1 gran capitalista",
+                          ifelse(contrata > 1e-6, "2 pequeño capitalista",
+                          ifelse(vende < 1e-6, "3 pequeño burgués",
+                          ifelse(capital > 0, "4 semiproletario", "5 proletario")))))
+
+p <- plan(capital, salario)
+p$clase <- clase(p)
+p$explotacion <- p$trabaja - valor * b
+coma <- function(x, d) format(round(x, d), decimal.mark = ",")
+cat("Salario: ", coma(salario, 3), " fanegas al día. Beneficio: ",
+    coma(100 * (1 - a - salario * l) / a, 1), "%\n", sep = "")
+tabla <- unique(p)
+tabla[, c("trabaja", "vende", "contrata", "explotacion")] <- round(tabla[, c("trabaja", "vende", "contrata", "explotacion")], 3)
+tabla
+```
+
+```{webr}
+#| exercise: roemer
+#| check: true
+# Se comprueba plan() con casos propios y la fórmula de la explotación, no el reparto:
+# la tarea 4 lo cambia.
+e <- .envir_result
+f <- e$plan
+coma <- function(x) format(round(x, 3), decimal.mark = ",")
+w <- 5 / 14
+W <- c(0, 0.5, 1, 2, 8)
+if (!is.function(f) || !is.data.frame(e$p)) {
+  list(correct = FALSE, message = "No encuentro plan() o la tabla p.")
+} else {
+  r <- (1 - e$a - w * e$l) / e$a
+  esperado <- pmax(0, (e$b - r * W) / w)
+  obtenido <- tryCatch(f(W, w)$trabaja, error = function(err) NULL)
+  if (is.null(obtenido) || length(obtenido) != length(W)) {
+    list(correct = FALSE, message = "plan() da un error o no devuelve un valor de trabaja por familia.")
+  } else if (any(obtenido < -1e-9)) {
+    list(correct = FALSE, message = paste0(
+      "Con 8 fanegas de simiente, plan() hace trabajar ", coma(obtenido[5]),
+      " días a la familia. Si el beneficio de su simiente ya le da su fanega, trabaja 0, no días negativos."))
+  } else if (isTRUE(all.equal(obtenido, rep(e$b / w, length(W))))) {
+    list(correct = FALSE, message = "Todas las familias trabajan lo mismo, sea cual sea su simiente: falta lo que les rinde, r * W.")
+  } else if (!isTRUE(all.equal(obtenido, esperado))) {
+    list(correct = FALSE, message = paste0(
+      "Con un salario de 5/14 de fanega al día, una familia sin simiente debería trabajar 2,8 días, y una con 2 fanegas, 1,2. plan() da ",
+      coma(obtenido[1]), " y ", coma(obtenido[4]), "."))
+  } else if (!isTRUE(all.equal(e$p$explotacion, e$p$trabaja - e$valor * e$b))) {
+    list(correct = FALSE, message = "plan() está bien. Falta explotacion: los días que trabaja cada familia menos los que cuesta su sustento, valor * b.")
+  } else {
+    p <- e$p
+    if (all(abs(p$explotacion) < 1e-6)) {
+      list(correct = TRUE, message = paste0(
+        "¡Correcto! Con la simiente repartida por igual, el salario es ", coma(e$salario),
+        " fanegas al día, el beneficio es cero y todas las familias trabajan lo que cuesta su sustento: no hay clases ni explotación."))
+    } else {
+      sin <- p[p$capital == min(p$capital), ][1, ]
+      list(correct = TRUE, message = paste0(
+        "¡Correcto! Con un salario de ", coma(e$salario), " fanegas al día, la familia más pobre trabaja ",
+        coma(sin$trabaja), " días por un sustento que cuesta ", coma(e$valor * e$b), ". ",
+        if (all(p$explotacion[p$vende > 1e-6] > 0) && all(p$explotacion[p$contrata > 1e-6] < 0))
+          "Y todo el que vende su trabajo es explotado, y todo el que contrata, explotador." else ""))
+    }
+  }
+}
+```
+
+::: {.hint exercise="roemer"}
+Una familia necesita `b` fanegas. Su simiente le rinde `r * W` sin trabajar, y cada día de trabajo, `w`: lo que le falta, `b - r * W`, dividido entre `w`, son los días que trabaja. Si lo que le falta es negativo, no trabaja: `pmax(0, ...)`. La explotación compara `p$trabaja` con lo que cuesta el sustento, `valor * b`.
+:::
+
+::: {.solution exercise="roemer"}
+`trabaja <- pmax(0, (b - r * W) / w)` en `plan()`, y `p$explotacion <- p$trabaja - valor * b`.
+:::
+:::
+
+::::
