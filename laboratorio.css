@@ -60,3 +60,29 @@ a.resuelto::after { content: " ✓"; color: #18bc9c; }
    que es más grande, queda más bajo. Los iconos siguen centrados. */
 .navbar > .navbar-container { align-items: baseline; }
 .navbar-container > .navbar-toggler, #quarto-search, .quarto-navbar-tools { align-self: center; }
+
+/* Las sugerencias del editor, con los colores del propio editor: CodeMirror las pinta
+   claras por defecto y, en modo oscuro, el texto heredado apenas se leía. */
+.cm-tooltip.cm-tooltip-autocomplete {
+  background-color: var(--exercise-code-block-bg);
+  color: var(--exercise-code-block-color);
+  border: 1px solid var(--exercise-gray);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+  overflow: hidden;
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul {
+  font-family: "Fira Code", monospace;
+  font-size: .9em;
+}
+.cm-tooltip.cm-tooltip-autocomplete > ul > li { padding: 3px 10px; line-height: 1.4; }
+.cm-tooltip.cm-tooltip-autocomplete ul li[aria-selected] {
+  background: rgb(var(--exercise-primary-rgb));
+  color: #fff;
+}
+.cm-completionMatchedText {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--exercise-editor-hl-fu);
+}
+.cm-tooltip-autocomplete li[aria-selected] .cm-completionMatchedText { color: inherit; }
