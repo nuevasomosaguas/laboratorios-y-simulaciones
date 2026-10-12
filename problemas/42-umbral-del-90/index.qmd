@@ -26,11 +26,12 @@ Los datos de la derecha son los 110 años-país con deuda por encima del 90%, ta
 1. Completa `cada_pais(d)`: la media de las medias de cada país. `tapply()` calcula una media por grupo.
 2. Completa `seleccion`: un vector lógico que deja fuera a Nueva Zelanda antes de 1950 y a Australia y Canadá antes de 1951.
 3. El resto ya está escrito. Mira cómo cambia el número al corregir cada paso: el publicado, sin los errores de la hoja, con todos los años y con cada año pesando lo mismo.
+4. La hoja perdía cinco países, pero al corregirla solo cuenta uno. Mira cuántos años de cada país quedan tras la selección, con `table(deuda$pais[seleccion])`: ¿por qué?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con la selección, el error de la hoja y la transcripción, la media sale −0,1%, el número publicado. Al recuperar las cinco filas perdidas sube a 0,3%. Con los años de posguerra, a 1,9%. Y si cada año pesa lo mismo, en lugar de cada país, a 2,2%. El hundimiento desaparece: con deuda alta se crece algo menos que con deudas de entre el 30% y el 90%, en torno al 3%, pero no hay ningún umbral a partir del cual el crecimiento se desplome.
+Con la selección, el error de la hoja y la transcripción, la media sale −0,1%, el número publicado. Al corregir la hoja sube a 0,3%, y casi todo se debe a un solo país. De los cinco que perdía la fórmula, Austria y Dinamarca no tienen ningún año por encima del 90%, y los de Australia y Canadá ya los quitaba la selección de posguerra: solo se recuperan los veinticinco años de Bélgica, que crece de media un 2,6%. La corrección de Nueva Zelanda apenas suma unas centésimas. Los errores interactúan: el efecto de un fallo depende de los que ya había, y la selección había dejado sin nada que perder a dos de los países que perdía la hoja. Con los años de posguerra, a 1,9%. Y si cada año pesa lo mismo, en lugar de cada país, a 2,2%. El hundimiento desaparece: con deuda alta se crece algo menos que con deudas de entre el 30% y el 90%, en torno al 3%, pero no hay ningún umbral a partir del cual el crecimiento se desplome.
 
 Para ser justos con Reinhart y Rogoff: reconocieron el error de la fórmula, pero sostuvieron que no cambiaba lo esencial, que con deuda alta se crece menos. El debate de fondo pasó a la ponderación y a la causalidad. Ninguna de las dos medias es la buena sin más: pesar por país deja que un solo año de Nueva Zelanda arrastre la media, y pesar por año deja que Bélgica, con veinticinco, la domine. Y aunque la asociación fuera fuerte, podría ir al revés: crecer poco hace subir la deuda, porque cae la recaudación y suben los gastos.
 
