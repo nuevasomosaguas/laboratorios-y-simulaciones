@@ -1,0 +1,211 @@
+---
+title: "Mirar los datos cada día"
+numero: 67
+nivel: 2
+duracion: "30 min"
+lectura: "[Dienes (2008)](https://nuevasomosaguas.github.io/biblioteca.html#dienes2008understanding); Armitage, McPherson y Rowe (1969)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Dos páginas web idénticas, un test A/B que se mira cada mañana y se para en cuanto sale significativo. Una de cada cinco veces, gana una de las dos."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Una tienda en línea quiere saber si una página de pago nueva vende más que la de siempre. Hace un **test A/B**: durante diez días, la mitad de las visitas ve la página A y la otra mitad, la B, 500 visitas al día cada una. Al final compara la proporción de visitas que compran con un contraste $z$ de dos proporciones, y si $|z| > 1{,}96$, declara una ganadora. Con un solo contraste al final, si las dos páginas venden igual, se equivoca un 5% de las veces.
+
+Pero nadie espera diez días. El equipo mira el panel cada mañana, con todos los datos acumulados hasta entonces, y en cuanto $|z|$ pasa de 1,96, para el test y cambia la página. Es la **parada opcional**, y no es un vicio solo de las empresas: Peter Armitage, Colin McPherson y Brenda Rowe calcularon en 1969 lo que hace con los ensayos clínicos.
+
+Si hay que mirar, la estadística sabe cómo hacerlo. Stuart Pocock propuso en 1977 subir el umbral de cada mirada, el mismo todos los días, hasta que la probabilidad de cruzarlo alguna vez sea del 5%. Peter O'Brien y Thomas Fleming propusieron en 1979 un umbral que empieza muy alto y baja con los días, $c\,\sqrt{K/k}$ el día $k$ de $K$, para que mirar pronto cueste poco al final. Aquí no hace falta buscar los umbrales en una tabla: se calibran simulando tests A/A, en los que las dos páginas son idénticas.
+
+**Tu tarea.**
+
+1. Completa `primer_dia(z, umbral)`: el primer día en que $|z|$ supera el umbral de ese día, o `NA` si no lo supera ninguno.
+2. Completa la calibración de Pocock: el umbral constante que $|z|$ cruza algún día en solo el 5% de los tests A/A. El de O'Brien y Fleming ya está calibrado igual.
+3. Lee la tabla: para cada regla, la proporción de tests A/A que declaran una ganadora; la de tests A/B que la encuentran cuando la página B vende de verdad un 25% más, del 5% al 6,25% de las visitas; y cuántos días dura de media un test A/B, contando diez para los que no paran.
+4. Mira el gráfico: treinta tests A/A, con los tres umbrales.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Mirando solo al final, el 5,0% de los tests A/A declara una ganadora entre dos páginas idénticas. Mirando cada mañana con el mismo 1,96, el 19,3%: casi uno de cada cinco, lo mismo que calcularon Armitage, McPherson y Rowe para diez miradas. Cada mirada añade una ocasión de cruzar el umbral por azar, y aunque las miradas están muy correlacionadas, porque cada una contiene los datos de la anterior, no lo están del todo. Con más miradas, la tasa sigue subiendo, y si se mira sin límite, el azar acaba cruzando cualquier umbral fijo con probabilidad uno.
+
+El umbral de Pocock que sale de la simulación, 2,55, es el de su tabla para diez miradas, 2,555, que equivale a pedir $p < 0{,}011$ cada día. Con él, los tests A/A vuelven a equivocarse un 4,9% de las veces. El precio se paga en potencia: con un efecto real, encuentra la ganadora el 65,1% de las veces, frente al 78,1% de mirar solo al final, porque el último día también exige 2,55. A cambio, el test dura 7,1 días de media en lugar de diez. El umbral de O'Brien y Fleming empieza en 6,64, que casi nunca se cruza el primer día, y termina en 2,10, poco más que 1,96: conserva casi toda la potencia, el 75,8%, y dura 7,9 días. Mirar cada día con 1,96 parece la regla más eficaz, con un 85,2% de ganadoras en 5,1 días, pero ese 85,2% está inflado por el mismo azar que le da un 19,3% de falsos positivos. Lo que reparten estas reglas es el 5% de error entre las miradas previstas, y por eso hay que fijar de antemano cuántas habrá. Lan y DeMets lo generalizaron en 1983 con la **función de gasto de alfa**, que permite mirar en momentos no previstos siempre que se sepa cuánto 5% se ha gastado ya.
+
+Es el mismo error de [El jardín de senderos que se bifurcan](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/66-el-jardin-de-senderos/) por otra vía: allí la decisión que dependía de los datos era qué analizar; aquí, cuándo parar. Zoltan Dienes lo usa para explicar por qué el valor *p* depende de las intenciones de quien investiga: los mismos datos dan un valor *p* distinto según si se pensaba parar el día 10 o al cruzar el umbral. Una inferencia bayesiana, en cambio, solo mira los datos que hay, y la regla de parada no cambia lo que dicen. No es una licencia para mirar sin cuidado: la protección viene de otro sitio. Como recuerda Richard Royall, la probabilidad de que una razón de verosimilitudes llegue alguna vez a $k$ a favor de una hipótesis falsa es como mucho $1/k$, se mire cuantas veces se mire.
+
+**Para ir más allá:** alarga el test a dos meses, con `K <- 60`. ¿Cuánto sube la tasa de falsos positivos de mirar cada día con 1,96? ¿Y qué umbral de Pocock sale ahora?
+
+Armitage, P., McPherson, C. K. y Rowe, B. C. (1969). Repeated significance tests on accumulating data. *Journal of the Royal Statistical Society: Series A*, 132(2), 235–244.
+
+Dienes, Z. (2011). Bayesian versus orthodox statistics: Which side are you on? *Perspectives on Psychological Science*, 6(3), 274–290.
+
+Lan, K. K. G. y DeMets, D. L. (1983). Discrete sequential boundaries for clinical trials. *Biometrika*, 70(3), 659–663.
+
+O'Brien, P. C. y Fleming, T. R. (1979). A multiple testing procedure for clinical trials. *Biometrics*, 35(3), 549–556.
+
+Pocock, S. J. (1977). Group sequential methods in the design and analysis of clinical trials. *Biometrika*, 64(2), 191–199.
+
+Royall, R. (1997). *Statistical Evidence: A Likelihood Paradigm*. Chapman & Hall.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: parada
+#| caption: "Tu código"
+K <- 10        # días, y miradas
+n_dia <- 500   # visitas al día de cada versión
+dias <- 1:K
+
+# El z de dos proporciones con los datos acumulados al final de cada día (no hace falta tocarlo)
+z_acumulado <- function(a, b) {
+  xa <- cumsum(a)
+  xb <- cumsum(b)
+  m <- n_dia * dias
+  compra <- (xa + xb) / (2 * m)
+  (xa - xb) / m / sqrt(compra * (1 - compra) * 2 / m)
+}
+# Tantos tests como R: una fila de z por test
+tests <- function(R, pa, pb) {
+  t(replicate(R, z_acumulado(rbinom(K, n_dia, pa), rbinom(K, n_dia, pb))))
+}
+
+# 1. El primer día en que |z| supera el umbral de ese día; NA si no lo supera ninguno
+primer_dia <- function(z, umbral) {
+  ______
+}
+
+# 2. Calibración con 10.000 tests A/A
+set.seed(1977)
+Z <- tests(10000, 0.05, 0.05)
+pocock <- rep(quantile(______, 0.95), K)
+obf <- quantile(apply(sweep(abs(Z), 2, sqrt(dias / K), "*"), 1, max), 0.95) * sqrt(K / dias)
+
+# 3. Cuatro reglas, con tests nuevos
+reglas <- list(
+  "solo al final"    = c(rep(Inf, K - 1), qnorm(0.975)),
+  "cada día con 1,96" = rep(qnorm(0.975), K),
+  "Pocock"           = pocock,
+  "O'Brien-Fleming"  = obf
+)
+aa <- tests(10000, 0.05, 0.05)
+ab <- tests(10000, 0.05, 0.0625)
+tabla <- t(sapply(reglas, function(u) {
+  dia_aa <- apply(aa, 1, primer_dia, umbral = u)
+  dia_ab <- apply(ab, 1, primer_dia, umbral = u)
+  c(falsos = mean(!is.na(dia_aa)), potencia = mean(!is.na(dia_ab)),
+    duracion = mean(ifelse(is.na(dia_ab), K, dia_ab)))
+}))
+
+# 4. Treinta tests A/A y los umbrales
+matplot(dias, t(Z[1:30, ]), type = "l", lty = 1, col = "grey75", ylim = c(-4.5, 4.5),
+        xlab = "Día", ylab = "z acumulado")
+for (s in c(-1, 1)) {
+  lines(dias, s * reglas[[2]], lwd = 2, lty = 2)
+  lines(dias, s * pocock, lwd = 2)
+  lines(dias, s * pmin(obf, 4.5), lwd = 2, col = "grey40")
+}
+legend("bottomleft", c("1,96", "Pocock", "O'Brien-Fleming"), lty = c(2, 1, 1), lwd = 2,
+       col = c("black", "black", "grey40"), bty = "n", horiz = TRUE)
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: parada
+#| solution: true
+K <- 10
+n_dia <- 500
+dias <- 1:K
+
+z_acumulado <- function(a, b) {
+  xa <- cumsum(a)
+  xb <- cumsum(b)
+  m <- n_dia * dias
+  compra <- (xa + xb) / (2 * m)
+  (xa - xb) / m / sqrt(compra * (1 - compra) * 2 / m)
+}
+tests <- function(R, pa, pb) {
+  t(replicate(R, z_acumulado(rbinom(K, n_dia, pa), rbinom(K, n_dia, pb))))
+}
+
+primer_dia <- function(z, umbral) {
+  which(abs(z) > umbral)[1]
+}
+
+set.seed(1977)
+Z <- tests(10000, 0.05, 0.05)
+pocock <- rep(quantile(apply(abs(Z), 1, max), 0.95), K)
+obf <- quantile(apply(sweep(abs(Z), 2, sqrt(dias / K), "*"), 1, max), 0.95) * sqrt(K / dias)
+
+reglas <- list(
+  "solo al final"    = c(rep(Inf, K - 1), qnorm(0.975)),
+  "cada día con 1,96" = rep(qnorm(0.975), K),
+  "Pocock"           = pocock,
+  "O'Brien-Fleming"  = obf
+)
+aa <- tests(10000, 0.05, 0.05)
+ab <- tests(10000, 0.05, 0.0625)
+tabla <- t(sapply(reglas, function(u) {
+  dia_aa <- apply(aa, 1, primer_dia, umbral = u)
+  dia_ab <- apply(ab, 1, primer_dia, umbral = u)
+  c(falsos = mean(!is.na(dia_aa)), potencia = mean(!is.na(dia_ab)),
+    duracion = mean(ifelse(is.na(dia_ab), K, dia_ab)))
+}))
+
+matplot(dias, t(Z[1:30, ]), type = "l", lty = 1, col = "grey75", ylim = c(-4.5, 4.5),
+        xlab = "Día", ylab = "z acumulado")
+for (s in c(-1, 1)) {
+  lines(dias, s * reglas[[2]], lwd = 2, lty = 2)
+  lines(dias, s * pocock, lwd = 2)
+  lines(dias, s * pmin(obf, 4.5), lwd = 2, col = "grey40")
+}
+legend("bottomleft", c("1,96", "Pocock", "O'Brien-Fleming"), lty = c(2, 1, 1), lwd = 2,
+       col = c("black", "black", "grey40"), bty = "n", horiz = TRUE)
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: parada
+#| check: true
+# primer_dia() se comprueba con casos propios; el umbral de Pocock, con su tabla de 1977:
+# 2,555 para diez miradas, que la simulación con 10.000 tests reproduce con un margen de 0,05.
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+pct <- function(x) paste0(format(round(100 * x, 1), nsmall = 1, decimal.mark = ","), "%")
+if (!is.function(e$primer_dia) || is.null(e$pocock)) {
+  list(correct = FALSE, message = "No encuentro primer_dia() o pocock.")
+} else if (!identical(as.integer(e$primer_dia(c(0.5, -2.1, 3), 1.96)), 2L)) {
+  list(correct = FALSE, message = paste0(
+    "Con z = (0,5; −2,1; 3) y el umbral 1,96, el test para el día 2: cuenta |z|, porque una página puede ganar ",
+    "por cualquiera de los dos lados, y el primer día que lo cruza."))
+} else if (!identical(as.integer(e$primer_dia(c(2.5, 2.5, 2.5), c(3, 2.6, 2.4))), 3L)) {
+  list(correct = FALSE, message = "Con umbrales que cambian cada día, primer_dia() tiene que comparar cada z con el umbral de su día.")
+} else if (!is.na(e$primer_dia(c(1, -1.5, 1.9), 1.96))) {
+  list(correct = FALSE, message = "Si |z| no supera el umbral ningún día, primer_dia() debería devolver NA.")
+} else if (length(e$pocock) != e$K || abs(e$pocock[1] - 2.555) > 0.05) {
+  list(correct = FALSE, message = paste0(
+    "El umbral de Pocock debería salir cerca de 2,555, el de su tabla para diez miradas, y sale ",
+    coma(e$pocock[1]), ". Para cada test A/A, ¿cuál es el mayor |z| de sus diez días? ",
+    "El umbral es el que solo supera el 5% de esos máximos."))
+} else {
+  t <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Mirando cada día con 1,96, el ", pct(t[2, "falsos"]), " de los tests A/A declara una ganadora. ",
+    "El umbral de Pocock, ", coma(e$pocock[1]), ", lo devuelve al ", pct(t[3, "falsos"]), "."))
+}
+```
+
+::: {.hint exercise="parada"}
+`which(abs(z) > umbral)` da los días en que se cruza el umbral, y `[1]` se queda con el primero, o con `NA` si no hay ninguno. Para Pocock, `apply(abs(Z), 1, max)` da el mayor $|z|$ de cada test: un test A/A declara una ganadora con el umbral $c$ si ese máximo pasa de $c$.
+:::
+
+::: {.solution exercise="parada"}
+`which(abs(z) > umbral)[1]` en `primer_dia()`, y `apply(abs(Z), 1, max)` dentro del `quantile()` de Pocock.
+:::
+:::
+
+::::

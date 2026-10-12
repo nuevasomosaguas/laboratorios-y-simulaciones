@@ -1,0 +1,210 @@
+---
+title: "Demasiados 0,049"
+numero: 68
+nivel: 2
+duracion: "35 min"
+lectura: "[Simonsohn, Nelson y Simmons (2014)](https://nuevasomosaguas.github.io/biblioteca.html#simmons2011falsepositive); Gerber y Malhotra (2008)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Nadie ve los senderos que tomó un análisis, pero dejan huella: en una literatura trucada, los valores p se amontonan justo debajo de 0,05."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En [El jardín de senderos que se bifurcan](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/66-el-jardin-de-senderos/) y [Mirar los datos cada día](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/67-mirar-los-datos-cada-dia/) se veía cómo se fabrica un falso positivo desde dentro. Quien lee un artículo no ve nada de eso: solo ve un valor *p*, y un 0,049 honesto es idéntico a uno trucado. Pero una literatura entera sí deja huellas, porque el truco no lleva el valor *p* a cualquier sitio: lo lleva justo por debajo de 0,05, y ahí se para.
+
+Uri Simonsohn, Leif Nelson y Joseph Simmons lo aprovecharon en 2014 con la **curva *p***: el reparto de los valores *p* significativos de una literatura entre 0 y 0,05. Si el efecto es real, los valores *p* pequeños son más probables que los grandes, y la curva baja. Si no hay efecto, el valor *p* se reparte por igual entre 0 y 1, y la curva es plana. Si se ha trucado, sube al final. Su contraste más sencillo cuenta qué parte de los valores *p* significativos está por debajo de 0,025: más de la mitad si hay efecto, la mitad si no lo hay, menos si se ha trucado.
+
+Seis años antes, Alan Gerber y Neil Malhotra habían mirado los estadísticos $z$ publicados en las dos grandes revistas de ciencia política, la *American Political Science Review* y el *American Journal of Political Science*, con el **test del calibre**: si nada empuja los resultados a cruzar 1,96, en una franja estrecha justo por encima debería haber más o menos tantos como en otra igual justo por debajo. Encontraron muchos más por encima.
+
+Aquí hay tres literaturas de 20.000 estudios, cada uno con dos grupos de 20 personas: una con un efecto real (media diferencia de medio desvío típico), otra sin efecto y otra sin efecto pero trucada con la parada opcional: si no sale, se añaden cinco personas por grupo y se vuelve a mirar, hasta 50.
+
+**Tu tarea.**
+
+1. Completa `curva_p(p)`: de los valores *p* menores que 0,05, la fracción que cae en cada tramo de 0,01. Las cinco fracciones suman 1.
+2. Completa `bajo_0025(p)`: de los valores *p* menores que 0,05, la fracción que está por debajo de 0,025.
+3. Completa `calibre(p)`: cuántos $|z|$ caen justo por encima de 1,96, hasta un 10% más. Los de justo por debajo ya están.
+4. La última tabla es la probabilidad de que el test del calibre detecte el truco, en literaturas de 1.000, 3.000 y 10.000 estudios, mitad con efecto real y mitad sin él, cuando se ha trucado una parte de los que no tienen efecto. ¿Qué hace falta para verlo?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Las tres curvas son las de Simonsohn, Nelson y Simmons. Con efecto real, el 42% de los valores *p* significativos está entre 0 y 0,01 y solo el 10%, entre 0,04 y 0,05; el 71% está por debajo de 0,025. Sin efecto, cada tramo tiene cerca del 20%, y por debajo de 0,025 está el 51%. La literatura trucada sube al final: el 9% entre 0 y 0,01 y el 29% entre 0,04 y 0,05, con solo el 34% por debajo de 0,025. Desde fuera no se ve ningún sendero, pero la forma de la curva dice cuál se tomó. Ojo con los casos mezclados: un efecto real trucado da una curva que baja menos, y una literatura con muchos efectos reales puede tapar unos pocos estudios trucados.
+
+El test del calibre ve lo mismo con los estadísticos $z$. En la literatura con efecto real hay 1.594 estudios justo por debajo de 1,96 y 1.419 justo por encima, menos, porque la densidad de $|z|$ baja en ese tramo; sin efecto, 527 y 397. En la trucada, 308 por debajo y 1.353 por encima, más de cuatro veces. Pero en una literatura que mezcla de todo, detectarlo pide mucho. Si se han trucado todos los estudios sin efecto, el test lo ve el 63% de las veces con 1.000 estudios y casi siempre con 3.000. Si se ha trucado la mitad, el 12% de las veces con 1.000 estudios y el 68% con 10.000. Si se ha trucado una cuarta parte, no lo ve casi nunca, por grande que sea la literatura: el exceso de los trucados apenas compensa el defecto que traen los efectos reales, y el test compara con una densidad plana. Sin ningún estudio trucado, nunca da la alarma. Gerber y Malhotra reunieron años de dos revistas, y el exceso que encontraron era tan grande que la probabilidad de verlo por azar era de una entre 32.000 millones.
+
+Las dos pruebas no ven lo mismo. El calibre detecta cualquier cosa que empuje los resultados por encima de 1,96, también los estudios que nunca se publican porque no salieron, el **cajón de los archivos**; la curva *p* solo mira los significativos, y un cajón lleno con estudios honestos no le cambia la forma. Ninguna dice qué estudio concreto está trucado: hablan de literaturas, no de artículos.
+
+**Para ir más allá:** truca la literatura con efecto real con la parada opcional, `literatura(20000, 0.5, trucar = TRUE)`. ¿Qué fracción de sus valores *p* significativos queda por debajo de 0,025? ¿Lo detectaría la curva *p*?
+
+Gerber, A. y Malhotra, N. (2008). Do statistical reporting standards affect what is published? Publication bias in two leading political science journals. *Quarterly Journal of Political Science*, 3(3), 313–326.
+
+Simonsohn, U., Nelson, L. D. y Simmons, J. P. (2014). P-curve: A key to the file-drawer. *Journal of Experimental Psychology: General*, 143(2), 534–547.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: curva
+#| caption: "Tu código"
+# El valor p del contraste t entre las n primeras columnas de X y de Y, fila a fila (no hace falta tocarlo)
+p_t <- function(X, Y, n) {
+  mx <- rowMeans(X[, 1:n, drop = FALSE])
+  my <- rowMeans(Y[, 1:n, drop = FALSE])
+  s2 <- (rowSums(X[, 1:n]^2) - n * mx^2 + rowSums(Y[, 1:n]^2) - n * my^2) / (2 * n - 2)
+  2 * pt(-abs((mx - my) / sqrt(s2 * 2 / n)), 2 * n - 2)
+}
+# R estudios con un efecto d; si trucar es TRUE, de 20 en adelante se añaden 5 por grupo hasta que sale
+literatura <- function(R, d, trucar = FALSE) {
+  X <- matrix(rnorm(R * 50, mean = d), R)
+  Y <- matrix(rnorm(R * 50), R)
+  p <- p_t(X, Y, 20)
+  if (trucar) for (n in seq(25, 50, 5)) {
+    sigue <- p >= 0.05
+    p[sigue] <- p_t(X[sigue, , drop = FALSE], Y[sigue, , drop = FALSE], n)
+  }
+  p
+}
+
+# 1. La curva p: el reparto de los p significativos en tramos de 0,01
+curva_p <- function(p) {
+  ______
+}
+
+# 2. La fracción de los p significativos que está por debajo de 0,025
+bajo_0025 <- function(p) ______
+
+# 3. El test del calibre: cuántos |z| caen justo por debajo y justo por encima de 1,96
+calibre <- function(p, ancho = 0.1) {
+  z <- qnorm(1 - p / 2)
+  c(debajo = sum(z >= 1.96 * (1 - ancho) & z < 1.96),
+    encima = ______)
+}
+
+set.seed(2014)
+lits <- list(real = literatura(20000, 0.5), nula = literatura(20000, 0), trucada = literatura(20000, 0, trucar = TRUE))
+curvas <- sapply(lits, curva_p)
+barplot(t(curvas), beside = TRUE, names.arg = c("0-0,01", "0,01-0,02", "0,02-0,03", "0,03-0,04", "0,04-0,05"),
+        col = c("grey20", "grey60", "white"), legend.text = names(lits), args.legend = list(bty = "n"),
+        xlab = "Valor p", ylab = "Fracción de los significativos")
+round(curvas, 3)
+round(sapply(lits, bajo_0025), 3)
+sapply(lits, calibre)
+
+# 4. ¿Lo detecta el calibre? Una literatura de N estudios, mitad con efecto y mitad sin él,
+#    en la que se ha trucado una fracción h de los que no tienen efecto
+detecta <- function(N, h) {
+  sin_efecto <- N %/% 2
+  trucados <- rbinom(1, sin_efecto, h)
+  p <- c(sample(lits$real, N - sin_efecto), sample(lits$nula, sin_efecto - trucados), sample(lits$trucada, trucados))
+  k <- calibre(p)
+  binom.test(k[["encima"]], sum(k), alternative = "greater")$p.value < 0.05
+}
+set.seed(2008)
+potencia <- outer(c(1000, 3000, 10000), c(0, 0.25, 0.5, 1),
+                  Vectorize(function(N, h) mean(replicate(300, detecta(N, h)))))
+dimnames(potencia) <- list(estudios = c(1000, 3000, 10000), trucados = c("0%", "25%", "50%", "100%"))
+round(potencia, 3)
+```
+
+```{webr}
+#| exercise: curva
+#| solution: true
+p_t <- function(X, Y, n) {
+  mx <- rowMeans(X[, 1:n, drop = FALSE])
+  my <- rowMeans(Y[, 1:n, drop = FALSE])
+  s2 <- (rowSums(X[, 1:n]^2) - n * mx^2 + rowSums(Y[, 1:n]^2) - n * my^2) / (2 * n - 2)
+  2 * pt(-abs((mx - my) / sqrt(s2 * 2 / n)), 2 * n - 2)
+}
+literatura <- function(R, d, trucar = FALSE) {
+  X <- matrix(rnorm(R * 50, mean = d), R)
+  Y <- matrix(rnorm(R * 50), R)
+  p <- p_t(X, Y, 20)
+  if (trucar) for (n in seq(25, 50, 5)) {
+    sigue <- p >= 0.05
+    p[sigue] <- p_t(X[sigue, , drop = FALSE], Y[sigue, , drop = FALSE], n)
+  }
+  p
+}
+
+curva_p <- function(p) {
+  table(cut(p[p < 0.05], seq(0, 0.05, 0.01))) / sum(p < 0.05)
+}
+
+bajo_0025 <- function(p) mean(p[p < 0.05] < 0.025)
+
+calibre <- function(p, ancho = 0.1) {
+  z <- qnorm(1 - p / 2)
+  c(debajo = sum(z >= 1.96 * (1 - ancho) & z < 1.96),
+    encima = sum(z >= 1.96 & z < 1.96 * (1 + ancho)))
+}
+
+set.seed(2014)
+lits <- list(real = literatura(20000, 0.5), nula = literatura(20000, 0), trucada = literatura(20000, 0, trucar = TRUE))
+curvas <- sapply(lits, curva_p)
+barplot(t(curvas), beside = TRUE, names.arg = c("0-0,01", "0,01-0,02", "0,02-0,03", "0,03-0,04", "0,04-0,05"),
+        col = c("grey20", "grey60", "white"), legend.text = names(lits), args.legend = list(bty = "n"),
+        xlab = "Valor p", ylab = "Fracción de los significativos")
+round(curvas, 3)
+round(sapply(lits, bajo_0025), 3)
+sapply(lits, calibre)
+
+detecta <- function(N, h) {
+  sin_efecto <- N %/% 2
+  trucados <- rbinom(1, sin_efecto, h)
+  p <- c(sample(lits$real, N - sin_efecto), sample(lits$nula, sin_efecto - trucados), sample(lits$trucada, trucados))
+  k <- calibre(p)
+  binom.test(k[["encima"]], sum(k), alternative = "greater")$p.value < 0.05
+}
+set.seed(2008)
+potencia <- outer(c(1000, 3000, 10000), c(0, 0.25, 0.5, 1),
+                  Vectorize(function(N, h) mean(replicate(300, detecta(N, h)))))
+dimnames(potencia) <- list(estudios = c(1000, 3000, 10000), trucados = c("0%", "25%", "50%", "100%"))
+round(potencia, 3)
+```
+
+```{webr}
+#| exercise: curva
+#| check: true
+# Las tres funciones se comprueban con valores p elegidos a mano.
+e <- .envir_result
+pct <- function(x) paste0(round(100 * x), "%")
+p <- c(0.001, 0.005, 0.012, 0.024, 0.026, 0.031, 0.049, 0.049, 0.2, 0.7)
+z <- c(1.70, 1.80, 1.90, 1.95, 1.97, 2.00, 2.10, 2.20, 3.00)
+p_z <- 2 * pnorm(-z)
+if (!all(c("curva_p", "bajo_0025", "calibre") %in% ls(e))) {
+  list(correct = FALSE, message = "Faltan funciones: curva_p(), bajo_0025() o calibre().")
+} else if (!isTRUE(all.equal(as.numeric(e$curva_p(p)), c(2, 1, 2, 1, 2) / 8))) {
+  list(correct = FALSE, message = paste0(
+    "Con los valores p (0,001; 0,005; 0,012; 0,024; 0,026; 0,031; 0,049; 0,049; 0,2; 0,7), ",
+    "curva_p() debería dar 2/8, 1/8, 2/8, 1/8 y 2/8: solo cuentan los ocho menores que 0,05, ",
+    "repartidos en cinco tramos de 0,01. ¿Divides entre los significativos, y no entre todos?"))
+} else if (!isTRUE(all.equal(e$bajo_0025(p), 4 / 8))) {
+  list(correct = FALSE, message = paste0(
+    "Con los mismos valores p, bajo_0025() debería dar 0,5: de los ocho significativos, cuatro están por debajo de 0,025."))
+} else if (!identical(as.numeric(e$calibre(p_z)), c(3, 3))) {
+  list(correct = FALSE, message = paste0(
+    "Con |z| = 1,70; 1,80; 1,90; 1,95; 1,97; 2,00; 2,10; 2,20 y 3,00, calibre() debería contar 3 por debajo ",
+    "(entre 1,764 y 1,96) y 3 por encima (entre 1,96 y 2,156), y cuenta ", paste(e$calibre(p_z), collapse = " y "), "."))
+} else {
+  b <- sapply(e$lits, e$bajo_0025)
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Por debajo de 0,025 queda el ", pct(b[["real"]]), " de los valores p significativos con efecto real, el ",
+    pct(b[["nula"]]), " sin efecto y el ", pct(b[["trucada"]]), " en la literatura trucada."))
+}
+```
+
+::: {.hint exercise="curva"}
+`p[p < 0.05]` se queda con los significativos, y `cut(x, seq(0, 0.05, 0.01))` los asigna a los cinco tramos; `table()` los cuenta. Para el calibre, copia la línea de `debajo` hacia el otro lado: desde 1,96 hasta `1.96 * (1 + ancho)`.
+:::
+
+::: {.solution exercise="curva"}
+`table(cut(p[p < 0.05], seq(0, 0.05, 0.01))) / sum(p < 0.05)` en `curva_p()`, `mean(p[p < 0.05] < 0.025)` en `bajo_0025()` y `sum(z >= 1.96 & z < 1.96 * (1 + ancho))` en `calibre()`.
+:::
+:::
+
+::::

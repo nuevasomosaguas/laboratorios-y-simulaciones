@@ -1,0 +1,208 @@
+---
+title: "El jardín de senderos que se bifurcan"
+numero: 66
+nivel: 2
+duracion: "30 min"
+lectura: "[Simmons, Nelson y Simonsohn (2011)](https://nuevasomosaguas.github.io/biblioteca.html#simmons2011falsepositive); Gelman y Loken (2013)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Dos grupos idénticos, tres decisiones razonables tomadas después de ver los datos, y un falso positivo de cada cuatro estudios."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 2011, Joseph Simmons, Leif Nelson y Uri Simonsohn publicaron dos experimentos. En el segundo, escuchar *When I'm Sixty-Four*, de los Beatles, hacía que los participantes fueran un año y medio más jóvenes, con $p = 0{,}040$. No era una broma, o no solo: cada paso del análisis era de los que se ven en cualquier revista, y su intención era enseñar que con esos pasos se puede demostrar cualquier cosa. Un valor *p* de 0,05 promete que, si no hay ningún efecto, solo uno de cada veinte estudios lo encontrará. Esa promesa vale para un análisis decidido antes de ver los datos.
+
+Andrew Gelman y Eric Loken llamaron a lo que pasa en la práctica *el jardín de senderos que se bifurcan*, por el cuento de Borges. Quien analiza no hace veinte contrastes y se queda con el mejor: hace uno solo, pero lo elige después de ver los datos, y con otros datos habría elegido otro. Tres bifurcaciones habituales:
+
+1. **Qué medir.** El estudio recoge dos medidas del mismo resultado, correlacionadas ($r = 0{,}5$). Se puede contrastar cualquiera de las dos, o su media.
+2. **Cuándo parar.** Si nada sale significativo con 20 personas por grupo, se añaden 10 más a cada grupo y se vuelve a mirar.
+3. **Qué controlar.** Se puede comparar los grupos sin más, controlando por sexo, o mirando si el efecto depende del sexo, con la interacción entre grupo y sexo.
+
+Los datos se simulan **sin ningún efecto**: el tratamiento y el control son idénticos. Todo lo que salga significativo es un falso positivo.
+
+**Tu tarea.**
+
+1. Completa `caminos()`: la columna de la interacción entre grupo y sexo, que es la que se contrasta en el tercer modelo. `p_coef(X, Y, j)` ya da el valor *p* del coeficiente `j` de una regresión de cada columna de `Y` sobre `X`.
+2. Completa `publica()`: si se puede ampliar la muestra, se amplía solo cuando **ningún** camino ha salido significativo.
+3. Completa lo que devuelve `publica()`: el estudio se publica si **algún** camino sale significativo.
+4. Lee la tasa de falsos positivos de cada jardín, en 2.000 estudios. El honesto toma un solo camino, fijado de antemano: la primera medida, sin controles y con 20 personas por grupo.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El análisis honesto da un 4,4% de falsos positivos, cerca del 5% que promete el umbral. Cada bifurcación por separado parece inocente: elegir entre dos medidas o su media lo sube al 10,2%; añadir diez personas si no sale, al 8,8%; probar el sexo como control o como interacción, al 10,5%. Juntas, llevan la tasa al 28,6%, más de uno de cada cuatro estudios sin ningún efecto. Simmons, Nelson y Simonsohn obtuvieron cifras muy parecidas con las mismas tres decisiones, un 30,9%, y con una cuarta, quedarse con dos de tres condiciones experimentales, pasaron del 60%.
+
+La lección de Gelman y Loken es que no hace falta mala fe. Quien analiza no tiene por qué haber probado los nueve caminos: le basta con mirar los datos y ver que la media de las dos medidas es lo más razonable, o que el efecto, claro, solo tiene sentido en las mujeres. Cada decisión es defendible, pero ninguna se habría tomado igual con otros datos, y eso basta para que el 0,05 deje de valer. Por eso no se arregla después con la corrección de Bonferroni de [¿Cuántos descubrimientos sobreviven?](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/41-falsos-descubrimientos/): para corregir hay que saber cuántos contrastes se han hecho, y aquí se ha hecho uno, elegido entre los que se habrían podido hacer, que nadie ha contado.
+
+Es la ley de Campbell de [Lo que se mide se corrompe](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/53-lo-que-se-mide-se-corrompe/) aplicada al valor *p*. Mientras $p < 0{,}05$ sea la condición para publicar, quien analiza optimiza el valor *p*, aunque no lo pretenda, y el valor *p* deja de medir la evidencia. El remedio que proponían Simmons, Nelson y Simonsohn es cerrar el jardín antes de entrar: decidir y declarar de antemano la muestra, las medidas y los controles. Es lo que hoy se llama un **prerregistro**.
+
+**Para ir más allá:** corrige con Bonferroni, dividiendo el umbral entre el número de caminos: `any(p < 0.05 / length(p))`. ¿Cuánto baja la tasa de «todo a la vez»? ¿Y por qué no cambia la de «diez más si no sale»? Esa bifurcación tiene su propio problema, [Mirar los datos cada día](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/67-mirar-los-datos-cada-dia/). Aunque la tasa baje, la corrección no sirve en la práctica, porque quien lee el artículo solo ve un camino y no sabe cuántos había.
+
+Gelman, A. y Loken, E. (2013). *The garden of forking paths: Why multiple comparisons can be a problem, even when there is no «fishing expedition» or «p-hacking» and the research hypothesis was posited ahead of time*. Manuscrito, Universidad de Columbia.
+
+Simmons, J. P., Nelson, L. D. y Simonsohn, U. (2011). False-positive psychology: Undisclosed flexibility in data collection and analysis allows presenting anything as significant. *Psychological Science*, 22(11), 1359–1366.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: jardin
+#| caption: "Tu código"
+# Un estudio sin ningún efecto: n personas por grupo, su sexo y dos medidas correlacionadas
+estudio <- function(n) {
+  y1 <- rnorm(2 * n)
+  data.frame(grupo = rep(0:1, each = n), sexo = rbinom(2 * n, 1, 0.5),
+             y1 = y1, y2 = 0.5 * y1 + sqrt(0.75) * rnorm(2 * n))
+}
+
+# El valor p del coeficiente j en la regresión de cada columna de Y sobre X (no hace falta tocarlo)
+p_coef <- function(X, Y, j) {
+  XtXi <- solve(crossprod(X))
+  b <- XtXi %*% crossprod(X, Y)
+  gl <- nrow(X) - ncol(X)
+  t <- b[j, ] / sqrt(colSums((Y - X %*% b)^2) / gl * XtXi[j, j])
+  2 * pt(-abs(t), gl)
+}
+
+# 1. Los valores p de los caminos: las medidas elegidas, sin controles y, si sexo es TRUE,
+#    con el sexo como control (coeficiente 2) y con la interacción grupo × sexo (coeficiente 4)
+caminos <- function(d, medidas = 1, sexo = FALSE) {
+  Y <- cbind(d$y1, d$y2, (d$y1 + d$y2) / 2)[, medidas, drop = FALSE]
+  X <- cbind(1, d$grupo)
+  p <- p_coef(X, Y, 2)
+  if (sexo) p <- c(p, p_coef(cbind(X, d$sexo), Y, 2), p_coef(cbind(X, d$sexo, ______), Y, 4))
+  p
+}
+
+# 2 y 3. Si ningún camino sale y se puede ampliar, se añade la reserva; se publica si algún camino sale
+publica <- function(d, reserva, medidas = 1, sexo = FALSE, ampliar = FALSE) {
+  p <- caminos(d, medidas, sexo)
+  if (ampliar && ______) p <- caminos(rbind(d, reserva), medidas, sexo)
+  ______
+}
+
+# 4. Dos mil estudios en cada jardín
+jardines <- list(
+  "honesto"                     = list(),
+  "dos medidas o su media"      = list(medidas = 1:3),
+  "diez más si no sale"         = list(ampliar = TRUE),
+  "sexo: control o interacción" = list(sexo = TRUE),
+  "todo a la vez"               = list(medidas = 1:3, sexo = TRUE, ampliar = TRUE)
+)
+set.seed(1899)
+tasa <- sapply(jardines, function(j) mean(replicate(2000, do.call(publica, c(list(estudio(20), estudio(10)), j)))))
+
+par(mar = c(4, 13, 1, 1))
+barplot(rev(tasa), horiz = TRUE, las = 1, col = "grey60", border = NA, xlab = "Falsos positivos")
+abline(v = 0.05, lty = 2)
+round(tasa, 3)
+```
+
+```{webr}
+#| exercise: jardin
+#| solution: true
+estudio <- function(n) {
+  y1 <- rnorm(2 * n)
+  data.frame(grupo = rep(0:1, each = n), sexo = rbinom(2 * n, 1, 0.5),
+             y1 = y1, y2 = 0.5 * y1 + sqrt(0.75) * rnorm(2 * n))
+}
+
+p_coef <- function(X, Y, j) {
+  XtXi <- solve(crossprod(X))
+  b <- XtXi %*% crossprod(X, Y)
+  gl <- nrow(X) - ncol(X)
+  t <- b[j, ] / sqrt(colSums((Y - X %*% b)^2) / gl * XtXi[j, j])
+  2 * pt(-abs(t), gl)
+}
+
+caminos <- function(d, medidas = 1, sexo = FALSE) {
+  Y <- cbind(d$y1, d$y2, (d$y1 + d$y2) / 2)[, medidas, drop = FALSE]
+  X <- cbind(1, d$grupo)
+  p <- p_coef(X, Y, 2)
+  if (sexo) p <- c(p, p_coef(cbind(X, d$sexo), Y, 2), p_coef(cbind(X, d$sexo, d$grupo * d$sexo), Y, 4))
+  p
+}
+
+publica <- function(d, reserva, medidas = 1, sexo = FALSE, ampliar = FALSE) {
+  p <- caminos(d, medidas, sexo)
+  if (ampliar && all(p >= 0.05)) p <- caminos(rbind(d, reserva), medidas, sexo)
+  any(p < 0.05)
+}
+
+jardines <- list(
+  "honesto"                     = list(),
+  "dos medidas o su media"      = list(medidas = 1:3),
+  "diez más si no sale"         = list(ampliar = TRUE),
+  "sexo: control o interacción" = list(sexo = TRUE),
+  "todo a la vez"               = list(medidas = 1:3, sexo = TRUE, ampliar = TRUE)
+)
+set.seed(1899)
+tasa <- sapply(jardines, function(j) mean(replicate(2000, do.call(publica, c(list(estudio(20), estudio(10)), j)))))
+
+par(mar = c(4, 13, 1, 1))
+barplot(rev(tasa), horiz = TRUE, las = 1, col = "grey60", border = NA, xlab = "Falsos positivos")
+abline(v = 0.05, lty = 2)
+round(tasa, 3)
+```
+
+```{webr}
+#| exercise: jardin
+#| check: true
+# caminos() se compara con lm(); publica(), con una versión de referencia en 300 estudios
+# con y sin efecto, para que haya de todo: caminos que salen, que no salen y que salen al ampliar.
+e <- .envir_result
+pct <- function(x) paste0(format(round(100 * x, 1), nsmall = 1, decimal.mark = ","), "%")
+referencia <- function(d, reserva, medidas = 1, sexo = FALSE, ampliar = FALSE) {
+  p <- e$caminos(d, medidas, sexo)
+  if (ampliar && all(p >= 0.05)) p <- e$caminos(rbind(d, reserva), medidas, sexo)
+  any(p < 0.05)
+}
+if (!is.function(e$caminos) || !is.function(e$publica) || !is.function(e$estudio)) {
+  list(correct = FALSE, message = "No encuentro estudio(), caminos() o publica().")
+} else {
+  set.seed(66)
+  d <- e$estudio(25)
+  lm_p <- summary(lm(y1 ~ grupo * sexo, data = d))$coefficients["grupo:sexo", 4]
+  casos <- lapply(1:300, function(i) {
+    d <- e$estudio(20)
+    d$y1 <- d$y1 + 0.4 * d$grupo * (i %% 2)  # la mitad de los estudios, con un efecto pequeño
+    list(d = d, reserva = e$estudio(10), medidas = if (i %% 3 == 0) 1:3 else 1, sexo = i %% 5 == 0)
+  })
+  iguales <- function(ampliar) all(vapply(casos, function(k) identical(
+    isTRUE(e$publica(k$d, k$reserva, k$medidas, k$sexo, ampliar)),
+    referencia(k$d, k$reserva, k$medidas, k$sexo, ampliar)), NA))
+  if (length(e$caminos(d, 1:3, TRUE)) != 9 || !isTRUE(all.equal(unname(e$caminos(d, 1, TRUE)[3]), lm_p))) {
+    list(correct = FALSE, message = paste0(
+      "El tercer camino de caminos() no coincide con la interacción de lm(y1 ~ grupo * sexo). ",
+      "La interacción es el producto de las dos variables, persona a persona."))
+  } else if (!iguales(FALSE)) {
+    list(correct = FALSE, message = paste0(
+      "Sin ampliar la muestra, publica() debería devolver TRUE si algún camino tiene p < 0,05, ",
+      "y FALSE si no sale ninguno. ¿Miras solo el primer camino, o exiges que salgan todos?"))
+  } else if (!iguales(TRUE)) {
+    list(correct = FALSE, message = paste0(
+      "Al ampliar, publica() falla: la reserva solo se añade cuando ningún camino ha salido significativo, ",
+      "y entonces se vuelven a probar todos los caminos con la muestra ampliada."))
+  } else {
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! Sin ningún efecto real, el análisis honesto publica el ", pct(.result[["honesto"]]),
+      " de los estudios, y el jardín completo, el ", pct(.result[["todo a la vez"]]), "."))
+  }
+}
+```
+
+::: {.hint exercise="jardin"}
+La interacción es el producto de las dos columnas: vale 1 solo para quien está en el grupo de tratamiento y tiene `sexo` igual a 1. Para `publica()`, `all()` y `any()` dicen si todos o alguno de los elementos de un vector lógico son `TRUE`: ¿cuándo se amplía, y cuándo se publica?
+:::
+
+::: {.solution exercise="jardin"}
+`d$grupo * d$sexo` en `caminos()`; en `publica()`, `all(p >= 0.05)` como condición para ampliar, y `any(p < 0.05)` como resultado.
+:::
+:::
+
+::::
