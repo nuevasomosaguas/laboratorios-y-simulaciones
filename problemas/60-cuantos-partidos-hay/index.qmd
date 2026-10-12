@@ -3,7 +3,7 @@ title: "¿Cuántos partidos hay de verdad?"
 numero: 60
 nivel: 2
 duracion: "25 min"
-lectura: "[Taagepera (2007)](https://nuevasomosaguas.github.io/biblioteca.html#taagepera2007predicting); [Alesina et al. (2003)](https://nuevasomosaguas.github.io/biblioteca.html#alesina2003fractionalization)"
+lectura: "[Taagepera (2007)](https://nuevasomosaguas.github.io/biblioteca.html#taagepera2008making); [Alesina et al. (2003)](https://nuevasomosaguas.github.io/biblioteca.html#vanhanen2012ethnic)"
 dificultad: "Intermedio"
 categories: [teoría de la información, juegos y votación]
 description: "En 2011 y en 2015 entraron trece partidos en el Congreso, y sin embargo el bipartidismo se rompió: depende de cómo se cuenten."
