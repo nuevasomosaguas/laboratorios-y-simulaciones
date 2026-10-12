@@ -1,0 +1,210 @@
+---
+title: "¿Por qué R es como es?"
+numero: 69
+nivel: 2
+duracion: "35 min"
+lectura: "[Arthur (1989)](https://nuevasomosaguas.github.io/biblioteca.html#durlauf2001social); [David (1985)](https://nuevasomosaguas.github.io/biblioteca.html#durlauf2001social)"
+dificultad: "Intermedio"
+categories: [equilibrios y dinámica, modelos de agentes]
+description: "Quien escribe <- en 2026 sigue una decisión de 1976. ¿Y si el informe reproducible hubiera existido en 1981?"
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Quien abre R en 2026 escribe `x <- c(1, 2, 3)`, y esa flecha no la eligió nadie en 2026, ni en 1993. En la primavera de 1976, John Chambers, Rick Becker, Doug Dunn y Paul Tukey se reunieron en los Bell Labs para diseñar una interfaz interactiva para las rutinas de Fortran con las que ya analizaban datos, y la llamaron S. La flecha de asignación la tomaron de un lenguaje anterior, PPL. Además, el terminal más usado en los laboratorios, el Execuport, tenía una tecla, la del guion bajo de ASCII, que imprimía una flecha hacia la izquierda, así que en S también asignaba `_`. A principios de los noventa, Ross Ihaka y Robert Gentleman escribieron R en Auckland con la sintaxis de S, porque la conocían bien. Ihaka escribió en 1998 que esa decisión, más que ninguna otra, había marcado el rumbo de R: una vez tomada, parecerse cada vez más a S fue irresistible. R arrastró el `_` hasta la versión 1.8.0, en 2003, que lo quitó tras dos años de avisos, y solo desde 2004 se puede usar en los nombres, como en `mi_variable`. Y `lowess()`, el suavizado que William Cleveland publicó en 1979 y que ya estaba en el manual de S de 1981, sigue en R, traducido del código que Cleveland escribió en los Bell Labs.
+
+Paul David contó en 1985 la historia del teclado QWERTY y la llamó **dependencia de la trayectoria**: decisiones tomadas por razones que ya no existen siguen pesando, porque cada nuevo usuario aprende lo que usan los demás. Un estudiante de 2026 sigue pagando, o disfrutando, decisiones de 1976.
+
+En 1981, analizar con S y escribir el informe eran dos trabajos separados. Se ejecutaba el análisis, `S < analisis > resultados`, y el informe, escrito para el programa de composición `troff`, leía la salida con `.so resultados`; los números del texto se copiaban a mano. Para unirlos bastaba con lo que ya había: `eqn` y `tbl` eran preprocesadores que buscaban sus bloques dentro de un documento y los convertían antes de componerlo, y uno más podría haber ejecutado los bloques de S. Es `spp`, el preprocesador imaginario de [S como en 1979](https://github.com/danielgccr/slike79), que reconstruye en el navegador aquel S y su UNIX. Nadie lo escribió: la idea llegó con Sweave en 2002, y una década después con knitr y R Markdown. ¿Qué habría cambiado si hubiera existido en 1981? La pregunta no se contesta en un archivo, porque lo que no pasó no dejó documentos. Se contesta con un modelo del mecanismo.
+
+Brian Arthur propuso uno en 1989. Los analistas llegan de uno en uno y eligen entre dos prácticas: **A**, copiar y pegar, y **B**, el informe reproducible. La mitad son **prácticos**: prefieren A, que no exige aprender nada, por un gusto que vale $g = 10{,}5$. La otra mitad son **metodólogos** y prefieren B por lo mismo. Pero cada colega que ya usa una práctica le suma $r = 1$: plantillas que copiar, alguien a quien preguntar, revistas que la aceptan. Un analista elige A si
+
+$$\text{gusto}_A + r\,n_A > \text{gusto}_B + r\,n_B,$$
+
+donde $n_A$ y $n_B$ cuentan quién usa ya cada práctica. B puede ser además mejor para todos, con una mejora $m$ que se suma a su gusto. Y B no está desde el principio: llega cuando A lleva $n_0$ analistas de ventaja.
+
+**Tu tarea.**
+
+1. Completa `elige_A()`: `TRUE` para cada analista que elige A.
+2. Completa `arriba`: la ventaja de A, en analistas, a partir de la cual también los metodólogos eligen A. Es el primer entero mayor que $g + m$. Desde ahí, la ventaja solo crece: es el **bloqueo**.
+3. Mira el gráfico: veinte historias que empiezan en $n_0 = 0$, con la ventaja de A, $n_A - n_B$, y las dos barreras.
+4. Lee la tabla: en qué fracción de 2.000 historias acaba ganando el informe reproducible según cuándo llega y si es mejor, frente a lo que da la teoría. ¿Qué dice de 1981 y de 2002?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Si el informe llega a la vez que el copiar y pegar, como habría pasado con un `spp` en 1981, gana en el 49,7% de las historias, y la teoría dice el 50%. Lo decide el orden en que llegan prácticos y metodólogos, que nadie podía prever: en las veinte historias del gráfico, la ventaja vaga entre las barreras hasta que toca una, entre el analista 23 y el 245, y desde ahí ya no vuelve. Si además el informe es mejor para todos, gana más, el 73,3%, pero sigue perdiendo una de cada cuatro veces: la práctica peor puede quedarse con todo, que es el argumento del QWERTY. Y cuanto más tarde llega, menos gana, en línea recta hasta cero: con 8 analistas de retraso, el 14,0% o el 37,6%; con 12, nunca si no es mejor; con 16, nunca aunque lo sea. Es la fórmula de Arthur, la de la ruina del jugador: entre las barreras, la ventaja es un paseo al azar. El Sweave de 2002 llegó con dos décadas de copiar y pegar detrás, en la zona de los ceros.
+
+Pero knitr, desde 2012, y R Markdown, desde 2014, sí se extendieron, y el modelo no sabe explicarlo. En él nadie cambia de práctica una vez elegida, y cada colega cuenta para siempre, aunque se haya jubilado. La respuesta a la pregunta contrafactual depende de qué sea un colega. Si lo que da los rendimientos crecientes dura, como el código, los libros y los paquetes, que siguen funcionando décadas después, la fecha de llegada lo decide todo, y por eso R no puede cambiar su flecha: cada guion de 1990 que todavía funciona es un colega. Si lo que cuenta son los colegas de ahora, que se jubilan y dejan paso a cohortes que eligen de nuevo, llegar tarde importa poco, y lo que decide es lo bueno que sea el informe y lo que cueste aprenderlo. Si esa es la buena, lo que cambió en 2012 no fue la fecha, sino el coste: knitr y RStudio abarataron mucho escribir un informe reproducible. Que R quitara el `_` en 2003 muestra que el bloqueo no es absoluto: se puede romper una convención si se avisa con tiempo y a quien la sigue le cuesta poco cambiar.
+
+Es razonar contrafactualmente con un mecanismo explícito, como pide la sociología analítica de Hedström. Lo que no pasó no se puede observar, pero se puede derivar de un mecanismo explícito, y la respuesta depende del mecanismo, no de la historia que se cuente. Por eso conviene leer también a los críticos. Stan Liebowitz y Stephen Margolis sostuvieron en 1990 que las pruebas de la superioridad del teclado Dvorak sobre el QWERTY eran débiles, y que quedarse para siempre con una tecnología peor exige que nadie pueda coordinar el cambio, cuando las empresas y los usuarios lo intentan si la ganancia es grande. El modelo enseña que el bloqueo en lo peor puede pasar, no que pasara.
+
+**Para ir más allá:** haz que los colegas se olviden. En `historias()`, cambia `nA <- nA + a` por `nA <- 0.9 * nA + a`, y lo mismo con `nB`: solo cuentan, más o menos, los diez últimos analistas. ¿Importa ahora cuándo llega el informe? ¿Y si es mejor?
+
+Arthur, W. B. (1989). Competing technologies, increasing returns, and lock-in by historical events. *The Economic Journal*, 99(394), 116–131.
+
+Becker, R. A. (1994). *A Brief History of S*. AT&T Bell Laboratories.
+
+David, P. A. (1985). Clio and the economics of QWERTY. *The American Economic Review*, 75(2), 332–337.
+
+Ihaka, R. (1998). R: Past and future history. Ponencia en *Interface '98*.
+
+Ihaka, R. y Gentleman, R. (1996). R: A language for data analysis and graphics. *Journal of Computational and Graphical Statistics*, 5(3), 299–314.
+
+Liebowitz, S. J. y Margolis, S. E. (1990). The fable of the keys. *The Journal of Law and Economics*, 33(1), 1–25.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: arthur
+#| caption: "Tu código"
+g <- 10.5   # lo que vale el gusto por la práctica preferida, en colegas
+r <- 1      # lo que suma cada colega que ya la usa
+
+# 1. ¿Elige A cada analista? Los prácticos prefieren A; los metodólogos, B; y B puede ser mejor para todos
+elige_A <- function(practico, nA, nB, m = 0) {
+  gusto_A <- ifelse(practico, g, 0)
+  gusto_B <- ifelse(practico, 0, g) + m
+  ______
+}
+
+# R historias a la vez: B llega cuando A lleva n0 de ventaja; cada fila, la ventaja de A tras cada analista
+historias <- function(n0, m = 0, R = 2000, pasos = 1000) {
+  nA <- rep(n0, R)
+  nB <- rep(0, R)
+  ventaja <- matrix(NA, pasos, R)
+  for (t in 1:pasos) {
+    a <- elige_A(runif(R) < 0.5, nA, nB, m)
+    nA <- nA + a
+    nB <- nB + !a
+    ventaja[t, ] <- nA - nB
+  }
+  ventaja
+}
+
+# 2. Las barreras: desde arriba también los metodólogos eligen A; desde -abajo, también los prácticos eligen B
+barreras <- function(m) c(arriba = ______, abajo = floor(g - m) + 1)
+
+# La teoría: entre las barreras, la ventaja es un paseo al azar, y gana B si toca -abajo antes que arriba
+teoria <- function(n0, m) {
+  b <- barreras(m)
+  pmax(0, (b[["arriba"]] - n0) / (b[["arriba"]] + b[["abajo"]]))
+}
+
+# 3. Veinte historias desde n0 = 0
+set.seed(1976)
+v <- historias(0, R = 20, pasos = 300)
+matplot(v, type = "l", lty = 1, col = "grey50", ylim = c(-40, 40),
+        xlab = "Analistas desde que llega el informe", ylab = "Ventaja de copiar y pegar")
+abline(h = c(barreras(0)[["arriba"]], -barreras(0)[["abajo"]]), lty = 2)
+
+# 4. ¿Cuándo gana el informe reproducible?
+n0 <- c(0, 4, 8, 12, 16, 20)
+tabla <- data.frame(n0 = n0)
+for (m in c(0, 5)) {
+  tabla[[paste0("simulado_m", m)]] <- sapply(n0, function(x) mean(historias(x, m)[1000, ] < 0))
+  tabla[[paste0("teoria_m", m)]] <- teoria(n0, m)
+}
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: arthur
+#| solution: true
+g <- 10.5
+r <- 1
+
+elige_A <- function(practico, nA, nB, m = 0) {
+  gusto_A <- ifelse(practico, g, 0)
+  gusto_B <- ifelse(practico, 0, g) + m
+  gusto_A + r * nA > gusto_B + r * nB
+}
+
+historias <- function(n0, m = 0, R = 2000, pasos = 1000) {
+  nA <- rep(n0, R)
+  nB <- rep(0, R)
+  ventaja <- matrix(NA, pasos, R)
+  for (t in 1:pasos) {
+    a <- elige_A(runif(R) < 0.5, nA, nB, m)
+    nA <- nA + a
+    nB <- nB + !a
+    ventaja[t, ] <- nA - nB
+  }
+  ventaja
+}
+
+barreras <- function(m) c(arriba = floor(g + m) + 1, abajo = floor(g - m) + 1)
+
+teoria <- function(n0, m) {
+  b <- barreras(m)
+  pmax(0, (b[["arriba"]] - n0) / (b[["arriba"]] + b[["abajo"]]))
+}
+
+set.seed(1976)
+v <- historias(0, R = 20, pasos = 300)
+matplot(v, type = "l", lty = 1, col = "grey50", ylim = c(-40, 40),
+        xlab = "Analistas desde que llega el informe", ylab = "Ventaja de copiar y pegar")
+abline(h = c(barreras(0)[["arriba"]], -barreras(0)[["abajo"]]), lty = 2)
+
+n0 <- c(0, 4, 8, 12, 16, 20)
+tabla <- data.frame(n0 = n0)
+for (m in c(0, 5)) {
+  tabla[[paste0("simulado_m", m)]] <- sapply(n0, function(x) mean(historias(x, m)[1000, ] < 0))
+  tabla[[paste0("teoria_m", m)]] <- teoria(n0, m)
+}
+round(tabla, 3)
+```
+
+```{webr}
+#| exercise: arthur
+#| check: true
+# elige_A() se comprueba con analistas elegidos a mano; las barreras, con g = 10,5 y m = 0, 5 y 2,5.
+e <- .envir_result
+pct <- function(x) paste0(round(100 * x), "%")
+coma <- function(x) format(x, decimal.mark = ",")
+if (!is.function(e$elige_A) || !is.function(e$barreras)) {
+  list(correct = FALSE, message = "No encuentro elige_A() o barreras().")
+} else if (!identical(e$elige_A(c(TRUE, FALSE, TRUE, FALSE), c(0, 0, 0, 30), c(0, 0, 20, 0)), c(TRUE, FALSE, FALSE, TRUE))) {
+  list(correct = FALSE, message = paste0(
+    "Sin nadie usando nada, un práctico elige A y un metodólogo, B. Pero un práctico con 20 colegas en B ",
+    "y ninguno en A elige B, porque 10,5 < 20; y un metodólogo con 30 colegas en A elige A. ",
+    "Compara el gusto más r por los colegas de cada práctica."))
+} else if (!identical(e$elige_A(TRUE, 0, 0, m = 12), FALSE)) {
+  list(correct = FALSE, message = paste0(
+    "Con una mejora m = 12, hasta un práctico prefiere B sin colegas, porque 12 > 10,5. ",
+    "La mejora se suma al gusto por B de todos, prácticos y metodólogos."))
+} else if (!isTRUE(all.equal(unname(e$barreras(0)), c(11, 11)))) {
+  list(correct = FALSE, message = paste0(
+    "Con g = 10,5 y m = 0, un metodólogo elige A cuando la ventaja de A pasa de 10,5, y la ventaja es un número entero: ",
+    "arriba debería ser 11, y es ", coma(e$barreras(0)[[1]]), "."))
+} else if (!isTRUE(all.equal(unname(e$barreras(5)[1]), 16))) {
+  list(correct = FALSE, message = paste0(
+    "Con m = 5, el metodólogo prefiere B por 10,5 + 5 = 15,5: arriba debería ser 16, y es ", coma(e$barreras(5)[[1]]),
+    ". ¿Sumas la mejora?"))
+} else if (!isTRUE(all.equal(unname(e$barreras(2.5)[1]), 14))) {
+  list(correct = FALSE, message = paste0(
+    "Con m = 2,5, g + m = 13 justo, y con una ventaja de 13 el metodólogo empata: no elige A. ",
+    "arriba debería ser 14, el primer entero mayor que 13, y es ", e$barreras(2.5)[[1]], "."))
+} else {
+  t <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Si llega a la vez, el informe reproducible gana en el ", pct(t$simulado_m0[1]),
+    " de las historias, y en el ", pct(t$simulado_m5[1]), " si es mejor. Con 20 analistas de retraso, en ninguna."))
+}
+```
+
+::: {.hint exercise="arthur"}
+`elige_A()` es la desigualdad del enunciado, elemento a elemento: `gusto_A + r * nA` frente a `gusto_B + r * nB`. Para `arriba`, un metodólogo elige A cuando $n_A - n_B > g + m$; como la ventaja es un número entero, el primero que lo cumple es `floor(g + m) + 1`, igual que `abajo`, pero con la mejora sumando.
+:::
+
+::: {.solution exercise="arthur"}
+`gusto_A + r * nA > gusto_B + r * nB` en `elige_A()`, y `floor(g + m) + 1` en `arriba`.
+:::
+:::
+
+::::
