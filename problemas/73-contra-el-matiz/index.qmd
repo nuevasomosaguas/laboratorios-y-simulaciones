@@ -1,0 +1,219 @@
+---
+title: "Contra el matiz"
+numero: 73
+nivel: 2
+duracion: "40 min"
+lectura: "Healy (2017); [Mullainathan y Spiess (2017)](https://nuevasomosaguas.github.io/biblioteca.html#angrist2009mostly); [Cinelli, Forney y Pearl (2024)](https://nuevasomosaguas.github.io/biblioteca.html#pearl2016causal)"
+dificultad: "Intermedio"
+categories: [inferencia causal, estadística]
+description: "Una regresión con 35 variables explica más que ninguna y dice que estudiar no sirve de nada. El LASSO la simplifica y predice mejor, pero dice lo mismo. Solo un grafo causal sabe qué variables sobran."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En 2017, el sociólogo Kieran Healy publicó un artículo con un título malsonante, «Fuck Nuance», contra una pregunta que se oye en todos los seminarios: «¿No es más complicado que eso?», o «¿No te estás dejando algo?». Para Healy, pedir más matiz es pedir que se añada algo, y una teoría que lo añade todo deja de abstraer y deja de poder refutarse. Su analogía es estadística: es como seguir añadiendo variables a una regresión porque la varianza explicada no deja de subir.
+
+Este problema lleva la analogía a la letra. En una encuesta simulada de 1.000 personas, la pregunta es cuánto sube el `salario` con los `estudios`. Los datos salen de este grafo causal, con todas las variables en unidades parecidas a desviaciones típicas:
+
+* El `origen` (los estudios de los padres) y la `capacidad` (una prueba a los 12 años) influyen en los `estudios` y en el `salario`.
+* Los `estudios` llevan a una `ocupacion` de más prestigio, que a su vez sube el `salario`.
+* El `barrio` (el precio de la vivienda donde se vive) depende de los `estudios` y del `salario`.
+* Además hay 30 `matiz_01`, `matiz_02`… que no influyen en nada: lo que alguien pidió controlar en un seminario, por si acaso.
+
+El efecto total de los estudios sobre el salario es `0.3 + 0.7 * 0.5 = 0.65`: 0,3 directos y 0,35 a través de la ocupación. Con los primeros 200 encuestados se ajustan tres modelos, y con los otros 800 se mide cuánto se equivoca cada uno al predecir el salario:
+
+* **Con todos los matices:** una regresión con las 35 variables.
+* **LASSO:** la misma regresión con una penalización que lleva a cero los coeficientes que no ayudan a predecir. Se calcula por descenso de coordenadas: cada coeficiente se ajusta con los demás fijos, se le resta `lambda` y, si cruza el cero, se queda en cero. `lambda` se elige por validación cruzada.
+* **DAG:** una regresión con los controles que dice el grafo.
+
+**Tu tarea.**
+
+1. Completa `suave()`, el umbral suave del LASSO: si `abs(z)` no pasa de `lambda`, devuelve 0; si pasa, acerca `z` a cero en `lambda`.
+2. Ejecuta y mira las dos primeras filas. ¿Qué modelo explica más varianza en los datos con los que se ajusta? ¿Cuál predice mejor el salario de los otros 800? ¿Qué variables conserva el LASSO, y qué dicen los dos del efecto de los estudios?
+3. Completa `controles` con las variables que cierran los caminos por la puerta trasera entre `estudios` y `salario`, y nada más.
+4. Añade `"ocupacion"` a los controles y vuelve a ejecutar. Después cámbiala por `"barrio"`. ¿Qué pasa con el efecto, y por qué?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+El modelo con todos los matices explica el 78% de la varianza del salario en los 200 con los que se ajusta, más que ningún otro. Es la regresión de la analogía de Healy, y dice que estudiar no sirve de nada: un efecto de −0,01. El LASSO la simplifica a siete variables, tres de ellas matices, y predice mejor el salario de los otros 800: un error cuadrático medio de 0,69 frente a 0,80, porque las 35 variables se ajustan también al ruido de la muestra. Pero conserva el barrio y la ocupación, que son los mejores predictores, y deja fuera los estudios: su efecto, cero. Para predecir, eso es lo correcto: sabido el barrio y la ocupación, los estudios añaden poco. Para explicar, es un desastre.
+
+El DAG controla por el origen y la capacidad, y da 0,57, cerca del 0,65 verdadero con un error típico de 0,08. Es el que peor predice, con un error de 1,35, porque deja fuera los dos mejores predictores. No es un defecto: el barrio y la ocupación predicen bien precisamente porque están en el camino o al final del efecto. La ocupación es un **mediador**: controlar por ella deja solo el efecto directo, 0,28 en la muestra frente al 0,3 verdadero, y responde a otra pregunta. El barrio es un **colisionador**: lo causan los estudios y el salario, y controlar por él abre un camino falso entre los dos que lleva el efecto a 0,07. Cinelli, Forney y Pearl los llaman *malos controles*.
+
+Mullainathan y Spiess lo resumieron en dos letras: el aprendizaje automático sirve para $\hat{y}$, la predicción, y no para $\hat{\beta}$, el coeficiente. El LASSO simplifica, pero con el criterio de la predicción, y quita lo que no predice, no lo que no explica. La simplificación que pide Healy necesita una teoría que diga qué se puede tirar: aquí, un grafo causal. Healy distingue tres trampas: el matiz del grano fino, que describe sin abstraer; el del marco conceptual, que se ensancha hasta que nada lo puede refutar; y el del entendido, que presume de ver lo que los demás no ven. La regresión con 35 variables es la segunda: un modelo al que nada le falta, y que por eso no dice nada.
+
+Healy, K. (2017). Fuck nuance. *Sociological Theory*, 35(2), 118–127.
+
+Mullainathan, S. y Spiess, J. (2017). Machine learning: An applied econometric approach. *Journal of Economic Perspectives*, 31(2), 87–106.
+
+Cinelli, C., Forney, A. y Pearl, J. (2024). A crash course in good and bad controls. *Sociological Methods & Research*, 53(3), 1071–1104.
+
+Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. *Journal of the Royal Statistical Society: Series B*, 58(1), 267–288.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: matiz
+#| caption: "Tu código"
+set.seed(2017)
+n <- 1000
+origen <- rnorm(n)
+capacidad <- rnorm(n)
+estudios <- 0.5 * origen + 0.5 * capacidad + rnorm(n)
+ocupacion <- 0.7 * estudios + rnorm(n)
+salario <- 0.3 * estudios + 0.5 * ocupacion + 0.3 * origen + 0.4 * capacidad + rnorm(n)
+barrio <- 0.4 * estudios + 0.8 * salario + rnorm(n)
+matices <- matrix(rnorm(n * 30), n, dimnames = list(NULL, sprintf("matiz_%02d", 1:30)))
+datos <- data.frame(salario, estudios, origen, capacidad, ocupacion, barrio, matices)
+entrena <- 1:200
+prueba <- 201:n
+
+# El LASSO, por descenso de coordenadas, con las variables tipificadas
+suave <- function(z, lambda) {
+  ______
+}
+lasso <- function(X, y, lambda, vueltas = 25) {
+  b <- setNames(rep(0, ncol(X)), colnames(X))
+  r <- y - mean(y)
+  for (v in 1:vueltas) for (j in seq_along(b)) {
+    r <- r + X[, j] * b[j]                                 # el residuo sin la variable j
+    b[j] <- suave(mean(X[, j] * r), lambda) / mean(X[, j]^2)
+    r <- r - X[, j] * b[j]
+  }
+  b
+}
+m <- as.matrix(datos[-1])
+X <- scale(m, center = colMeans(m[entrena, ]), scale = apply(m[entrena, ], 2, sd))
+y <- datos$salario
+
+# lambda, por validación cruzada en cinco pliegues dentro de los 200
+lambdas <- exp(seq(log(0.5), log(0.005), length.out = 20))
+pliegue <- rep(1:5, length.out = length(entrena))
+error_cv <- sapply(lambdas, function(l) mean(sapply(1:5, function(f) {
+  dentro <- entrena[pliegue != f]
+  fuera <- entrena[pliegue == f]
+  b <- lasso(X[dentro, ], y[dentro], l)
+  mean((y[fuera] - mean(y[dentro]) - X[fuera, ] %*% b)^2)
+})))
+b <- lasso(X[entrena, ], y[entrena], lambdas[which.min(error_cv)])
+cat("El LASSO conserva:", names(b)[b != 0], "\n")
+
+# Los controles que dice el grafo
+controles <- c(______)
+
+todo <- lm(salario ~ ., datos[entrena, ])
+dag <- lm(reformulate(c("estudios", controles), "salario"), datos[entrena, ])
+pred_lasso <- mean(y[entrena]) + X %*% b
+r2 <- function(pred) 1 - mean((y[entrena] - pred[entrena])^2) / mean((y[entrena] - mean(y[entrena]))^2)
+ecm <- function(pred) mean((y[prueba] - pred[prueba])^2)
+data.frame(modelo = c("Con todos los matices", "LASSO", "DAG"),
+           efecto_estudios = round(c(coef(todo)["estudios"], b["estudios"] / sd(m[entrena, "estudios"]),
+                                     coef(dag)["estudios"]), 2),
+           r2_entrena = round(c(r2(predict(todo, datos)), r2(pred_lasso), r2(predict(dag, datos))), 2),
+           ecm_prueba = round(c(ecm(predict(todo, datos)), ecm(pred_lasso), ecm(predict(dag, datos))), 2))
+```
+
+```{webr}
+#| exercise: matiz
+#| solution: true
+set.seed(2017)
+n <- 1000
+origen <- rnorm(n)
+capacidad <- rnorm(n)
+estudios <- 0.5 * origen + 0.5 * capacidad + rnorm(n)
+ocupacion <- 0.7 * estudios + rnorm(n)
+salario <- 0.3 * estudios + 0.5 * ocupacion + 0.3 * origen + 0.4 * capacidad + rnorm(n)
+barrio <- 0.4 * estudios + 0.8 * salario + rnorm(n)
+matices <- matrix(rnorm(n * 30), n, dimnames = list(NULL, sprintf("matiz_%02d", 1:30)))
+datos <- data.frame(salario, estudios, origen, capacidad, ocupacion, barrio, matices)
+entrena <- 1:200
+prueba <- 201:n
+
+suave <- function(z, lambda) {
+  sign(z) * pmax(abs(z) - lambda, 0)
+}
+lasso <- function(X, y, lambda, vueltas = 25) {
+  b <- setNames(rep(0, ncol(X)), colnames(X))
+  r <- y - mean(y)
+  for (v in 1:vueltas) for (j in seq_along(b)) {
+    r <- r + X[, j] * b[j]
+    b[j] <- suave(mean(X[, j] * r), lambda) / mean(X[, j]^2)
+    r <- r - X[, j] * b[j]
+  }
+  b
+}
+m <- as.matrix(datos[-1])
+X <- scale(m, center = colMeans(m[entrena, ]), scale = apply(m[entrena, ], 2, sd))
+y <- datos$salario
+
+lambdas <- exp(seq(log(0.5), log(0.005), length.out = 20))
+pliegue <- rep(1:5, length.out = length(entrena))
+error_cv <- sapply(lambdas, function(l) mean(sapply(1:5, function(f) {
+  dentro <- entrena[pliegue != f]
+  fuera <- entrena[pliegue == f]
+  b <- lasso(X[dentro, ], y[dentro], l)
+  mean((y[fuera] - mean(y[dentro]) - X[fuera, ] %*% b)^2)
+})))
+b <- lasso(X[entrena, ], y[entrena], lambdas[which.min(error_cv)])
+cat("El LASSO conserva:", names(b)[b != 0], "\n")
+
+controles <- c("origen", "capacidad")
+
+todo <- lm(salario ~ ., datos[entrena, ])
+dag <- lm(reformulate(c("estudios", controles), "salario"), datos[entrena, ])
+pred_lasso <- mean(y[entrena]) + X %*% b
+r2 <- function(pred) 1 - mean((y[entrena] - pred[entrena])^2) / mean((y[entrena] - mean(y[entrena]))^2)
+ecm <- function(pred) mean((y[prueba] - pred[prueba])^2)
+data.frame(modelo = c("Con todos los matices", "LASSO", "DAG"),
+           efecto_estudios = round(c(coef(todo)["estudios"], b["estudios"] / sd(m[entrena, "estudios"]),
+                                     coef(dag)["estudios"]), 2),
+           r2_entrena = round(c(r2(predict(todo, datos)), r2(pred_lasso), r2(predict(dag, datos))), 2),
+           ecm_prueba = round(c(ecm(predict(todo, datos)), ecm(pred_lasso), ecm(predict(dag, datos))), 2))
+```
+
+```{webr}
+#| exercise: matiz
+#| check: true
+# suave() se prueba con casos propios; controles, por lo que el grafo dice de cada variable.
+e <- .envir_result
+f <- e$suave
+ctrl <- e$controles
+matices <- sprintf("matiz_%02d", 1:30)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función suave().")
+} else if (!isTRUE(all.equal(tryCatch(f(c(-2, -0.5, 0, 0.5, 3), 1), error = function(err) NULL), c(-1, 0, 0, 0, 2)))) {
+  list(correct = FALSE, message = "Con lambda = 1, suave(c(-2, -0.5, 0, 0.5, 3), 1) debería dar -1, 0, 0, 0, 2: lo que no pasa de lambda en valor absoluto se queda en cero, y lo demás se acerca a cero en lambda, por los dos lados.")
+} else if (!is.character(ctrl)) {
+  list(correct = FALSE, message = "controles tiene que ser un vector con los nombres de las variables, entre comillas: c(\"una\", \"otra\").")
+} else if (any(c("estudios", "salario") %in% ctrl)) {
+  list(correct = FALSE, message = "estudios es el tratamiento y salario el resultado: no van entre los controles.")
+} else if (length(setdiff(ctrl, c("origen", "capacidad", "ocupacion", "barrio", matices))) > 0) {
+  list(correct = FALSE, message = paste0("No conozco ", paste(setdiff(ctrl, names(e$datos)), collapse = ", "), ": los nombres son los de las columnas de datos."))
+} else if ("ocupacion" %in% ctrl) {
+  list(correct = FALSE, message = "ocupacion está en el camino de los estudios al salario: es un mediador. Controlar por ella deja solo el efecto directo, y la pregunta es por el total.")
+} else if ("barrio" %in% ctrl) {
+  list(correct = FALSE, message = "barrio lo causan los estudios y el salario: es un colisionador. Controlar por él abre un camino falso entre los dos.")
+} else if (!all(c("origen", "capacidad") %in% ctrl)) {
+  list(correct = FALSE, message = "Queda abierto un camino por la puerta trasera: ¿qué variables influyen a la vez en los estudios y en el salario?")
+} else if (any(matices %in% ctrl)) {
+  list(correct = FALSE, message = "Los matices no sesgan el efecto, porque no influyen en nada, pero tampoco cierran ningún camino: sobran. El grafo dice qué controlar, y nada más.")
+} else {
+  list(correct = TRUE, message = "¡Correcto! Con el origen y la capacidad, el efecto de los estudios sale cerca del 0,65 verdadero. El modelo con todo y el LASSO lo llevan a cero, porque controlan por un mediador y un colisionador: predicen mejor, pero no explican.")
+}
+```
+
+::: {.hint exercise="matiz"}
+`suave()` cabe en una línea: `abs(z) - lambda` dice cuánto pasa `z` del umbral, `pmax(..., 0)` lo deja en cero si no pasa, y `sign(z)` le devuelve el signo. Para los controles, recorre el grafo: ¿qué variables son causa a la vez de los estudios y del salario?
+:::
+
+::: {.solution exercise="matiz"}
+`sign(z) * pmax(abs(z) - lambda, 0)` y `controles <- c("origen", "capacidad")`.
+:::
+:::
+
+::::
