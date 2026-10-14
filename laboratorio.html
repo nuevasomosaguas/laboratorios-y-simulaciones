@@ -66,27 +66,32 @@
 })();
 
 // Un aviso de R que se repite en un bucle se pinta una vez, con las veces que salió, y no cien.
+// quarto-live llena la salida fuera de la página y la inserta de una vez, así que se revisa todo lo insertado.
 (() => {
+  const juntar = (aviso) => {
+    if (aviso.dataset.aviso) return;
+    const clave = aviso.textContent.replace(/\s+/g, " ").trim();
+    const previo = aviso.previousElementSibling;
+    if (previo?.dataset.aviso !== clave) {
+      aviso.dataset.aviso = clave;
+      aviso.dataset.veces = 1;
+      return;
+    }
+    previo.dataset.veces = Number(previo.dataset.veces) + 1;
+    let veces = previo.querySelector(".avisos-repetidos");
+    if (!veces) {
+      veces = document.createElement("span");
+      veces.className = "avisos-repetidos";
+      previo.querySelector(".callout-caption-container").append(" ", veces);
+    }
+    veces.textContent = `(×${previo.dataset.veces})`;
+    aviso.remove();
+  };
   new MutationObserver((cambios) => {
     for (const cambio of cambios) {
       cambio.addedNodes.forEach((nodo) => {
-        if (nodo.nodeType !== Node.ELEMENT_NODE || !nodo.querySelector(":scope > .callout-warning")) return;
-        const clave = nodo.textContent.replace(/\s+/g, " ").trim();
-        const previo = nodo.previousElementSibling;
-        if (previo?.dataset.aviso !== clave) {
-          nodo.dataset.aviso = clave;
-          nodo.dataset.veces = 1;
-          return;
-        }
-        previo.dataset.veces = Number(previo.dataset.veces) + 1;
-        let veces = previo.querySelector(".avisos-repetidos");
-        if (!veces) {
-          veces = document.createElement("span");
-          veces.className = "avisos-repetidos";
-          previo.querySelector(".callout-caption-container").append(" ", veces);
-        }
-        veces.textContent = `(×${previo.dataset.veces})`;
-        nodo.remove();
+        if (nodo.nodeType !== Node.ELEMENT_NODE) return;
+        nodo.querySelectorAll(".callout-warning").forEach((c) => juntar(c.parentElement));
       });
     }
   }).observe(document.body, { childList: true, subtree: true });
