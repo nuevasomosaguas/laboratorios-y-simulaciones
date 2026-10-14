@@ -1,0 +1,296 @@
+---
+title: "¿En qué medida afecta a la esperanza de vida suprimir la televisión pública?"
+numero: 76
+nivel: 2
+duracion: "30 min"
+lectura: "[Angrist y Pischke (2009)](https://nuevasomosaguas.github.io/biblioteca.html#angrist2009mostly); Abadie, Diamond y Hainmueller (2010); [Preston, Heuveline y Guillot (2001)](https://nuevasomosaguas.github.io/biblioteca.html#preston2001demography)"
+dificultad: "Intermedio"
+categories: [inferencia causal, demografía]
+description: "El 29 de noviembre de 2013 se apagó Canal Nou, y la esperanza de vida en las provincias valencianas siguió como si nada. ¿Prueba eso que no importaba, o que no lo habríamos visto aunque importara?"
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+Los datos: esperanza.csv, en esta carpeta (SHA-256 54ccbb3c6bfe78085b50194cdb83cb273419a9e30a6276bc177e62ef5e9cd1e8),
+copiado tal cual en el código del ejercicio: la esperanza de vida al nacer, ambos sexos, de las 50 provincias, de 2006 a 2017.
+
+Salen de los Indicadores Demográficos Básicos del INE, tabla 1485, «Esperanza de Vida al Nacimiento por provincia, según
+sexo», descargada el 14 de octubre de 2026 de https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/1485?nult=40
+(SHA-256 bbe5b95e548c1b2a8c3d4a183dbc185582fd715b9f5105a01909fa92a8a70e2f). Se quedan las series «Ambos sexos» y los años
+2006 a 2017, y se quitan Ceuta y Melilla, dos ciudades pequeñas cuya esperanza de vida salta hasta
+dos años de un año a otro. Los años se cortan en 2017 porque À Punt, la televisión pública valenciana que sustituyó a Canal Nou, empezó
+a emitir el 10 de junio de 2018.
+
+Las dos constantes del paso 3 salen de las Tablas de Mortalidad del INE, tabla 27153, total nacional, ambos sexos, 2013:
+e0 = 82,77, y la entropía de Keyfitz, H = e-daga / e0 = 9,70 / 82,77 = 0,117, con e-daga calculado con las defunciones
+d(x) y la esperanza de vida e(x) de la tabla, por edades simples.
+
+Las fechas: la Ley 4/2013, de 27 de noviembre, de la Generalitat (BOE-A-2013-12824, BOE del 7 de diciembre), suprime el
+servicio, y la emisión se cortó el 29 de noviembre de 2013.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El 29 de noviembre de 2013, a las 12:19, se apagó la señal de Canal Nou. Dos días antes, las Cortes Valencianas habían aprobado la ley que suprimía la radio y la televisión públicas de la Generalitat: la empresa arrastraba una deuda grande y un tribunal acababa de anular el despido de más de mil trabajadores. Durante cuatro años y medio, hasta que À Punt empezó a emitir en junio de 2018, la Comunitat Valenciana se quedó sin televisión autonómica.
+
+Se puede discutir si una televisión pública vale lo que cuesta, y hay argumentos en los dos lados: la información y la cohesión que da, y el dinero que se podría gastar en otra cosa. Aquí la pregunta es más estrecha y se puede medir: ¿cambió la esperanza de vida? Hay mecanismos en las dos direcciones. Una televisión pública emite campañas de salud y tiene menos incentivos para anunciar comida basura; sin ella, alguien podría informarse peor. Pero también se puede ver menos televisión, y Veerman y sus colegas estimaron en 2012 que cada hora de televisión después de los 25 años quita, de media, 21,8 minutos de vida.
+
+Con un tratamiento, una fecha y un grupo tratado, el diseño es el de **diferencias en diferencias**: cuánto cambió la esperanza de vida de las tres provincias valencianas entre antes (2006-2013) y después (2014-2017), menos lo que cambió en las otras 47 en el mismo tiempo. Lo que cambió en las demás hace de contrafactual: lo que habría pasado en Valencia sin el apagón, si las tendencias fueran paralelas. Pero una diferencia nunca es exactamente cero, y hace falta saber cuánto se mueve por azar. Para eso están los **placebos**: el mismo cálculo con tres provincias al azar que no perdieron ninguna televisión. Si la cifra de Valencia no se sale de las de los placebos, los datos no distinguen el efecto del ruido.
+
+**Tu tarea.**
+
+1. Completa `dif_en_dif()`: el cambio medio de las provincias `tratadas` menos el cambio medio de las demás.
+2. Completa los placebos: en cada repetición, tres provincias al azar de entre las que no son valencianas.
+3. Mira el resultado. `efecto` es la diferencia en diferencias de Valencia, en años; `umbral`, lo que supera el 95% de los placebos; `p`, la proporción de placebos que se alejan de cero más que Valencia. ¿Qué cambia si el antes es solo 2012-2013 (`desde_2012`)? Y `mortalidad`: cuánto tendría que cambiar la mortalidad, a todas las edades, para que el efecto llegara al umbral.
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Con el antes de 2006 a 2013, la diferencia en diferencias de las provincias valencianas es de 0,016 años, unos 6 días, y el 92% de los placebos se aleja más de cero. Por provincias, Alicante da −0,10, Castellón +0,01 y Valencia +0,13: ni siquiera coinciden en el signo. El umbral de los placebos es de 0,28 años, unos 103 días. Con la entropía de la tabla de vida de España en 2013, $H$ = 0,117, la esperanza de vida cambia un $H$% por cada 1% que cambia la mortalidad (Keyfitz, 1977; el laboratorio 61 lo explica), y, mover la esperanza de vida 0,28 años exige que la mortalidad baje o suba un 2,9% a todas las edades durante cuatro años. Es año y medio del progreso de esos años, en los que la esperanza de vida media de las provincias subía 0,19 años por año.
+
+El gráfico de la izquierda pide prudencia con cualquier cifra. Las provincias valencianas vivían 0,59 años menos que el resto en 2006 y solo 0,28 menos en 2012: se estaban acercando, y las tendencias no eran paralelas. Después del apagón la distancia vuelve a 0,48 años. Con el antes de 2012-2013, la diferencia en diferencias pasa a −0,12 años, unos 45 días menos de vida, pero el 41% de los placebos con esa misma ventana se aleja más de cero. El signo depende de la ventana, y ninguna de las dos se sale del ruido. Es el jardín de senderos del laboratorio 66 en pequeño: quien quisiera encontrar un efecto lo encontraría eligiendo los años.
+
+¿Prueba esto que la televisión pública no afecta a la salud? No: prueba que este experimento no podía verlo. La esperanza de vida de un año es una medida de periodo, y los mecanismos de la televisión, el sedentarismo y la información sobre hábitos actúan sobre enfermedades crónicas que tardan décadas. Con los 21,8 minutos por hora de Veerman, que salen de un estudio observacional y tienen un intervalo de 0,3 a 44,7 minutos, perder 0,28 años de vida pediría unas 6.800 horas más de televisión por persona, casi 5 horas al día durante los cuatro años. El cierre de un canal, que se sustituye por los demás, no se acerca a eso. Cuando el efecto plausible queda tan lejos del umbral, un resultado nulo no informa, y lo honrado es calcular el umbral antes de mirar el efecto.
+
+Tres precisiones de método. Con un solo grupo tratado y una sola fecha, los estimadores para tratamientos escalonados, como el de Callaway y Sant'Anna (2021), no añaden nada: el problema no es la heterogeneidad temporal, sino la inferencia con tres unidades tratadas, y para eso están los placebos de Abadie, Diamond y Hainmueller (2010). El control sintético de esos mismos autores buscaría una combinación de provincias que siguiera a las valencianas antes de 2013, y es la respuesta natural a unas tendencias que no son paralelas. Y la idea de instrumentar la televisión con la orografía, que hace que unos pueblos reciban la señal y otros no, es de Olken (2009) en Indonesia, que encontró que más televisión y radio va con menos participación en asociaciones y menos confianza. DellaVigna y Kaplan (2007) aprovecharon otra cosa: la entrada de Fox News en las redes de cable de unos pueblos y no de otros. Que la información de salud beneficie sobre todo a quien tiene más estudios, y ensanche así las desigualdades, se sigue de la tesis de las causas fundamentales de Link y Phelan (1995): quien tiene más recursos aprovecha antes cada conocimiento nuevo sobre la salud.
+
+Abadie, A., Diamond, A. y Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California's tobacco control program. *Journal of the American Statistical Association*, 105(490), 493–505.
+
+Angrist, J. D. y Pischke, J.-S. (2009). *Mostly Harmless Econometrics: An Empiricist's Companion*. Princeton University Press.
+
+Callaway, B. y Sant'Anna, P. H. C. (2021). Difference-in-differences with multiple time periods. *Journal of Econometrics*, 225(2), 200–230.
+
+DellaVigna, S. y Kaplan, E. (2007). The Fox News effect: Media bias and voting. *The Quarterly Journal of Economics*, 122(3), 1187–1234.
+
+Keyfitz, N. (1977). What difference would it make if cancer were eradicated? An examination of the Taeuber paradox. *Demography*, 14(4), 411–418.
+
+Link, B. G. y Phelan, J. (1995). Social conditions as fundamental causes of disease. *Journal of Health and Social Behavior*, número extraordinario, 80–94.
+
+Olken, B. A. (2009). Do television and radio destroy social capital? Evidence from Indonesian villages. *American Economic Journal: Applied Economics*, 1(4), 1–33.
+
+Veerman, J. L., Healy, G. N., Cobiac, L. J., Vos, T., Winkler, E. A. H., Owen, N. y Dunstan, D. W. (2012). Television viewing time and reduced life expectancy: A life table analysis. *British Journal of Sports Medicine*, 46(13), 927–930.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: apagon
+#| caption: "Tu código"
+# Esperanza de vida al nacer, ambos sexos, por provincia, 2006-2017. INE, Indicadores Demográficos Básicos.
+e0 <- rbind(
+  "Albacete" = c(81.55, 81.58, 81.84, 81.81, 82.65, 82.43, 82.65, 82.84, 82.66, 82.87, 83.14, 83.47),
+  "Alicante/Alacant" = c(80.85, 80.92, 81.26, 81.91, 82.09, 82.17, 81.99, 82.57, 82.66, 82.51, 82.85, 82.68),
+  "Almería" = c(79.47, 79.52, 79.95, 80.23, 80.96, 80.79, 81.03, 81.58, 81.82, 81.11, 81.70, 81.75),
+  "Asturias" = c(80.19, 80.37, 80.70, 81.09, 81.18, 81.30, 81.52, 82.19, 82.11, 82.21, 82.38, 82.59),
+  "Badajoz" = c(79.91, 80.27, 80.60, 80.52, 80.69, 81.42, 81.05, 81.54, 81.80, 81.70, 81.96, 82.09),
+  "Balears (Illes)" = c(80.85, 81.26, 81.19, 81.15, 81.56, 81.93, 81.85, 82.56, 82.60, 82.28, 82.86, 82.68),
+  "Barcelona" = c(81.38, 81.40, 81.69, 81.98, 82.34, 82.66, 82.57, 83.06, 83.27, 83.23, 83.53, 83.40),
+  "Burgos" = c(82.15, 82.09, 82.09, 82.34, 83.17, 82.96, 82.89, 83.57, 83.60, 84.22, 84.09, 83.82),
+  "Cantabria" = c(80.99, 80.99, 81.62, 81.96, 82.06, 82.42, 82.54, 82.96, 82.78, 82.69, 83.14, 83.31),
+  "Castellón/Castelló" = c(80.46, 80.66, 80.98, 80.94, 81.91, 81.91, 82.48, 82.43, 82.41, 82.32, 82.68, 82.72),
+  "Ciudad Real" = c(80.76, 80.70, 80.85, 81.49, 82.11, 81.96, 81.89, 82.43, 82.63, 82.09, 82.68, 82.37),
+  "Coruña (A)" = c(80.66, 80.54, 81.07, 81.16, 81.69, 81.96, 82.22, 82.34, 82.62, 82.32, 82.53, 82.92),
+  "Cuenca" = c(82.16, 82.20, 82.01, 83.13, 82.87, 83.09, 82.11, 82.51, 83.37, 82.87, 83.18, 83.24),
+  "Cáceres" = c(81.20, 80.73, 81.69, 81.86, 81.99, 82.19, 82.01, 82.34, 83.21, 82.54, 82.82, 82.47),
+  "Cádiz" = c(79.34, 79.86, 79.57, 79.75, 80.18, 80.26, 80.02, 80.66, 81.17, 80.82, 81.05, 81.27),
+  "Córdoba" = c(80.49, 80.38, 80.74, 81.06, 81.55, 81.67, 81.46, 82.11, 82.39, 82.01, 82.49, 82.22),
+  "Girona" = c(81.39, 81.56, 81.76, 81.84, 82.25, 82.58, 82.35, 83.00, 82.86, 82.74, 83.29, 83.12),
+  "Granada" = c(79.73, 79.58, 80.19, 80.39, 80.77, 81.06, 81.16, 81.94, 81.94, 81.40, 82.21, 82.13),
+  "Guadalajara" = c(83.12, 82.39, 83.22, 83.74, 83.76, 83.61, 83.77, 84.53, 84.36, 83.66, 83.89, 84.06),
+  "Guipúzcoa" = c(81.83, 81.34, 81.83, 82.22, 82.74, 82.74, 82.86, 83.04, 83.30, 83.10, 83.60, 83.48),
+  "Huelva" = c(79.41, 79.01, 79.72, 80.21, 80.60, 80.62, 80.04, 80.72, 81.24, 81.37, 81.39, 81.71),
+  "Huesca" = c(81.58, 82.37, 82.54, 82.13, 82.19, 82.74, 82.76, 83.43, 83.25, 82.78, 83.00, 83.20),
+  "Jaén" = c(80.34, 79.80, 80.28, 80.33, 81.32, 80.97, 81.35, 81.73, 81.94, 81.57, 81.96, 82.09),
+  "León" = c(81.56, 81.18, 81.78, 82.57, 82.58, 82.97, 82.91, 82.73, 83.12, 83.26, 83.48, 83.69),
+  "Lleida" = c(80.88, 80.88, 81.63, 81.76, 81.80, 82.08, 82.44, 82.61, 82.92, 82.79, 83.44, 83.12),
+  "Lugo" = c(80.81, 81.16, 81.52, 81.25, 82.06, 82.29, 81.92, 82.66, 82.66, 82.39, 82.58, 83.00),
+  "Madrid" = c(82.06, 82.08, 82.58, 82.93, 83.39, 83.63, 83.64, 84.13, 84.20, 83.97, 84.50, 84.48),
+  "Murcia" = c(80.27, 80.30, 80.43, 80.90, 81.62, 81.71, 81.72, 82.27, 82.47, 82.21, 82.51, 82.40),
+  "Málaga" = c(79.52, 79.66, 79.89, 80.50, 80.86, 81.21, 81.26, 81.71, 81.64, 81.65, 82.10, 82.22),
+  "Navarra" = c(82.02, 82.20, 82.29, 82.90, 83.68, 83.47, 83.42, 83.49, 83.45, 83.75, 83.81, 83.80),
+  "Ourense" = c(81.18, 81.46, 81.43, 82.24, 82.22, 81.90, 82.39, 82.63, 83.66, 83.20, 83.04, 83.77),
+  "Palencia" = c(81.13, 80.96, 82.22, 81.32, 81.93, 82.29, 82.40, 83.18, 82.18, 83.00, 83.15, 83.16),
+  "Palmas (Las)" = c(79.45, 79.90, 79.34, 80.85, 81.28, 81.26, 81.25, 81.69, 81.74, 81.62, 81.85, 81.99),
+  "Pontevedra" = c(80.73, 80.90, 81.39, 81.53, 81.97, 82.18, 82.20, 82.79, 83.07, 82.78, 82.65, 83.02),
+  "Rioja (La)" = c(81.88, 81.49, 81.93, 82.52, 82.95, 82.85, 82.66, 83.61, 83.78, 83.37, 83.80, 83.61),
+  "Salamanca" = c(82.75, 82.60, 82.79, 82.96, 83.68, 83.94, 83.77, 84.31, 84.58, 84.58, 84.47, 84.41),
+  "Santa Cruz de Tenerife" = c(79.73, 79.62, 80.25, 80.97, 81.48, 81.31, 81.57, 82.25, 81.95, 81.75, 82.10, 82.27),
+  "Segovia" = c(82.50, 82.47, 82.85, 83.12, 83.35, 83.40, 83.64, 83.76, 84.09, 83.28, 84.01, 83.92),
+  "Sevilla" = c(79.26, 79.41, 79.56, 80.08, 80.38, 80.59, 80.79, 81.36, 81.59, 81.09, 81.73, 81.39),
+  "Soria" = c(82.21, 82.42, 82.79, 83.36, 83.85, 84.00, 83.64, 84.45, 84.02, 84.05, 83.02, 84.78),
+  "Tarragona" = c(80.74, 80.93, 81.13, 81.49, 82.00, 82.24, 82.05, 82.52, 82.85, 82.52, 82.83, 83.03),
+  "Teruel" = c(81.87, 81.68, 82.50, 82.22, 82.42, 82.54, 83.10, 83.02, 83.13, 83.01, 83.72, 83.56),
+  "Toledo" = c(81.88, 81.31, 81.94, 82.44, 82.83, 83.21, 83.18, 83.46, 83.80, 83.14, 83.55, 82.81),
+  "Valencia/València" = c(80.14, 80.13, 80.52, 80.91, 81.08, 81.42, 81.61, 82.18, 82.19, 81.96, 82.31, 82.26),
+  "Valladolid" = c(81.61, 81.93, 81.88, 82.66, 82.47, 83.04, 83.16, 83.69, 83.86, 83.23, 84.18, 83.96),
+  "Vizcaya" = c(81.11, 81.19, 81.48, 81.74, 82.03, 82.14, 82.50, 83.13, 83.10, 82.98, 83.14, 83.50),
+  "Zamora" = c(82.06, 82.49, 82.54, 82.97, 83.45, 83.38, 83.22, 83.27, 83.41, 83.61, 83.23, 83.06),
+  "Zaragoza" = c(81.27, 81.08, 81.55, 81.86, 82.13, 82.18, 82.55, 82.98, 82.71, 82.69, 83.35, 83.16),
+  "Álava" = c(82.20, 81.92, 82.55, 82.35, 83.19, 83.04, 83.53, 83.36, 84.38, 83.49, 84.18, 83.89),
+  "Ávila" = c(81.34, 81.07, 82.07, 82.96, 82.23, 82.72, 83.31, 82.88, 83.15, 82.57, 83.28, 83.32)
+)
+colnames(e0) <- 2006:2017
+valencianas <- c("Alicante/Alacant", "Castellón/Castelló", "Valencia/València")
+otras <- setdiff(rownames(e0), valencianas)
+
+# 1. Diferencias en diferencias: cuánto cambia la esperanza de vida de las tratadas, menos lo que cambia en las demás
+dif_en_dif <- function(tratadas, e = e0, antes = 2006:2013, despues = 2014:2017) {
+  cambio <- rowMeans(e[, as.character(despues)]) - rowMeans(e[, as.character(antes)])
+  ______
+}
+efecto <- dif_en_dif(valencianas)
+
+# 2. Placebos: el mismo cálculo con tres provincias al azar que no perdieron nada
+set.seed(2013)
+placebos <- replicate(2000, dif_en_dif(______, e0[otras, ]))
+umbral <- quantile(abs(placebos), 0.95)
+
+# 3. Lo que tendría que bajar la mortalidad para mover la esperanza de vida el umbral (Keyfitz, España 2013)
+H <- 0.117
+e0_2013 <- 82.77
+mortalidad <- 100 * umbral / (H * e0_2013)
+
+par(mfrow = c(1, 2))
+plot(2006:2017, colMeans(e0[valencianas, ]) - colMeans(e0[otras, ]), type = "b", pch = 20,
+     xlab = "Año", ylab = "Valencianas menos el resto (años)")
+abline(v = 2013.9, lty = 2)
+hist(placebos, breaks = 40, col = "grey80", border = "white", main = "", xlab = "Diferencias en diferencias (años)")
+abline(v = efecto, col = "firebrick", lwd = 2)
+
+round(c(efecto = efecto, desde_2012 = dif_en_dif(valencianas, antes = 2012:2013),
+        umbral = unname(umbral), mortalidad = unname(mortalidad),
+        p = mean(abs(placebos) >= abs(efecto))), 3)
+```
+
+```{webr}
+#| exercise: apagon
+#| solution: true
+e0 <- rbind(
+  "Albacete" = c(81.55, 81.58, 81.84, 81.81, 82.65, 82.43, 82.65, 82.84, 82.66, 82.87, 83.14, 83.47),
+  "Alicante/Alacant" = c(80.85, 80.92, 81.26, 81.91, 82.09, 82.17, 81.99, 82.57, 82.66, 82.51, 82.85, 82.68),
+  "Almería" = c(79.47, 79.52, 79.95, 80.23, 80.96, 80.79, 81.03, 81.58, 81.82, 81.11, 81.70, 81.75),
+  "Asturias" = c(80.19, 80.37, 80.70, 81.09, 81.18, 81.30, 81.52, 82.19, 82.11, 82.21, 82.38, 82.59),
+  "Badajoz" = c(79.91, 80.27, 80.60, 80.52, 80.69, 81.42, 81.05, 81.54, 81.80, 81.70, 81.96, 82.09),
+  "Balears (Illes)" = c(80.85, 81.26, 81.19, 81.15, 81.56, 81.93, 81.85, 82.56, 82.60, 82.28, 82.86, 82.68),
+  "Barcelona" = c(81.38, 81.40, 81.69, 81.98, 82.34, 82.66, 82.57, 83.06, 83.27, 83.23, 83.53, 83.40),
+  "Burgos" = c(82.15, 82.09, 82.09, 82.34, 83.17, 82.96, 82.89, 83.57, 83.60, 84.22, 84.09, 83.82),
+  "Cantabria" = c(80.99, 80.99, 81.62, 81.96, 82.06, 82.42, 82.54, 82.96, 82.78, 82.69, 83.14, 83.31),
+  "Castellón/Castelló" = c(80.46, 80.66, 80.98, 80.94, 81.91, 81.91, 82.48, 82.43, 82.41, 82.32, 82.68, 82.72),
+  "Ciudad Real" = c(80.76, 80.70, 80.85, 81.49, 82.11, 81.96, 81.89, 82.43, 82.63, 82.09, 82.68, 82.37),
+  "Coruña (A)" = c(80.66, 80.54, 81.07, 81.16, 81.69, 81.96, 82.22, 82.34, 82.62, 82.32, 82.53, 82.92),
+  "Cuenca" = c(82.16, 82.20, 82.01, 83.13, 82.87, 83.09, 82.11, 82.51, 83.37, 82.87, 83.18, 83.24),
+  "Cáceres" = c(81.20, 80.73, 81.69, 81.86, 81.99, 82.19, 82.01, 82.34, 83.21, 82.54, 82.82, 82.47),
+  "Cádiz" = c(79.34, 79.86, 79.57, 79.75, 80.18, 80.26, 80.02, 80.66, 81.17, 80.82, 81.05, 81.27),
+  "Córdoba" = c(80.49, 80.38, 80.74, 81.06, 81.55, 81.67, 81.46, 82.11, 82.39, 82.01, 82.49, 82.22),
+  "Girona" = c(81.39, 81.56, 81.76, 81.84, 82.25, 82.58, 82.35, 83.00, 82.86, 82.74, 83.29, 83.12),
+  "Granada" = c(79.73, 79.58, 80.19, 80.39, 80.77, 81.06, 81.16, 81.94, 81.94, 81.40, 82.21, 82.13),
+  "Guadalajara" = c(83.12, 82.39, 83.22, 83.74, 83.76, 83.61, 83.77, 84.53, 84.36, 83.66, 83.89, 84.06),
+  "Guipúzcoa" = c(81.83, 81.34, 81.83, 82.22, 82.74, 82.74, 82.86, 83.04, 83.30, 83.10, 83.60, 83.48),
+  "Huelva" = c(79.41, 79.01, 79.72, 80.21, 80.60, 80.62, 80.04, 80.72, 81.24, 81.37, 81.39, 81.71),
+  "Huesca" = c(81.58, 82.37, 82.54, 82.13, 82.19, 82.74, 82.76, 83.43, 83.25, 82.78, 83.00, 83.20),
+  "Jaén" = c(80.34, 79.80, 80.28, 80.33, 81.32, 80.97, 81.35, 81.73, 81.94, 81.57, 81.96, 82.09),
+  "León" = c(81.56, 81.18, 81.78, 82.57, 82.58, 82.97, 82.91, 82.73, 83.12, 83.26, 83.48, 83.69),
+  "Lleida" = c(80.88, 80.88, 81.63, 81.76, 81.80, 82.08, 82.44, 82.61, 82.92, 82.79, 83.44, 83.12),
+  "Lugo" = c(80.81, 81.16, 81.52, 81.25, 82.06, 82.29, 81.92, 82.66, 82.66, 82.39, 82.58, 83.00),
+  "Madrid" = c(82.06, 82.08, 82.58, 82.93, 83.39, 83.63, 83.64, 84.13, 84.20, 83.97, 84.50, 84.48),
+  "Murcia" = c(80.27, 80.30, 80.43, 80.90, 81.62, 81.71, 81.72, 82.27, 82.47, 82.21, 82.51, 82.40),
+  "Málaga" = c(79.52, 79.66, 79.89, 80.50, 80.86, 81.21, 81.26, 81.71, 81.64, 81.65, 82.10, 82.22),
+  "Navarra" = c(82.02, 82.20, 82.29, 82.90, 83.68, 83.47, 83.42, 83.49, 83.45, 83.75, 83.81, 83.80),
+  "Ourense" = c(81.18, 81.46, 81.43, 82.24, 82.22, 81.90, 82.39, 82.63, 83.66, 83.20, 83.04, 83.77),
+  "Palencia" = c(81.13, 80.96, 82.22, 81.32, 81.93, 82.29, 82.40, 83.18, 82.18, 83.00, 83.15, 83.16),
+  "Palmas (Las)" = c(79.45, 79.90, 79.34, 80.85, 81.28, 81.26, 81.25, 81.69, 81.74, 81.62, 81.85, 81.99),
+  "Pontevedra" = c(80.73, 80.90, 81.39, 81.53, 81.97, 82.18, 82.20, 82.79, 83.07, 82.78, 82.65, 83.02),
+  "Rioja (La)" = c(81.88, 81.49, 81.93, 82.52, 82.95, 82.85, 82.66, 83.61, 83.78, 83.37, 83.80, 83.61),
+  "Salamanca" = c(82.75, 82.60, 82.79, 82.96, 83.68, 83.94, 83.77, 84.31, 84.58, 84.58, 84.47, 84.41),
+  "Santa Cruz de Tenerife" = c(79.73, 79.62, 80.25, 80.97, 81.48, 81.31, 81.57, 82.25, 81.95, 81.75, 82.10, 82.27),
+  "Segovia" = c(82.50, 82.47, 82.85, 83.12, 83.35, 83.40, 83.64, 83.76, 84.09, 83.28, 84.01, 83.92),
+  "Sevilla" = c(79.26, 79.41, 79.56, 80.08, 80.38, 80.59, 80.79, 81.36, 81.59, 81.09, 81.73, 81.39),
+  "Soria" = c(82.21, 82.42, 82.79, 83.36, 83.85, 84.00, 83.64, 84.45, 84.02, 84.05, 83.02, 84.78),
+  "Tarragona" = c(80.74, 80.93, 81.13, 81.49, 82.00, 82.24, 82.05, 82.52, 82.85, 82.52, 82.83, 83.03),
+  "Teruel" = c(81.87, 81.68, 82.50, 82.22, 82.42, 82.54, 83.10, 83.02, 83.13, 83.01, 83.72, 83.56),
+  "Toledo" = c(81.88, 81.31, 81.94, 82.44, 82.83, 83.21, 83.18, 83.46, 83.80, 83.14, 83.55, 82.81),
+  "Valencia/València" = c(80.14, 80.13, 80.52, 80.91, 81.08, 81.42, 81.61, 82.18, 82.19, 81.96, 82.31, 82.26),
+  "Valladolid" = c(81.61, 81.93, 81.88, 82.66, 82.47, 83.04, 83.16, 83.69, 83.86, 83.23, 84.18, 83.96),
+  "Vizcaya" = c(81.11, 81.19, 81.48, 81.74, 82.03, 82.14, 82.50, 83.13, 83.10, 82.98, 83.14, 83.50),
+  "Zamora" = c(82.06, 82.49, 82.54, 82.97, 83.45, 83.38, 83.22, 83.27, 83.41, 83.61, 83.23, 83.06),
+  "Zaragoza" = c(81.27, 81.08, 81.55, 81.86, 82.13, 82.18, 82.55, 82.98, 82.71, 82.69, 83.35, 83.16),
+  "Álava" = c(82.20, 81.92, 82.55, 82.35, 83.19, 83.04, 83.53, 83.36, 84.38, 83.49, 84.18, 83.89),
+  "Ávila" = c(81.34, 81.07, 82.07, 82.96, 82.23, 82.72, 83.31, 82.88, 83.15, 82.57, 83.28, 83.32)
+)
+colnames(e0) <- 2006:2017
+valencianas <- c("Alicante/Alacant", "Castellón/Castelló", "Valencia/València")
+otras <- setdiff(rownames(e0), valencianas)
+
+# 1. Diferencias en diferencias: cuánto cambia la esperanza de vida de las tratadas, menos lo que cambia en las demás
+dif_en_dif <- function(tratadas, e = e0, antes = 2006:2013, despues = 2014:2017) {
+  cambio <- rowMeans(e[, as.character(despues)]) - rowMeans(e[, as.character(antes)])
+  mean(cambio[tratadas]) - mean(cambio[!rownames(e) %in% tratadas])
+}
+efecto <- dif_en_dif(valencianas)
+
+# 2. Placebos: el mismo cálculo con tres provincias al azar que no perdieron nada
+set.seed(2013)
+placebos <- replicate(2000, dif_en_dif(sample(otras, 3), e0[otras, ]))
+umbral <- quantile(abs(placebos), 0.95)
+
+# 3. Lo que tendría que bajar la mortalidad para mover la esperanza de vida el umbral (Keyfitz, España 2013)
+H <- 0.117
+e0_2013 <- 82.77
+mortalidad <- 100 * umbral / (H * e0_2013)
+
+par(mfrow = c(1, 2))
+plot(2006:2017, colMeans(e0[valencianas, ]) - colMeans(e0[otras, ]), type = "b", pch = 20,
+     xlab = "Año", ylab = "Valencianas menos el resto (años)")
+abline(v = 2013.9, lty = 2)
+hist(placebos, breaks = 40, col = "grey80", border = "white", main = "", xlab = "Diferencias en diferencias (años)")
+abline(v = efecto, col = "firebrick", lwd = 2)
+
+round(c(efecto = efecto, desde_2012 = dif_en_dif(valencianas, antes = 2012:2013),
+        umbral = unname(umbral), mortalidad = unname(mortalidad),
+        p = mean(abs(placebos) >= abs(efecto))), 3)
+```
+
+```{webr}
+#| exercise: apagon
+#| check: true
+# dif_en_dif() se comprueba con cuatro provincias inventadas: a sube un año después de 2013, b medio año, c y d nada.
+# Con a tratada, el efecto es 1 - (0,5 + 0 + 0) / 3 = 0,833.
+e <- .envir_result
+coma <- function(x, d = 3) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+prueba <- rbind(a = rep(80, 12) + c(rep(0, 8), rep(1, 4)), b = rep(80, 12) + c(rep(0, 8), rep(0.5, 4)),
+                c = rep(81, 12), d = rep(79, 12))
+colnames(prueba) <- 2006:2017
+if (!is.function(e$dif_en_dif) || !is.numeric(e$placebos)) {
+  list(correct = FALSE, message = "No encuentro dif_en_dif() o placebos.")
+} else if (!isTRUE(all.equal(e$dif_en_dif("a", prueba), 5 / 6))) {
+  list(correct = FALSE, message = paste0(
+    "Con cuatro provincias inventadas en las que a sube 1 año después de 2013, b medio año y c y d nada, dif_en_dif(\"a\") ",
+    "debería dar 1 - 0,5 / 3 = 0,833, y da ", coma(e$dif_en_dif("a", prueba)),
+    ". Al cambio de las tratadas hay que restarle el cambio medio de las demás, y solo de las demás."))
+} else if (length(e$placebos) != 2000 || sd(e$placebos) < 0.11 || sd(e$placebos) > 0.19) {
+  list(correct = FALSE, message = paste0(
+    "Los placebos tienen una desviación típica de ", coma(sd(e$placebos)),
+    ", y con tres provincias distintas en cada repetición debería rondar 0,15. ",
+    "Cada placebo tiene que ser un grupo nuevo de tres provincias al azar, como el grupo de las valencianas."))
+} else {
+  r <- .result
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! La diferencia en diferencias de Valencia es de ", coma(r["efecto"]), " años, y el umbral de los placebos, de ",
+    coma(r["umbral"], 2), ": para superarlo, la mortalidad tendría que cambiar un ", coma(r["mortalidad"], 1),
+    "% a todas las edades."))
+}
+```
+
+::: {.hint exercise="apagon"}
+En `dif_en_dif()`, `cambio[tratadas]` son los cambios de las tratadas, y `!rownames(e) %in% tratadas` elige las demás: resta sus medias. En los placebos, `sample()` elige al azar de entre `otras`.
+:::
+
+::: {.solution exercise="apagon"}
+`mean(cambio[tratadas]) - mean(cambio[!rownames(e) %in% tratadas])` en `dif_en_dif()`, y `sample(otras, 3)` en los placebos.
+:::
+:::
+
+::::
