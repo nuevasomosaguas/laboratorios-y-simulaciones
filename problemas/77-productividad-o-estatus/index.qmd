@@ -1,0 +1,214 @@
+---
+title: "¿Productividad o estatus?"
+numero: 77
+nivel: 2
+duracion: "30 min"
+lectura: "Landers, Rebitzer y Taylor (1996); [Spence (1973)](https://nuevasomosaguas.github.io/biblioteca.html#gibbons1992game); [Goldin (2021)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
+dificultad: "Intermedio"
+categories: [juegos y votación, efectos de segundo orden]
+description: "Por qué en empresas como Bain Capital se trabaja tanto, y en el Mittelstand alemán, las horas justas. Si las horas de más produjeran, serían productividad; si solo dicen quién aguanta, son estatus."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!--
+La curva de producción sale de Pencavel, J. (2015), The Economic Journal, 125(589), 2052-2076, en la versión de trabajo
+IZA DP No. 8129 (abril de 2014), https://docs.iza.org/dp8129.pdf, descargada el 15 de octubre de 2026 (SHA-256
+e21553d03f7a1763898de97b5b9b411d8e8b45aedcd642522b9405dd7bed569a). Con los datos de las fábricas de municiones británicas
+de la Primera Guerra Mundial, en las que trabajaban sobre todo mujeres: «below 49 weekly hours, variations in output are proportional to variations in hours; for
+those observations corresponding to 49 or more hours, output rises with hours at a decreasing rate and a maximum of output
+occurs at about 63 hours. Output at 70 hours differs little from output at 56 hours» (p. 16). La curva del problema es la
+más sencilla con esas tres propiedades: lineal hasta 49, una parábola que empalma con la misma pendiente, con el máximo
+en 63, y por eso produccion(56) = produccion(70) = 54,25. Los dos costes, theta = 1/48 y 1/40, y los premios son inventados.
+
+Las leyes alemanas, en https://www.gesetze-im-internet.de, consultadas el 15 de octubre de 2026: § 3 ArbZG (ocho horas por
+día laborable, hasta diez si la media de seis meses o 24 semanas no pasa de ocho), § 18 ArbZG (no se aplica a los leitende
+Angestellte) y § 87.1, puntos 2 y 3, BetrVG (el comité de empresa codecide el principio y el fin de la jornada y su
+alargamiento temporal). La definición de Mittelstand, del IfM Bonn
+(https://www.ifm-bonn.org/definitionen/mittelstandsdefinition-des-ifm-bonn): hasta dos personas o sus familias tienen al
+menos el 50% de la empresa y forman parte de su dirección.
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En un fondo de capital riesgo como Bain Capital, en un gran bufete o en un banco de inversión, las semanas largas son parte del oficio, sobre todo los primeros años. En una empresa familiar alemana del Mittelstand se trabajan las horas pactadas. Hay dos explicaciones. La de la **productividad**: en esas firmas cada hora vale mucho, y quien la trabaja la cobra. La del **estatus**: las horas no se trabajan por lo que producen, sino por lo que dicen de quien las trabaja.
+
+La segunda tiene un modelo. En 1996, Renée Landers, James Rebitzer y Lowell Taylor estudiaron dos grandes bufetes estadounidenses. Los socios se reparten los beneficios, así que quieren como socios a los que trabajarán mucho toda la vida, los **incansables**. Pero eso no se ve en la cara: se ve en las horas facturadas de los años de asociado. Y si las horas sirven para elegir socio, un asociado normal tiene un motivo para trabajar como un incansable. Para separarlos, la firma pide tantas horas que a un normal ya no le compense fingir: es la **señal** de Spence (1973), y Akerlof (1976) lo llamó la **carrera de ratas**.
+
+El modelo, por semana. Producir: lo que dice Pencavel (2015) con los datos de las fábricas de municiones británicas de la Primera Guerra Mundial, en las que trabajaban sobre todo mujeres, proporcional a las horas hasta las 49, cada vez menos después, con el máximo a las 63 horas, y a las 70, lo mismo que a las 56. Trabajar cuesta $\theta h^2/2$, y menos al incansable ($\theta$ = 1/48) que al normal ($\theta$ = 1/40). Cada uno cobra lo que produce, y el **bienestar** es lo que produce menos lo que le cuesta. El **premio** es lo que vale llegar a socio, repartido por semana de los años de asociado y medido en horas de producción: un premio de 27 son dos tercios de lo que gana un normal.
+
+**Tu tarea.**
+
+1. **Productividad.** Completa `horas_eficientes()`: las horas que hacen máximo el bienestar de quien tiene un coste `theta`. Es lo que trabajaría cada uno si nada dependiera de sus horas más que su sueldo.
+2. **Estatus.** Completa `horas_de_carrera()`: las horas `h` a partir de las cuales un normal, que sin premio trabajaría `h0`, pierde por trabajarlas justo lo que vale el premio. Con menos, le compensaría fingirse incansable.
+3. Mira la tabla y el gráfico. ¿Cuántas de las horas del incansable son productividad y cuántas estatus? ¿Cuánto producen las horas de estatus, y cuánto le cuestan? ¿Qué pasa cuando el premio pasa de 20?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin premio por horas, el incansable trabaja 48 horas y el normal, 40: todo es productividad. Con un premio de 27, la firma tiene que pedir 70 horas para que a un normal no le compense fingir, y el incansable las trabaja: 48 de productividad y 22 de estatus. Esas 22 horas producen 6,25 horas de producción, unos 17 minutos por hora, y aun contando lo que producen le cuestan al incansable 20,8 de bienestar a la semana. La señal funciona, porque solo la da quien no la necesita fingir, y es casi pura pérdida: lo que la firma gana es saber quién es quién, y lo pagan los asociados con horas que no producen.
+
+El gráfico de la derecha lo muestra según el premio. Con un premio de 5, el incansable trabaja 56 horas, y con 10, 60,5, y la producción extra sube hasta 7,8 horas. Pasadas las 63 horas, cada hora de más produce menos que nada: con un premio de 35 se trabajan 73,3 horas, y producen 4,2 horas más que las 48, menos que con un premio de 10. Cuanto más vale llegar a socio, más horas se piden, y no porque haga falta lo que producen. Es la diferencia con los torneos de Lazear y Rosen (1981): un ascenso al que más **produce** puede dar el esfuerzo justo; el que la carrera de ratas exagera es el ascenso al que más **aguanta**, porque mide al trabajador, no lo que hace.
+
+En el Mittelstand, el premio por horas es casi cero, por dos razones. La empresa es de una familia que la dirige, así que no hay sociedad que ganar facturando horas; según la definición del IfM Bonn, hasta dos personas o sus familias tienen al menos la mitad y están en la dirección. Y la ley alemana de jornada permite ocho horas por día laborable, diez si la media de seis meses no pasa de ocho: 48 horas a la semana, el mismo umbral de Pencavel, y el comité de empresa codecide cuándo empieza y acaba la jornada y cuándo se alarga. Las horas no pueden ser la señal si nadie puede trabajar muchas más que los demás. La ley no alcanza a los directivos, y ahí la carrera puede volver.
+
+La otra explicación tiene su defensa. Claudia Goldin llama **trabajos codiciosos** a los que pagan cada hora más cuantas más horas se trabajan: en finanzas, en derecho o en la gran empresa, un trabajador no se sustituye por otro a mitad de una operación, y el cliente paga por tener a la misma persona disponible a cualquier hora. Ahí una hora puede valer mucho aunque se produzca cansado, y la curva de una fábrica de proyectiles no tiene por qué valer para cerrar una compra. Alexandra Michel siguió durante nueve años a los empleados de dos bancos de inversión: los tres primeros años, a los bancos les compensó el exceso de trabajo; desde el cuarto, el cuerpo empezó a fallar y el rendimiento bajó. Las dos explicaciones predicen cosas distintas: si las horas son estatus, deberían bajar en cuanto la firma sabe quién es quién, tras el ascenso; si son productividad, deberían seguir.
+
+El mismo mecanismo está en [*Todos con máster*](../50-todos-con-master/): una credencial que vale porque ordena a los candidatos, y que todos tienen que perseguir aunque entre todos no ganen nada.
+
+Akerlof, G. A. (1976). The economics of caste and of the rat race and other woeful tales. *The Quarterly Journal of Economics*, 90(4), 599–617.
+
+Goldin, C. (2014). A grand gender convergence: Its last chapter. *American Economic Review*, 104(4), 1091–1119.
+
+Goldin, C. (2021). *Career and Family: Women's Century-Long Journey toward Equity*. Princeton University Press.
+
+Landers, R. M., Rebitzer, J. B. y Taylor, L. J. (1996). Rat race redux: Adverse selection in the determination of work hours in law firms. *American Economic Review*, 86(3), 329–348.
+
+Lazear, E. P. y Rosen, S. (1981). Rank-order tournaments as optimum labor contracts. *Journal of Political Economy*, 89(5), 841–864.
+
+Michel, A. (2011). Transcending socialization: A nine-year ethnography of the body's role in organizational control and knowledge workers' transformation. *Administrative Science Quarterly*, 56(3), 325–368.
+
+Pencavel, J. (2015). The productivity of working hours. *The Economic Journal*, 125(589), 2052–2076.
+
+Spence, M. (1973). Job market signaling. *The Quarterly Journal of Economics*, 87(3), 355–374.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: estatus
+#| caption: "Tu código"
+# Lo que produce una semana de h horas, en horas de trabajo descansado: la curva de Pencavel (2015),
+# proporcional hasta las 49 horas, máxima a las 63 y, a las 70, igual que a las 56
+produccion <- function(h) ifelse(h < 49, h, 49 + (h - 49) - (h - 49)^2 / 28)
+
+# Lo que cuesta trabajar: theta * h^2 / 2. A quien es incansable le cuesta menos
+incansable <- 1 / 48
+normal <- 1 / 40
+bienestar <- function(h, theta) produccion(h) - theta * h^2 / 2
+
+# 1. Productividad: las horas que haría cada uno si cobrara lo que produce y nada más
+horas_eficientes <- function(theta) {
+  optimize(function(h) ______, c(0, 100), maximum = TRUE)$maximum
+}
+
+# 2. Estatus: las horas que exige la firma para que a un normal no le compense fingirse incansable.
+#    premio: lo que vale llegar a socio, por semana de los años de asociado, en horas de producción
+horas_de_carrera <- function(premio, theta = normal) {
+  h0 <- horas_eficientes(theta)
+  if (premio <= 0) return(h0)
+  uniroot(function(h) ______, c(h0, 100), tol = 1e-9)$root
+}
+
+# 3. Las horas de un incansable, sin premio por horas (el Mittelstand) y con premios cada vez mayores
+premios <- c(0, 5, 10, 20, 27, 35)
+tabla <- t(sapply(premios, function(premio) {
+  h_ef <- horas_eficientes(incansable)
+  h <- max(horas_de_carrera(premio), h_ef)
+  c(premio = premio, horas = h, productividad = h_ef, estatus = h - h_ef,
+    produccion_extra = produccion(h) - produccion(h_ef),
+    coste = bienestar(h_ef, incansable) - bienestar(h, incansable))
+}))
+rownames(tabla) <- c("Mittelstand", paste("premio", premios[-1]))
+
+par(mfrow = c(1, 2))
+curve(produccion(x), 0, 80, lwd = 2, xlab = "Horas a la semana", ylab = "Producción")
+abline(v = c(48, 70), lty = 2, col = c("steelblue", "firebrick"))
+barplot(t(tabla[, c("productividad", "estatus")]), col = c("steelblue", "firebrick"), border = NA,
+        names.arg = premios, xlab = "Premio por llegar a socio", ylab = "Horas a la semana del incansable",
+        legend.text = c("Productividad", "Estatus"), args.legend = list(x = "topleft", bty = "n"))
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: estatus
+#| solution: true
+# Lo que produce una semana de h horas, en horas de trabajo descansado: la curva de Pencavel (2015),
+# proporcional hasta las 49 horas, máxima a las 63 y, a las 70, igual que a las 56
+produccion <- function(h) ifelse(h < 49, h, 49 + (h - 49) - (h - 49)^2 / 28)
+
+# Lo que cuesta trabajar: theta * h^2 / 2. A quien es incansable le cuesta menos
+incansable <- 1 / 48
+normal <- 1 / 40
+bienestar <- function(h, theta) produccion(h) - theta * h^2 / 2
+
+# 1. Productividad: las horas que haría cada uno si cobrara lo que produce y nada más
+horas_eficientes <- function(theta) {
+  optimize(function(h) bienestar(h, theta), c(0, 100), maximum = TRUE)$maximum
+}
+
+# 2. Estatus: las horas que exige la firma para que a un normal no le compense fingirse incansable.
+#    premio: lo que vale llegar a socio, por semana de los años de asociado, en horas de producción
+horas_de_carrera <- function(premio, theta = normal) {
+  h0 <- horas_eficientes(theta)
+  if (premio <= 0) return(h0)
+  uniroot(function(h) bienestar(h0, theta) - bienestar(h, theta) - premio, c(h0, 100), tol = 1e-9)$root
+}
+
+# 3. Las horas de un incansable, sin premio por horas (el Mittelstand) y con premios cada vez mayores
+premios <- c(0, 5, 10, 20, 27, 35)
+tabla <- t(sapply(premios, function(premio) {
+  h_ef <- horas_eficientes(incansable)
+  h <- max(horas_de_carrera(premio), h_ef)
+  c(premio = premio, horas = h, productividad = h_ef, estatus = h - h_ef,
+    produccion_extra = produccion(h) - produccion(h_ef),
+    coste = bienestar(h_ef, incansable) - bienestar(h, incansable))
+}))
+rownames(tabla) <- c("Mittelstand", paste("premio", premios[-1]))
+
+par(mfrow = c(1, 2))
+curve(produccion(x), 0, 80, lwd = 2, xlab = "Horas a la semana", ylab = "Producción")
+abline(v = c(48, 70), lty = 2, col = c("steelblue", "firebrick"))
+barplot(t(tabla[, c("productividad", "estatus")]), col = c("steelblue", "firebrick"), border = NA,
+        names.arg = premios, xlab = "Premio por llegar a socio", ylab = "Horas a la semana del incansable",
+        legend.text = c("Productividad", "Estatus"), args.legend = list(x = "topleft", bty = "n"))
+
+round(tabla, 2)
+```
+
+```{webr}
+#| exercise: estatus
+#| check: true
+# horas_eficientes() se comprueba con un tipo inventado, theta = 1/60, que pasa del codo de las 49 horas: ahí la
+# producción marginal, 1 - (h - 49) / 14, iguala al coste marginal, h / 60, en h = 4,5 / (1/60 + 1/14) = 51,1 horas.
+# horas_de_carrera(), con que la pérdida de fingirse incansable sea justo el premio.
+e <- .envir_result
+coma <- function(x, d = 1) if (length(x) == 1 && is.numeric(x)) format(round(x, d), nsmall = d, decimal.mark = ",") else "otra cosa"
+intenta <- function(expr) tryCatch(expr, error = function(err) NA)
+if (!is.function(e$horas_eficientes) || !is.function(e$horas_de_carrera)) {
+  list(correct = FALSE, message = "No encuentro horas_eficientes() u horas_de_carrera().")
+} else if (!isTRUE(abs(intenta(e$horas_eficientes(1 / 60)) - 4.5 / (1 / 60 + 1 / 14)) < 0.01)) {
+  list(correct = FALSE, message = paste0(
+    "Con theta = 1/60, horas_eficientes() debería dar 51,1 horas, y da ", coma(intenta(e$horas_eficientes(1 / 60))),
+    ". Busca las horas que hacen máximo el bienestar, lo que se produce menos lo que cuesta, no solo la producción."))
+} else {
+  h <- intenta(e$horas_de_carrera(10, 1 / 40))
+  perdida <- if (is.na(h)) NA else e$bienestar(40, 1 / 40) - e$bienestar(h, 1 / 40)
+  if (!isTRUE(abs(perdida - 10) < 0.01 && h > 40)) {
+    list(correct = FALSE, message = paste0(
+      "Con un premio de 10, horas_de_carrera() da ", coma(h), " horas, y con ellas un trabajador normal pierde ",
+      coma(perdida), " de bienestar por fingirse incansable, en vez de 10. La firma pide justo las horas a las que ",
+      "lo que pierde un normal por trabajarlas iguala al premio: ni una menos, o le compensaría fingir."))
+  } else {
+    r <- .result
+    list(correct = TRUE, message = paste0(
+      "¡Correcto! Con un premio de 27, el incansable trabaja ", coma(r["premio 27", "horas"], 0), " horas: ",
+      coma(r["premio 27", "productividad"], 0), " de productividad y ", coma(r["premio 27", "estatus"], 0),
+      " de estatus, que solo producen ", coma(r["premio 27", "produccion_extra"], 2), " horas más."))
+  }
+}
+```
+
+::: {.hint exercise="estatus"}
+En `horas_eficientes()`, `optimize()` busca el máximo de la función que le des: el bienestar de quien trabaja `h` horas. En `horas_de_carrera()`, `uniroot()` busca la `h` en la que la función vale cero: lo que pierde un normal al pasar de sus `h0` horas a `h`, menos el premio.
+:::
+
+::: {.solution exercise="estatus"}
+`bienestar(h, theta)` en `horas_eficientes()`, y `bienestar(h0, theta) - bienestar(h, theta) - premio` en `horas_de_carrera()`.
+:::
+:::
+
+::::
