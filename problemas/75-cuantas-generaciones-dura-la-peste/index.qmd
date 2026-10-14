@@ -3,7 +3,7 @@ title: "¿Cuántas generaciones dura la peste?"
 numero: 75
 nivel: 2
 duracion: "30 min"
-lectura: "[Malthus (1798) y Clark (2007)](https://nuevasomosaguas.github.io/biblioteca.html#clark2007farewell)"
+lectura: "[Malthus (1798), Clark (2007) y Lee y Anderson (2002)](https://nuevasomosaguas.github.io/biblioteca.html#clark2007farewell)"
 dificultad: "Intermedio"
 categories: [demografía, equilibrios y dinámica]
 description: "La peste negra hizo más ricos a los que sobrevivieron, y el freno malthusiano tardó siglos en deshacerlo."
@@ -17,12 +17,12 @@ engine: markdown
 ::: {.enunciado}
 Según Malthus, la población vuelve siempre a su equilibrio: si sobra comida, nacen más y mueren menos, y si falta, al revés. En [*La trampa malthusiana*](../31-trampa-malthusiana/) ese freno devuelve la renta a su sitio después de cada invento. Pero ¿cuánto tarda?
 
-El demógrafo Ronald Lee se lo preguntó, y su conclusión, en 1987, fue incómoda para los dos bandos. El freno existía: sin él no se explica cómo se recupera una población tras una catástrofe. Pero en los humanos era mucho más débil que en los grandes mamíferos, «suave y fácil de arrollar» por cualquier otra cosa, y explicaba una parte minúscula de lo que la población crecía o menguaba cada año. Arnaud Deseau (2024) lo ha medido en nueve economías europeas entre los siglos XIV y XVIII: Inglaterra tiene el freno más débil, con una media vida de unos 230 años, y Suecia el más fuerte, con 20.
+El demógrafo Ronald Lee se lo preguntó, y su conclusión, en 1987, fue incómoda para los dos bandos. El freno existía: sin él no se explica cómo se recupera una población tras una catástrofe. Pero en los humanos era mucho más débil que en los grandes mamíferos, «suave y fácil de arrollar» por cualquier otra cosa, y explicaba una parte minúscula de lo que la población crecía o menguaba cada año. En 2002, con Michael Anderson, lo estimó con los datos anuales de Inglaterra entre 1540 y 1870: el efecto de un choque se borra a un ritmo del 0,65% al año, y la mitad tarda 107 años en desaparecer. Arnaud Deseau (2024) lo ha medido en nueve economías europeas entre los siglos XIV y XVIII, y encuentra frenos muy distintos: en Inglaterra, una media vida de unos 230 años, y en Suecia, de 20.
 
 El modelo, en su versión más simple:
 
 - **El hueco.** $x_t = \log(N_t / N^*)$ mide cuánto se aparta la población de su equilibrio: 0 es el equilibrio, y $\log(0{,}4) = -0{,}92$, haber perdido el 60%.
-- **El freno.** Cada año se cierra una fracción $\beta$ del hueco: $x_t = (1 - \beta)\,x_{t-1} + \varepsilon_t$. Con $\beta = 0{,}003$, el freno de Inglaterra, se cierra el 0,3% al año.
+- **El freno.** Cada año se cierra una fracción $\beta$ del hueco: $x_t = (1 - \beta)\,x_{t-1} + \varepsilon_t$. Con $\beta = 0{,}0065$, el freno de Inglaterra que estiman Lee y Anderson, se cierra el 0,65% al año.
 - **El azar.** $\varepsilon_t$ son las cosechas, las epidemias y las guerras de cada año, con desviación típica `sigma`. Sin azar, `sigma = 0`.
 - **La renta.** Con la tierra fija, si la tierra se lleva la mitad del producto, la renta por persona sobre la de equilibrio es $e^{-x/2}$: con menos gente, cada cual tiene más tierra.
 
@@ -31,23 +31,25 @@ El modelo, en su versión más simple:
 1. Completa la línea de `simular()` que cierra una fracción `beta` del hueco cada año.
 2. Completa `media_vida()`: los años que pasan hasta que el hueco se queda en la mitad o menos.
 3. La peste negra llega a Inglaterra en 1348. Mira la gráfica de la izquierda: ¿cuánto sube la renta de los que sobreviven? ¿En qué año se ha cerrado la mitad del hueco? ¿Cuánto más ricos que antes de la peste son sus tataranietos, cien años después?
-4. Cambia `beta` a 0.035, el freno de Suecia, y compara.
+4. Cambia `beta` a 0.035, el freno de Suecia según Deseau, y después a 0.003, el que él estima para Inglaterra, y compara.
 5. Mira la gráfica de la derecha, con azar: 3.000 años de población sin ninguna peste. ¿Qué parte de los años pasa cerca del equilibrio? ¿Qué parte del crecimiento de cada año explica el freno, el $R^2$?
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con el freno de Inglaterra, la peste que mata al 60% sube la renta de los supervivientes un 58%, y la mitad del hueco no se cierra hasta 231 años después: en 1579, en tiempos de Isabel I. Cien años después de la peste, cuatro generaciones, la renta sigue un 40% por encima del equilibrio, y a los 300 años, todavía un 20%. Con el freno de Suecia, la media vida es de 20 años, y a los cien la renta solo está un 1,3% por encima. La misma ley de Malthus produce un mundo que vuelve a su sitio en una generación y otro que tarda siglos.
+Con el freno de Inglaterra que estiman Lee y Anderson, la peste que mata al 60% sube la renta de los supervivientes un 58%, y la mitad del hueco no se cierra hasta 107 años después, en 1455: la media vida que ellos calculan. Cien años después de la peste, cuatro generaciones, la renta sigue un 27% por encima del equilibrio, y a los 300 años, todavía un 7%. Con el freno de Suecia que mide Deseau, la media vida es de 20 años, y a los cien la renta solo está un 1,3% por encima; con el que él estima para Inglaterra, 231 años, y un 40% a los cien. La misma ley de Malthus produce un mundo que vuelve a su sitio en una generación y otro que tarda siglos.
 
-El azar enseña lo que vio Lee. Con choques inventados de un 1% al año, la población inglesa pasa a menos de un 10% de su equilibrio el 67% de los años, y la sueca, el 99%. Y en los dos casos el freno explica casi nada del crecimiento de cada año: un $R^2$ de 0,004 en Inglaterra y de 0,02 en Suecia. Visto año a año, el freno es invisible, y en un siglo lo decide todo. Es lo que tiene un mecanismo social: no hace falta que se vea en cada dato para gobernar el largo plazo, y que «se cumpliera durante toda la historia» no dice gran cosa hasta que se sabe con qué fuerza. Con un freno débil, la homeostasis es un régimen laxo, en el que los desequilibrios duran generaciones.
+El azar enseña lo que vio Lee. Con choques inventados de un 1% al año, la población inglesa pasa a menos de un 10% de su equilibrio el 83% de los años, y la sueca, el 99%. Y en los dos casos el freno explica casi nada del crecimiento de cada año: un $R^2$ de 0,006 en Inglaterra y de 0,02 en Suecia. Visto año a año, el freno es invisible, y en un siglo lo decide todo. Es lo que tiene un mecanismo social: no hace falta que se vea en cada dato para gobernar el largo plazo, y que «se cumpliera durante toda la historia» no dice gran cosa hasta que se sabe con qué fuerza. Lee y Anderson lo dicen así: con un equilibrio tan débil, la población y el nivel de vida dependían mucho de la acumulación de choques, y cada variable se movía con tanta independencia que podía empujar a las demás durante siglos. La homeostasis es un régimen laxo, en el que los desequilibrios duran generaciones.
 
-El modelo es mínimo: el equilibrio está quieto, y en la historia se movía, porque la técnica y las instituciones lo desplazaban, como pasó probablemente tras la peste. Deseau calibra un modelo con matrimonio, fecundidad y supervivencia, y su media vida sale del producto de la parte de la tierra en el producto por la suma de las elasticidades de los frenos preventivo y positivo a la renta. Cuánta gente mató la peste se discute: el 60% del modelo es el de la simulación de Deseau, que sigue el 62,5% que Benedictow estima para Inglaterra, en el extremo alto de las estimaciones.
+El modelo es mínimo: el equilibrio está quieto, y en la historia se movía, porque la técnica y las instituciones lo desplazaban, como pasó probablemente tras la peste. Casi todo el freno inglés venía de los nacimientos: en Lee y Anderson, la respuesta de la fecundidad a los salarios es clara, y la de la mortalidad, el freno positivo, está muy cerca de cero. Y estiman que la elasticidad del salario respecto a la población es de casi -1, el doble que en el modelo: con ella, la peste habría multiplicado el salario por 2,5. Ellos mismos avisan de que sus estimaciones descansan sobre todo en la covariación a corto plazo, lo que resta confianza a la lectura homeostática. Deseau calibra un modelo con matrimonio, fecundidad y supervivencia, y su media vida sale del producto de la parte de la tierra en el producto por la suma de las elasticidades de los frenos preventivo y positivo a la renta. Cuánta gente mató la peste se discute: el 60% del modelo es el de la simulación de Deseau, que sigue el 62,5% que Benedictow estima para Inglaterra, en el extremo alto de las estimaciones.
 
 Deseau, A. (2024). Speed of convergence in a Malthusian world: Weak or strong homeostasis? *Explorations in Economic History*, 94, 101634.
 
 Benedictow, O. J. (2004). *The Black Death, 1346-1353: The Complete History*. Boydell & Brewer.
 
 Lee, R. D. (1987). Population dynamics of humans and other animals. *Demography*, 24(4), 443-465.
+
+Lee, R. y Anderson, M. (2002). Malthus in state space: Macro economic-demographic relations in English history, 1540 to 1870. *Journal of Population Economics*, 15(2), 195-220.
 
 Lee, R. D. (1993). Accidental and systematic change in population history: Homeostasis in a stochastic setting. *Explorations in Economic History*, 30(1), 1-30.
 
@@ -59,7 +61,7 @@ Malthus, T. R. (1798). *An Essay on the Principle of Population*. J. Johnson.
 ```{webr}
 #| exercise: peste
 #| caption: "Tu código"
-beta <- 0.003   # el freno de Inglaterra: cada año se cierra el 0,3% del hueco
+beta <- 0.0065   # el freno de Inglaterra, según Lee y Anderson: cada año se cierra el 0,65% del hueco
 
 # x es log(N / N*): 0 es el equilibrio, y log(0.4) es haber perdido el 60% de la población
 simular <- function(beta, anos, x0, sigma = 0) {
@@ -95,7 +97,7 @@ c(renta_tras_la_peste = renta[1], media_vida = media_vida(peste),
 ```{webr}
 #| exercise: peste
 #| solution: true
-beta <- 0.003
+beta <- 0.0065
 
 simular <- function(beta, anos, x0, sigma = 0) {
   x <- numeric(anos)
