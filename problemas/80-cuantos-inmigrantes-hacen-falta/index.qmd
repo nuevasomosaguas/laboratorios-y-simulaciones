@@ -1,0 +1,315 @@
+---
+title: "¿Cuántos inmigrantes hacen falta para no envejecer?"
+numero: 80
+nivel: 2
+duracion: "35 min"
+lectura: "[Wachter (2014)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential); Zamora (2005); Espenshade, Bouvier y Arthur (1982)"
+semana: "[Semana 11](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Con diez millones de inmigrantes al año, España pasaría de 41 a más de 600 millones de habitantes en 2051, y seguiría teniendo más mayores por persona en edad de trabajar que en 2001."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!-- El artículo: Zamora López, F. (2005), «La España que viene», Papeles de Economía Española, 104, 330-343,
+     páginas 359 a 372 del PDF del número, https://www.funcas.es/wp-content/uploads/Migracion/Publicaciones/PDF/1146.pdf
+     (descargado el 15-10-2026, SHA-256 b658923a3d2c9e418e54f4271709638587b43d0535c071b8ba93c75aa5d4003b).
+     Sus cifras, copiadas en el código (zamora) y en el texto: cuadro 1 (p. 335) y cuadro 3 (p. 337).
+
+     datos.csv (SHA-256 922ad43dca706a5d143fa562352455426094ebb60866af4ced112720fc4b0a18), copiado tal cual en el código.
+     Fuentes, consultadas el 15-10-2026:
+     - INE, Cifras de población, tabla 56934 de la API Tempus (DATOS_TABLA/56934?date=20010101 y date=19910101):
+       población residente el 1 de enero de 2001 y de 1991 por edad simple y sexo (SHA-256 de las respuestas JSON:
+       452c21361bf05ff0d9989a73b7aed5564b495bd4f08dc782fd43ea7c9cf72c93 y f0648fbfd9f3a83147e4628ee4332d8af0d1e700c9f0af549eb7a19aa631afa7).
+       En ine.csv: anyo, edad, sexo (H, M) y n; la última edad es 100 y más.
+     - Human Life-Table Database, https://www.lifetable.de, ESP.zip (SHA-256 46f98d23790cfdc593043c3c9c209b82b4cbe9712d3f75264c12d886bf1f4bbd):
+       tablas del INE de España, por sexo y edad simple: 1980-1981 (Ref-ID 1058.1), 1995 (476.05) y 1998-1999 (475.1),
+       la de Zamora (75,25 y 82,17 años de esperanza de vida al nacer). En tablas.csv, las filas de esas tres.
+     - Eurostat, API de difusión: demo_gind (nacidos vivos de 1991 a 2000) y demo_frate (tasas de fecundidad de 2001
+       por grupos de edad, tasas2001 en el código; ISF de 2001, 1,23).
+     La tabla de 2050 conserva el patrón por edad de la mejora de 1980-1998 (sin las edades en que la mortalidad subió)
+     y lo escala hasta la esperanza de vida que fija Zamora (p. 334): 83,73 años los hombres y 91,42 las mujeres.
+     El saldo de 1991-2000 se calcula por residuo, como lo describe Zamora en su nota 7.
+
+p <- read.csv("ine.csv"); t <- read.csv("tablas.csv", check.names = FALSE)
+grupo <- function(x) tapply(x, pmin(0:100 %/% 5, 19), sum)
+pob <- function(anyo, s) { d <- p[p$anyo == anyo & p$sexo == s, ]; v <- numeric(101); v[d$edad + 1] <- d$n; v }
+mx <- function(ref, s) { d <- t[t[["Ref-ID"]] == ref & t$Sex == s, ]; d[order(d$Age), "m(x)"] }
+vida <- function(m) {
+  a <- c(0.1, rep(0.5, 99)); q <- c(m[-101] / (1 + (1 - a) * m[-101]), 1)
+  l <- cumprod(c(1, 1 - q[-101])); L <- c(l[-101] * (1 - q[-101] * (1 - a)), l[101] / m[101])
+  list(L = L, e0 = sum(L))
+}
+m80 <- lapply(1:2, function(s) mx("1058.1", s)); m98 <- lapply(1:2, function(s) mx("475.1", s))
+mejora <- lapply(1:2, function(s) pmin(m98[[s]] / m80[[s]], 1))
+k <- sapply(1:2, function(s) uniroot(function(k) vida(m98[[s]] * mejora[[s]]^k)$e0 - c(83.73, 91.42)[s], c(0, 50))$root)
+m50 <- lapply(1:2, function(s) m98[[s]] * mejora[[s]]^k[s])
+m95 <- lapply(1:2, function(s) mx("476.05", s))
+nac <- c(395989, 396747, 385786, 370148, 363469, 362626, 369035, 365193, 380130, 397632)
+saldo <- sapply(1:2, function(s) {
+  L <- vida(m95[[s]])$L; N91 <- pob(1991, c("H", "M")[s]); esperado <- numeric(101)
+  esperado[11:100] <- N91[1:90] * L[11:100] / L[1:90]
+  esperado[101] <- sum(N91[91:101] * 0.3)
+  esperado[1:10] <- rev(nac) * c(0.515, 0.485)[s] * L[1:10]
+  pob(2001, c("H", "M")[s]) - esperado
+})
+x <- data.frame(edad = seq(0, 95, 5),
+  poblacion_2001_h = grupo(pob(2001, "H")), poblacion_2001_m = grupo(pob(2001, "M")),
+  L_1998_h = round(grupo(vida(m98[[1]])$L), 5), L_1998_m = round(grupo(vida(m98[[2]])$L), 5),
+  L_2050_h = round(grupo(vida(m50[[1]])$L), 5), L_2050_m = round(grupo(vida(m50[[2]])$L), 5),
+  saldo_1991_2000_h = round(grupo(saldo[, 1])), saldo_1991_2000_m = round(grupo(saldo[, 2])))
+write.csv(x, "datos.csv", row.names = FALSE, quote = FALSE)
+-->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+Es la continuación de [¿Cuántos trabajadores por pensionista?](../29-trabajadores-por-pensionista/index.qmd). Allí, en un país inventado y sin migración, la tasa de dependencia acababa donde la dejaba la tabla de vida, y la inmigración quedaba como una de las palancas posibles. Aquí se prueba esa palanca con datos de España.
+
+En 2005, el demógrafo Francisco Zamora López, de la Complutense, se hizo una pregunta sencilla: ¿cuántos hijos, o cuántos inmigrantes, harían falta para que España llegase a 2051 tan envejecida como en 2001, ni más ni menos? Entonces había 24,73 personas de 65 años o más por cada 100 de 15 a 64. Con fecundidad, la respuesta fue entre 10 y 11 hijos por mujer. Con 1,7 hijos y migración, ni siquiera 10 millones de inmigrantes netos al año, que llevarían a España a 627,7 millones de habitantes, bajaban de 37. Sorprende porque en el debate público la inmigración suele presentarse como lo que paga las pensiones.
+
+El código reproduce sus simulaciones con el *método de los componentes*. Parte de la población de España el 1 de enero de 2001, por sexo y grupos de cinco años de edad, y avanza de cinco en cinco años hasta 2051. En cada paso, cada grupo envejece cinco años con la supervivencia de la tabla de vida, que mejora hasta la esperanza de vida que supone Zamora para 2050 (83,73 años los hombres, 91,42 las mujeres). Las mujeres de 15 a 49 años tienen hijos con el calendario de 2001. Y llegan los inmigrantes del quinquenio, repartidos por edad y sexo como el saldo migratorio de 1991-2000, igual que en el artículo: `perfil` dice qué fracción de cada inmigrante cae en cada grupo, y suma 1.
+
+**Tu tarea.**
+
+1. Completa la última línea de `proyectar()`: la población al final del quinquenio son los supervivientes y los nacidos (`nuevo`) más los inmigrantes de esos cinco años. `saldo` es el número de inmigrantes netos *al año*.
+2. Completa el cálculo de `limite`: la tasa de dependencia de 2051 en una España que en 2001 estuviera vacía, hecha solo de los inmigrantes y de sus hijos.
+3. Mira la tabla y el gráfico: la tasa de dependencia de 2051 con 1,7 hijos por mujer y cada saldo migratorio, la de Zamora y la de este modelo. ¿Cuánto baja con cada millón de inmigrantes de más? ¿Hacia dónde va? La línea de puntos es la de 2001, y la discontinua, el límite.
+4. Cuando la comprobación te dé por bueno el código, mira el largo plazo. Con `pasos = 100`, la proyección sigue 500 años con la mortalidad de 2050. Compara `dependencia(proyectar(1.7, 1e6, pasos = 100))` con la de `1e7` inmigrantes al año.
+5. En el cuadro 1 de Zamora, sin migración, con 2,1 hijos por mujer hay en 2051 *menos* personas de 15 a 64 años que con 1,7: 18,53 millones frente a 18,84. Compara `grupos(proyectar(1.7, 0))` con `grupos(proyectar(2.1, 0))`. Después, deja que cada fecundidad llegue a su nivel en un año distinto: `grupos(proyectar(1.7, 0, llega = 2016))` y `grupos(proyectar(2.1, 0, llega = 2051))`. ¿Errata, o hipótesis distintas?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+En 2001 había 24,47 mayores por cada 100 personas de 15 a 64 años. Zamora da 24,73, con otra estimación de la población de 2001: 40,38 millones de habitantes, frente a los 40,67 de la serie actual del INE. Sin migración y con 1,7 hijos por mujer, en 2051 serían 66,97. Con 400.000 inmigrantes al año, 52,29; con 2 millones, 39,99; con 10 millones, 34,55, en una España de 631 millones de habitantes. Zamora obtiene 74,82, 57,31, 43,16 y 37,07, y 627,7 millones: el modelo reproduce la forma de su tabla, con 2,5 a 5 puntos menos cuando hay migración.
+
+Los rendimientos son decrecientes. Los primeros 400.000 inmigrantes al año bajan la tasa casi 15 puntos; pasar de 5 a 10 millones, menos de 2. Los inmigrantes llegan sobre todo con 20 a 40 años y diluyen a los mayores que ya había en 2001, pero cuantos más llegan, más se parece la población de 2051 a la de los propios inmigrantes y sus hijos. Ese es el límite: 32,83 mayores por cada 100, que ningún saldo, por grande que sea, deja atrás. Es la «franja eficiente» de Zamora, entre cero y unos 2 millones al año.
+
+La tarea 4 es la razón. Los inmigrantes también envejecen, y en 2051 los primeros en llegar apenas empiezan a jubilarse. Espenshade, Bouvier y Arthur demostraron en 1982 que, si la fecundidad está por debajo del reemplazo, un número constante de inmigrantes al año, con edades fijas, lleva a una población *estacionaria*, y que su estructura por edad no depende de cuántos inmigrantes llegan: de eso solo depende su tamaño. Tras 500 años, con un millón al año la tasa es de 53,27, y con diez millones, de 53,21: más del doble que en 2001, y mucho más que el límite de 2051. La foto de 2051 favorece a la inmigración porque la toma a mitad de camino. Las Naciones Unidas llegaron a una conclusión parecida en 2000, en su informe sobre la *migración de reemplazo*.
+
+La tarea 5 es una lección de lectura. Con la fecundidad constante desde 2002, el modelo da 20,39 millones de personas de 15 a 64 años con 1,7 hijos por mujer y 24,46 con 2,1. Así debe ser: las generaciones nacidas entre 2002 y 2036 tendrán en 2051 de 15 a 49 años, y con más fecundidad son más grandes. La tabla de Zamora no es una errata, porque el texto, la nota 11 y los cuatro cuadros dicen lo mismo, pero el artículo no cuenta cómo llega la fecundidad a cada nivel. Si el 1,7 se alcanza hacia 2016 y el 2,1 solo hacia 2051, el modelo da 18,96 y 18,32 millones, y el orden de Zamora. Lo que se compara en la tabla no son dos fecundidades, sino dos caminos. Antes de citar una cifra de un escenario, hay que leer sus hipótesis.
+
+Y un contrapeso. La tasa de dependencia demográfica no es la económica: las pensiones no las pagan las personas de 15 a 64 años, sino las que trabajan, y la tasa de empleo, la edad de jubilación y la productividad mueven la carga tanto o más que la pirámide, como mostraba la jubilación a los 70 en el problema 29. Zamora muestra que la inmigración no detiene el envejecimiento, una cuestión de estructura. No muestra que sea indiferente para financiar las pensiones, una cuestión de cotizantes, salarios y prestaciones: un inmigrante cotiza mientras trabaja y cobra después, y el saldo depende de su empleo y su salario a lo largo de la vida. Las cuentas de transferencias de Lee y Mason separan las dos cosas, edad por edad.
+
+Zamora López, F. (2005). La España que viene. *Papeles de Economía Española*, 104, 330-343.
+
+Espenshade, T. J., Bouvier, L. F. y Arthur, W. B. (1982). Immigration and the Stable Population Model. *Demography*, 19(1), 125-133.
+
+Naciones Unidas (2000). *Replacement Migration: Is It a Solution to Declining and Ageing Populations?* ESA/P/WP.160. División de Población.
+
+Lee, R. y Mason, A. (eds.) (2011). *Population Aging and the Generational Economy: A Global Perspective*. Edward Elgar.
+
+Wachter, K. W. (2014). *Essential Demographic Methods*. Harvard University Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: inmigrantes
+#| caption: "Tu código"
+# España, 1 de enero de 2001 (INE), por grupos de cinco años de edad: 0-4, 5-9, ..., 95 y más
+edad <- seq(0, 95, 5)
+N2001 <- cbind(
+  hombres = c(965495, 994871, 1093998, 1315032, 1679401, 1771122, 1702764, 1625229, 1478949, 1271512,
+              1191447, 1048687, 913276, 972144, 810578, 582816, 299128, 149213, 49105, 9122),
+  mujeres = c(912757, 941184, 1036257, 1249616, 1603744, 1697149, 1653738, 1610632, 1484409, 1281792,
+              1221049, 1094247, 1000534, 1109470, 1009274, 820850, 536763, 322396, 126550, 29243))
+# Años que vive en cada grupo de edad cada recién nacido: la tabla de 1998-99 (INE) y la de 2050,
+# con la esperanza de vida que supone Zamora: 83,73 años los hombres y 91,42 las mujeres
+L1998 <- cbind(
+  c(4.97238, 4.96661, 4.96208, 4.95267, 4.93266, 4.90901, 4.87828, 4.83794, 4.78628, 4.71414,
+    4.60648, 4.4464, 4.21096, 3.86025, 3.36226, 2.66987, 1.82845, 0.96232, 0.33397, 0.05971),
+  c(4.97625, 4.97156, 4.96834, 4.96355, 4.95702, 4.94963, 4.93934, 4.92454, 4.90288, 4.87083,
+    4.82565, 4.76197, 4.66654, 4.51327, 4.25281, 3.7987, 3.032, 1.92614, 0.81256, 0.15719))
+L2050 <- cbind(
+  c(4.99987, 4.99982, 4.99968, 4.99669, 4.98817, 4.97714, 4.94801, 4.90717, 4.86303, 4.82676,
+    4.78482, 4.73418, 4.6544, 4.53161, 4.36063, 4.06405, 3.52536, 2.47818, 0.92389, 0.16654),
+  c(4.99992, 4.99987, 4.99979, 4.99905, 4.9978, 4.99665, 4.99432, 4.98906, 4.98251, 4.97573,
+    4.97033, 4.96566, 4.95969, 4.95102, 4.93552, 4.90033, 4.7902, 4.28437, 2.27773, 0.45044))
+# El saldo migratorio de 1991-2000 por edad y sexo: lo que sobra en 2001 de la población de 1991
+# envejecida diez años y de los nacidos en esos años. Por encima de 75 sale negativo, por el ruido
+# de la estimación, y se pone a cero. El perfil es el reparto de cada inmigrante: suma 1.
+saldo9100 <- cbind(
+  c(6106, 17655, 58554, 58941, 98888, 82046, 79511, 89188, 79156, 54721,
+    39034, 28880, 28745, 33640, 17085, 2705, -3008, -1644, -956, -8333),
+  c(8573, 19943, 55071, 55552, 91921, 73126, 75800, 87504, 74071, 49180,
+    34478, 23913, 20186, 21555, 10448, -1070, -5453, -1364, 338, -19535))
+perfil <- pmax(saldo9100, 0) / sum(pmax(saldo9100, 0))
+# El calendario de la fecundidad de 2001 (Eurostat), de 15-19 a 45-49 años: suma 1
+tasas2001 <- c(0.00964, 0.02628, 0.06449, 0.09459, 0.04477, 0.00717, 0.00036)
+calendario <- tasas2001 / sum(tasas2001)
+
+# Mayores de 65 por cada persona de 15 a 64 años, la medida de Zamora
+dependencia <- function(N) {
+  n <- rowSums(N)
+  sum(n[edad >= 65]) / sum(n[edad >= 15 & edad < 65])
+}
+
+# Los tres grandes grupos de edad, en millones
+grupos <- function(N) {
+  n <- rowSums(N) / 1e6
+  round(c("0-14" = sum(n[edad < 15]), "15-64" = sum(n[edad >= 15 & edad < 65]), "65+" = sum(n[edad >= 65])), 2)
+}
+
+# Cinco años por paso, de 2001 a 2051. isf: hijos por mujer, que suben en línea recta desde
+# los 1,24 de 2001 hasta llegar a isf en el año llega. saldo: inmigrantes netos al año.
+proyectar <- function(isf, saldo, N = N2001, llega = 2001, pasos = 10) {
+  for (t in 1:pasos) {
+    anyo <- 2001 + 5 * t - 2.5                    # el centro del quinquenio
+    w <- min(1, (anyo - 2001) / 50)               # la mortalidad va de la de 1998 a la de 2050
+    L <- (1 - w) * L1998 + w * L2050
+    P <- L[-1, ] / L[-20, ]                       # supervivencia de cada grupo al siguiente
+    P[19, ] <- L[20, ] / (L[19, ] + L[20, ])      # los de 90 y más pasan al grupo abierto
+    nuevo <- rbind(0, P * N[-20, ])
+    nuevo[20, ] <- P[19, ] * (N[19, ] + N[20, ])
+    hijos <- 1.24 + (isf - 1.24) * min(1, (anyo - 2001) / (llega - 2001))
+    madres <- (N[4:10, 2] + nuevo[4:10, 2]) / 2   # mujeres de 15 a 49, a mitad del quinquenio
+    nacidos <- hijos * sum(calendario * madres)
+    nuevo[1, ] <- nacidos * c(0.515, 0.485) * L[1, ] / 5
+    # Los inmigrantes de los cinco años, repartidos por edad y sexo
+    N <- nuevo + ______
+  }
+  N
+}
+
+# 1. Los escenarios de Zamora con 1,7 hijos por mujer: el saldo, en millones al año
+saldos <- c(0, 0.4, 2, 3, 5, 10)
+modelo <- sapply(saldos, function(s) 100 * dependencia(proyectar(1.7, s * 1e6)))
+# 2. El límite: una España hecha solo de inmigrantes y de sus hijos
+limite <- 100 * dependencia(proyectar(1.7, 1e6, N = ______))
+
+zamora <- c(74.82, 57.31, 43.16, 40.88, 38.80, 37.07)
+plot(saldos, zamora, pch = 19, col = "grey50", ylim = c(0, 90),
+     xlab = "Inmigrantes netos al año (millones)", ylab = "Mayores por cada 100 personas de 15 a 64 años")
+lines(saldos, modelo, type = "b", pch = 19, col = "#c0392b")
+abline(h = c(100 * dependencia(N2001), limite), lty = c(3, 2))
+round(rbind(saldo_millones = saldos, zamora, este_modelo = modelo, limite = limite), 2)
+```
+
+```{webr}
+#| exercise: inmigrantes
+#| solution: true
+# España, 1 de enero de 2001 (INE), por grupos de cinco años de edad: 0-4, 5-9, ..., 95 y más
+edad <- seq(0, 95, 5)
+N2001 <- cbind(
+  hombres = c(965495, 994871, 1093998, 1315032, 1679401, 1771122, 1702764, 1625229, 1478949, 1271512,
+              1191447, 1048687, 913276, 972144, 810578, 582816, 299128, 149213, 49105, 9122),
+  mujeres = c(912757, 941184, 1036257, 1249616, 1603744, 1697149, 1653738, 1610632, 1484409, 1281792,
+              1221049, 1094247, 1000534, 1109470, 1009274, 820850, 536763, 322396, 126550, 29243))
+# Años que vive en cada grupo de edad cada recién nacido: la tabla de 1998-99 (INE) y la de 2050,
+# con la esperanza de vida que supone Zamora: 83,73 años los hombres y 91,42 las mujeres
+L1998 <- cbind(
+  c(4.97238, 4.96661, 4.96208, 4.95267, 4.93266, 4.90901, 4.87828, 4.83794, 4.78628, 4.71414,
+    4.60648, 4.4464, 4.21096, 3.86025, 3.36226, 2.66987, 1.82845, 0.96232, 0.33397, 0.05971),
+  c(4.97625, 4.97156, 4.96834, 4.96355, 4.95702, 4.94963, 4.93934, 4.92454, 4.90288, 4.87083,
+    4.82565, 4.76197, 4.66654, 4.51327, 4.25281, 3.7987, 3.032, 1.92614, 0.81256, 0.15719))
+L2050 <- cbind(
+  c(4.99987, 4.99982, 4.99968, 4.99669, 4.98817, 4.97714, 4.94801, 4.90717, 4.86303, 4.82676,
+    4.78482, 4.73418, 4.6544, 4.53161, 4.36063, 4.06405, 3.52536, 2.47818, 0.92389, 0.16654),
+  c(4.99992, 4.99987, 4.99979, 4.99905, 4.9978, 4.99665, 4.99432, 4.98906, 4.98251, 4.97573,
+    4.97033, 4.96566, 4.95969, 4.95102, 4.93552, 4.90033, 4.7902, 4.28437, 2.27773, 0.45044))
+# El saldo migratorio de 1991-2000 por edad y sexo: lo que sobra en 2001 de la población de 1991
+# envejecida diez años y de los nacidos en esos años. Por encima de 75 sale negativo, por el ruido
+# de la estimación, y se pone a cero. El perfil es el reparto de cada inmigrante: suma 1.
+saldo9100 <- cbind(
+  c(6106, 17655, 58554, 58941, 98888, 82046, 79511, 89188, 79156, 54721,
+    39034, 28880, 28745, 33640, 17085, 2705, -3008, -1644, -956, -8333),
+  c(8573, 19943, 55071, 55552, 91921, 73126, 75800, 87504, 74071, 49180,
+    34478, 23913, 20186, 21555, 10448, -1070, -5453, -1364, 338, -19535))
+perfil <- pmax(saldo9100, 0) / sum(pmax(saldo9100, 0))
+# El calendario de la fecundidad de 2001 (Eurostat), de 15-19 a 45-49 años: suma 1
+tasas2001 <- c(0.00964, 0.02628, 0.06449, 0.09459, 0.04477, 0.00717, 0.00036)
+calendario <- tasas2001 / sum(tasas2001)
+
+# Mayores de 65 por cada persona de 15 a 64 años, la medida de Zamora
+dependencia <- function(N) {
+  n <- rowSums(N)
+  sum(n[edad >= 65]) / sum(n[edad >= 15 & edad < 65])
+}
+
+# Los tres grandes grupos de edad, en millones
+grupos <- function(N) {
+  n <- rowSums(N) / 1e6
+  round(c("0-14" = sum(n[edad < 15]), "15-64" = sum(n[edad >= 15 & edad < 65]), "65+" = sum(n[edad >= 65])), 2)
+}
+
+# Cinco años por paso, de 2001 a 2051. isf: hijos por mujer, que suben en línea recta desde
+# los 1,24 de 2001 hasta llegar a isf en el año llega. saldo: inmigrantes netos al año.
+proyectar <- function(isf, saldo, N = N2001, llega = 2001, pasos = 10) {
+  for (t in 1:pasos) {
+    anyo <- 2001 + 5 * t - 2.5                    # el centro del quinquenio
+    w <- min(1, (anyo - 2001) / 50)               # la mortalidad va de la de 1998 a la de 2050
+    L <- (1 - w) * L1998 + w * L2050
+    P <- L[-1, ] / L[-20, ]                       # supervivencia de cada grupo al siguiente
+    P[19, ] <- L[20, ] / (L[19, ] + L[20, ])      # los de 90 y más pasan al grupo abierto
+    nuevo <- rbind(0, P * N[-20, ])
+    nuevo[20, ] <- P[19, ] * (N[19, ] + N[20, ])
+    hijos <- 1.24 + (isf - 1.24) * min(1, (anyo - 2001) / (llega - 2001))
+    madres <- (N[4:10, 2] + nuevo[4:10, 2]) / 2   # mujeres de 15 a 49, a mitad del quinquenio
+    nacidos <- hijos * sum(calendario * madres)
+    nuevo[1, ] <- nacidos * c(0.515, 0.485) * L[1, ] / 5
+    # Los inmigrantes de los cinco años, repartidos por edad y sexo
+    N <- nuevo + 5 * saldo * perfil
+  }
+  N
+}
+
+# 1. Los escenarios de Zamora con 1,7 hijos por mujer: el saldo, en millones al año
+saldos <- c(0, 0.4, 2, 3, 5, 10)
+modelo <- sapply(saldos, function(s) 100 * dependencia(proyectar(1.7, s * 1e6)))
+# 2. El límite: una España hecha solo de inmigrantes y de sus hijos
+limite <- 100 * dependencia(proyectar(1.7, 1e6, N = 0 * N2001))
+
+zamora <- c(74.82, 57.31, 43.16, 40.88, 38.80, 37.07)
+plot(saldos, zamora, pch = 19, col = "grey50", ylim = c(0, 90),
+     xlab = "Inmigrantes netos al año (millones)", ylab = "Mayores por cada 100 personas de 15 a 64 años")
+lines(saldos, modelo, type = "b", pch = 19, col = "#c0392b")
+abline(h = c(100 * dependencia(N2001), limite), lty = c(3, 2))
+round(rbind(saldo_millones = saldos, zamora, este_modelo = modelo, limite = limite), 2)
+```
+
+```{webr}
+#| exercise: inmigrantes
+#| check: true
+# Se comprueba con casos propios: una España vacía y un solo paso.
+e <- .envir_result
+f <- e$proyectar
+coma <- function(x, d = 1) format(round(x, d), nsmall = d, decimal.mark = ",")
+prueba <- if (is.function(f)) tryCatch(f(1.24, 1e6, N = 0 * e$N2001, pasos = 1), error = function(err) NULL)
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función proyectar().")
+} else if (is.null(prueba) || !isTRUE(all.equal(dim(as.matrix(prueba)), c(20L, 2L)))) {
+  list(correct = FALSE, message = "proyectar() da un error o no devuelve una población de 20 grupos de edad y dos sexos.")
+} else if (isTRUE(all.equal(sum(prueba), 0))) {
+  list(correct = FALSE, message = "proyectar() no suma los inmigrantes: una España vacía sigue vacía.")
+} else if (isTRUE(all.equal(prueba, 1e6 * e$perfil, check.attributes = FALSE))) {
+  list(correct = FALSE, message = "Cada paso son cinco años, y saldo es el número de inmigrantes al año: en un paso llegan cinco veces saldo.")
+} else if (isTRUE(all.equal(sum(prueba), 2e8))) {
+  list(correct = FALSE, message = "Los inmigrantes no llegan todos con la misma edad: perfil dice cómo se reparten por edad y sexo.")
+} else if (!isTRUE(all.equal(prueba, 5e6 * e$perfil, check.attributes = FALSE))) {
+  list(correct = FALSE, message = "En una España vacía, con un millón de inmigrantes al año, tras un paso tiene que haber cinco millones de personas, repartidas según perfil.")
+} else if (!isTRUE(all.equal(e$modelo, c(66.96765821, 52.29452500, 39.98940888, 37.96238648, 36.10742918, 34.55266632), tolerance = 1e-6))) {
+  list(correct = FALSE, message = "Los inmigrantes están bien, pero la tabla no sale como debería. ¿Has cambiado algo más de proyectar() o de los saldos?")
+} else if (isTRUE(all.equal(e$limite, 100 * e$dependencia(f(1.7, 1e6))))) {
+  list(correct = FALSE, message = "Ese es el millón de inmigrantes al año sobre la España de 2001. El límite es sin ella: una población que empieza vacía, con la forma de N2001.")
+} else if (!isTRUE(all.equal(e$limite, 32.83293167, tolerance = 1e-6))) {
+  list(correct = FALSE, message = "proyectar() está bien, pero limite no. Es la dependencia de 2051 en una España que empieza vacía en 2001.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con 10 millones de inmigrantes al año, en 2051 habría ", coma(e$modelo[6]), " mayores por cada 100 personas de 15 a 64 años, ",
+    "y por mucho que lleguen, nunca menos de ", coma(e$limite), ". En 2001 eran ", coma(100 * e$dependencia(e$N2001)), "."))
+}
+```
+
+::: {.hint exercise="inmigrantes"}
+`perfil` reparte un inmigrante entre los 20 grupos de edad y los dos sexos, y cada paso dura cinco años. Para el límite, una población de ceros con la misma forma que `N2001`.
+:::
+
+::: {.solution exercise="inmigrantes"}
+`N <- nuevo + 5 * saldo * perfil` en `proyectar()`, y `N = 0 * N2001` en el límite.
+:::
+:::
+
+::::
