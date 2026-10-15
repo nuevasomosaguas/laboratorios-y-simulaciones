@@ -21,4 +21,6 @@ listing:
 
 Problemas de ciencias sociales cuantitativas que se resuelven escribiendo código de R en el navegador, sin instalar nada. R funciona gracias a [webR](https://docs.r-wasm.org/webr/latest/): la primera vez descarga unos megas y tarda unos segundos; después queda en la caché.
 
+Para afianzar las bases de R, la lectura principal es [*An Introduction to R*](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf), el manual oficial del proyecto R: R base, sin paquetes añadidos.
+
 No hay clasificación: los problemas resueltos se marcan con ✓ solo en este navegador.
