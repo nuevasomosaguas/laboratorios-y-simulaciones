@@ -1,0 +1,178 @@
+---
+title: "¿Da el bootstrap más potencia que la t de Student?"
+numero: 78
+nivel: 2
+duracion: "30 min"
+lectura: "[Efron y Hastie (2016)](https://nuevasomosaguas.github.io/biblioteca.html#efron2016computer); [Evans y Rosenthal (2010)](https://nuevasomosaguas.github.io/biblioteca.html#evans2010probability); Efron (1979)"
+dificultad: "Intermedio"
+categories: [estadística]
+description: "Remuestrear los datos en lugar de usar una fórmula parece dar potencia gratis. No la da: la potencia sale del estadístico que se contrasta, y lo que da el bootstrap es libertad para elegirlo."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!-- El programa citado: Sánchez Carrión, J. J., Estadística inferencial (2º del grado de Sociología, UCM), curso 2019-20,
+     https://biblioteca.ucm.es/data/cont/docs/400-2019-09-04-19-20%20801236%20Estadistica%20inferencial%20aplic.%20CCSS-Sanchez%20Carrion%20G%20Soc.pdf
+     descargado el 15-10-2026, SHA-256 95c87944a479c288100e0ea34a79c18a4d032b32d7df0ac6a69484cee1df5fef.
+     Solo se cita el temario (tema 7.3); el problema no usa datos externos. -->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El programa de Estadística inferencial del grado de Sociología de la Complutense, en el curso 2019-20, compara dos medias como se ha hecho siempre: con la *t* de Student y, si los datos no se parecen a una normal, con el contraste no paramétrico de Mann y Whitney (su tema 7.3). Los dos llevan una fórmula detrás. La *t* supone que la diferencia de medias se reparte como una normal, o casi; Mann y Whitney cambian los datos por sus rangos y cuentan.
+
+En 1979, Bradley Efron propuso no hacer suposiciones: si no se sabe cómo se reparte un estadístico, se remuestrean los datos que hay y se mira. Es el ***bootstrap***, y el programa no lo trata. ¿Se pierde potencia por no usarlo, la probabilidad de detectar una diferencia que existe?
+
+El contraste *bootstrap* de dos grupos funciona así. Si la hipótesis nula es cierta, los dos grupos salen de la misma población, y la mejor estimación de esa población es juntar las dos muestras. De ese montón se sacan, con reposición, `B` pares de remuestras del tamaño de cada grupo, y en cada par se calcula la diferencia del estadístico: así se ve cómo se reparte la diferencia cuando no hay efecto. El valor *p* es la fracción de esas diferencias que es, en valor absoluto, al menos tan grande como la observada. El estadístico se elige: aquí, la media o la media de los logaritmos. Cada fila de la matriz que recibe `estad` es una remuestra.
+
+Los datos son ingresos de dos grupos de 20 personas, sesgados a la derecha como los de verdad: una lognormal con mediana de 20.000 euros y media de unos 33.000. En el grupo `x`, cada persona cobra el doble.
+
+**Tu tarea.**
+
+1. Completa la población de la hipótesis nula, `z`, en `p_boot()`.
+2. Completa el valor *p*: la fracción de las `B` diferencias que, en valor absoluto, llega al menos a la observada.
+3. Mira la tabla del final. La fila `sin_efecto` es la frecuencia con la que cada contraste da un falso positivo; la fila `el_doble`, su potencia. ¿Gana el *bootstrap* a la *t*? ¿Cuándo, y por qué?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin efecto, los cuatro contrastes dan falsos positivos con una frecuencia cercana al 5% que prometen: la *t*, el 3,2%; Mann-Whitney, el 4,2%; el *bootstrap* de la media, el 4,4%, y el de la media de los logaritmos, el 5,8%. Cuando un grupo cobra el doble, la *t* lo detecta el 38% de las veces y el *bootstrap* de la media, el 41%: casi lo mismo. Remuestrear no da potencia. La *t* y el *bootstrap* de la media hacen la misma pregunta, si difieren las medias, y la *t* contesta con una fórmula lo que el *bootstrap* contesta remuestreando.
+
+La potencia la da el estadístico. El *bootstrap* de la media de los logaritmos detecta la diferencia el 55% de las veces, y Mann-Whitney, el 52%. Con ingresos, la media depende de unas pocas personas que cobran mucho, y varía tanto de una muestra a otra que tapa la diferencia; los logaritmos y los rangos dan a cada persona un peso parecido. En una sola muestra puede pasar cualquier cosa: en la del ejemplo, la *t* da 0,009 y el *bootstrap* de los logaritmos, 0,024. La potencia se mide en muchas.
+
+Lo que da el *bootstrap* es libertad. La *t* sirve para la media y Mann-Whitney para los rangos; para la mediana, la media recortada, el índice de Gini o el cociente de dos medias, cada uno pediría su propia fórmula, y para muchos no hay una sencilla. El *bootstrap* las sustituye todas por la misma función: basta con cambiar `estad`. Dos avisos. Cambiar de estadístico cambia la pregunta: la media de los logaritmos compara medias geométricas, no medias. Aquí da igual, porque multiplicar los ingresos por dos mueve todas las medidas a la vez, pero en general el estadístico se elige por la pregunta, y antes de ver los datos: probar varios y quedarse con el que sale es el [jardín de senderos que se bifurcan](https://nuevasomosaguas.github.io/laboratorios-y-simulaciones/problemas/66-el-jardin-de-senderos/). Y el *bootstrap* también se apoya en una aproximación, que la muestra se parece a la población, y con muestras pequeñas puede fallar.
+
+**Para ir más allá:** cambia `sdlog = 1` por `sdlog = 0.25` en `ingresos()`, unos datos casi normales, y el efecto de `potencia(2)` por `potencia(1.2)`. ¿Sigue habiendo un ganador?
+
+Efron, B. (1979). Bootstrap methods: Another look at the jackknife. *The Annals of Statistics*, 7(1), 1–26.
+
+Efron, B. y Hastie, T. (2016). *Computer Age Statistical Inference: Algorithms, Evidence, and Data Science*. Cambridge University Press. Capítulo 10 y sección 4.4.
+
+Mann, H. B. y Whitney, D. R. (1947). On a test of whether one of two random variables is stochastically larger than the other. *The Annals of Mathematical Statistics*, 18(1), 50–60.
+
+Sánchez Carrión, J. J. (2019). *Estadística inferencial. Programa de la asignatura, 2º curso del grado de Sociología, 2019-20*. Universidad Complutense de Madrid.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: bootstrap
+#| caption: "Tu código"
+# Ingresos de n personas, sesgados a la derecha; factor = 2 duplica los de todos (no hace falta tocarlo)
+ingresos <- function(n, factor = 1) factor * rlnorm(n, meanlog = log(20000), sdlog = 1)
+# Dos estadísticos: reciben una matriz con una muestra por fila y devuelven uno por fila
+media <- function(M) rowMeans(M)
+media_log <- function(M) rowMeans(log(M))
+
+# El contraste bootstrap: ¿salen x e y de la misma población?
+p_boot <- function(x, y, estad, B = 499) {
+  z <- ______   # 1. la población si la hipótesis nula es cierta
+  X <- matrix(sample(z, B * length(x), replace = TRUE), nrow = B)
+  Y <- matrix(sample(z, B * length(y), replace = TRUE), nrow = B)
+  dif <- estad(X) - estad(Y)                         # B diferencias sin efecto
+  obs <- estad(matrix(x, 1)) - estad(matrix(y, 1))   # la diferencia observada
+  ______   # 2. el valor p
+}
+
+# Una muestra: en x, cada persona cobra el doble
+set.seed(1979)
+x <- ingresos(20, factor = 2)
+y <- ingresos(20)
+round(c(media_x = mean(x), media_y = mean(y)))
+c(t = t.test(x, y)$p.value, boot_media = p_boot(x, y, media), boot_log = p_boot(x, y, media_log))
+
+# 3. La fracción de R muestras en que cada contraste da p < 0,05
+potencia <- function(factor, R = 500) {
+  p <- replicate(R, {
+    x <- ingresos(20, factor)
+    y <- ingresos(20)
+    c(t = t.test(x, y)$p.value, mann_whitney = wilcox.test(x, y)$p.value,
+      boot_media = p_boot(x, y, media), boot_log = p_boot(x, y, media_log))
+  })
+  rowMeans(p < 0.05)
+}
+round(rbind(sin_efecto = potencia(1), el_doble = potencia(2)), 3)
+```
+
+```{webr}
+#| exercise: bootstrap
+#| solution: true
+ingresos <- function(n, factor = 1) factor * rlnorm(n, meanlog = log(20000), sdlog = 1)
+media <- function(M) rowMeans(M)
+media_log <- function(M) rowMeans(log(M))
+
+p_boot <- function(x, y, estad, B = 499) {
+  z <- c(x, y)
+  X <- matrix(sample(z, B * length(x), replace = TRUE), nrow = B)
+  Y <- matrix(sample(z, B * length(y), replace = TRUE), nrow = B)
+  dif <- estad(X) - estad(Y)
+  obs <- estad(matrix(x, 1)) - estad(matrix(y, 1))
+  mean(abs(dif) >= abs(obs))
+}
+
+set.seed(1979)
+x <- ingresos(20, factor = 2)
+y <- ingresos(20)
+round(c(media_x = mean(x), media_y = mean(y)))
+c(t = t.test(x, y)$p.value, boot_media = p_boot(x, y, media), boot_log = p_boot(x, y, media_log))
+
+potencia <- function(factor, R = 500) {
+  p <- replicate(R, {
+    x <- ingresos(20, factor)
+    y <- ingresos(20)
+    c(t = t.test(x, y)$p.value, mann_whitney = wilcox.test(x, y)$p.value,
+      boot_media = p_boot(x, y, media), boot_log = p_boot(x, y, media_log))
+  })
+  rowMeans(p < 0.05)
+}
+round(rbind(sin_efecto = potencia(1), el_doble = potencia(2)), 3)
+```
+
+```{webr}
+#| exercise: bootstrap
+#| check: true
+# p_boot() se comprueba con muestras elegidas a mano.
+f <- .envir_result$p_boot
+media <- function(M) rowMeans(M)
+media_log <- function(M) rowMeans(log(M))
+num <- function(x) format(round(x, 3), decimal.mark = ",")
+prueba <- function(x, y, estad) { set.seed(1); f(x, y, estad, B = 999) }
+if (!is.function(f)) {
+  list(correct = FALSE, message = "No encuentro la función p_boot().")
+} else if (!is.numeric(p1 <- prueba(1:10 + 100, 1:10, media)) || length(p1) != 1 || p1 > 0.01) {
+  list(correct = FALSE, message = paste0(
+    "Con x = 101:110 e y = 1:10, dos grupos que no se tocan, p_boot() debería dar un valor p casi nulo, y da ",
+    num(p1), ". ¿Remuestreas cada grupo de sí mismo? Entonces las diferencias se centran en la observada, no en cero."))
+} else if ((p2 <- prueba(1:10, 1:10 + 100, media)) > 0.01) {
+  list(correct = FALSE, message = paste0(
+    "Con x = 1:10 e y = 101:110, al revés, el valor p debería ser igual de pequeño, y da ", num(p2),
+    ". Una diferencia de -100 es tan extrema como una de 100: compara valores absolutos."))
+} else if ((p3 <- min(prueba(rep(0, 10), c(rep(0, 9), 10), media), prueba(c(rep(0, 9), 10), rep(0, 10), media))) > 1) {
+  list(correct = FALSE, message = paste0(
+    "p_boot() da un valor p de ", num(p3), ", y un valor p es una fracción: tiene que estar entre 0 y 1."))
+} else if (p3 < 0.3) {
+  list(correct = FALSE, message = paste0(
+    "Con un grupo de diez ceros y otro de nueve ceros y un 10, el valor p debería rondar 0,6, porque muchas remuestras ",
+    "dan una diferencia al menos tan grande, y da ", num(p3), ". La población de la hipótesis nula tiene que incluir los dos grupos."))
+} else if ((p4 <- prueba(rep(c(1, 1, 1, 1, 16), 4), rep(4, 20), media_log)) > 0.01) {
+  list(correct = FALSE, message = paste0(
+    "Con x = (1, 1, 1, 1, 16) cuatro veces e y = veinte cuatros, las medias son iguales pero las medias de los logaritmos no: ",
+    "con media_log, el valor p debería ser casi nulo, y da ", num(p4), ". ¿Usas el estadístico que llega en estad?"))
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Cuando un grupo cobra el doble, el bootstrap de la media detecta la diferencia casi tan a menudo como la t, ",
+    "y el de la media de los logaritmos, mucho más: la potencia la da el estadístico, no el remuestreo."))
+}
+```
+
+::: {.hint exercise="bootstrap"}
+Si los dos grupos salen de la misma población, un ingreso de `x` y uno de `y` son intercambiables: junta los dos con `c()`. Para el valor *p*, `abs(dif) >= abs(obs)` da `TRUE` o `FALSE` para cada remuestra, y `mean()` cuenta la fracción de `TRUE`.
+:::
+
+::: {.solution exercise="bootstrap"}
+`z <- c(x, y)` y `mean(abs(dif) >= abs(obs))`.
+:::
+:::
+
+::::
