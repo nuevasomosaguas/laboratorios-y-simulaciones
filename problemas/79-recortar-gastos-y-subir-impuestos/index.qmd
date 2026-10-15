@@ -1,0 +1,237 @@
+---
+title: "¿Por qué recortar gastos y subir impuestos?"
+numero: 79
+nivel: 2
+duracion: "35 min"
+lectura: "[Lee y Mason (2011)](https://nuevasomosaguas.github.io/biblioteca.html#wachter2014essential); Comisión Europea (2024); Blanchard (2019)"
+dificultad: "Intermedio"
+categories: [demografía, equilibrios y dinámica]
+description: "Recortar pensiones y gasto y, aun así, subir impuestos parece una contradicción. La aritmética de la deuda y del envejecimiento dice cuándo lo es y cuándo no."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!-- El tuit: Jesús Fernández-Villaverde (@JesusFerna7026), 14-10-2026, https://x.com/JesusFerna7026/status/2110410043095138776,
+     en respuesta a «¿A qué debe renunciar el ciudadano?» (@profancestral), dentro del hilo que abre su tuit 2110407335554478150.
+     Los puntos 1 a 4 se comprobaron el 15-10-2026 en https://cdn.syndication.twimg.com/tweet-result?id=2110410043095138776,
+     que corta el texto en «5) Cortar»; el resto es el texto que circuló del tuit completo.
+
+     envejecimiento.csv (SHA-256 691aecc8a716ac2e1d374f9e0aff14514de9773105509472fddd616c7c4db494), copiado tal cual en el código:
+     España, % del PIB, cada cinco años de 2025 a 2070. Sale de European Commission (2024), The 2024 Ageing Report: Economic and
+     Budgetary Projections for the EU Member States (2022-2070), Institutional Paper 279,
+     https://economy-finance.ec.europa.eu/document/download/971dd209-41c2-425d-94f8-e3c3c3459af9_en?filename=ip279_en.pdf
+     (descargado el 15-10-2026, SHA-256 952ee30dededf74d3c260c9442202515542ca24b4f4e7f17ff549585af97f930):
+     coste_base, tabla II.1.135 (gasto ligado a la edad: pensiones, sanidad, cuidados de larga duración y educación);
+     coste_menos_migracion, tabla II.1.139 (migración un 33% menor); coste_mas_migracion, tabla II.1.138 (un 33% mayor);
+     pensiones_base, tabla II.1.64.
+
+     Eurostat, consultado el 15-10-2026 con la API de difusión: gov_10dd_edpt1 (deuda de 2025, 100,7%), gov_10a_main
+     (2025: gasto total 45,3%, déficit 2,4%, intereses 2,4%, subvenciones D.3 1,2%), gov_10a_exp (COFOG 2024: exclusión
+     social GF1007, 0,7%) y nama_10_gdp (PIB de 2025, 1.690.012 millones de euros; de 2024, 1.598.588).
+     El crecimiento nominal, 3,2%, es la media del crecimiento potencial de España en 2025-2070 de la tabla II.1.14 (1,2%)
+     más el 2% de inflación que persigue el BCE. -->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+El 14 de octubre de 2026, el economista Jesús Fernández-Villaverde escribió en un hilo que el votante medio no votará nunca a quien pretenda arreglar España. Alguien le preguntó a qué tendría que renunciar el ciudadano, y contestó con una lista: «1) Bajar las pensiones. 2) Reducir el resto del gasto público de manera drástica. 3) Subir los impuestos (sí, incluso con 1) y 2) no llega y no me haga las cuentas del Gran Capitán de las "paguitas y subvenciones")». Seguían más horas trabajadas por persona, menos inmigración no cualificada, más ahorro y desregular miles de sectores.
+
+El tercer punto parece contradecir a los dos primeros: si se recorta, ¿para qué subir impuestos? La respuesta está en dos cuentas. La primera es la de la deuda. Si la deuda pública es $d$ (en % del PIB), el tipo de interés que paga es $i$, la economía crece a $g$ en euros corrientes y el Estado tiene un saldo primario $s$ (lo que ingresa menos lo que gasta, sin contar los intereses), la deuda del año siguiente es
+
+$$d_{t+1} = d_t \, \frac{1 + i}{1 + g} - s_{t+1}.$$
+
+La segunda es la del envejecimiento. En 2025, España debía el 100,7% del PIB, y su déficit (2,4%) era igual a lo que pagaba de intereses (2,4%): su saldo primario era cero. Pero el Ageing Report de la Comisión Europea proyecta que el gasto ligado a la edad (pensiones, sanidad, cuidados y educación) pasará del 24,4% del PIB en 2025 al 29,4% en 2055, si no cambian las leyes de 2024. Cada punto que sube ese gasto es un punto menos de saldo primario, salvo que algo lo compense.
+
+En el código, `saldo()` da el saldo primario de cada año entre 2025 y 2070: el de 2025, menos lo que ha subido el gasto de la edad desde entonces, más lo que se recorte de pensiones (`corte_pensiones`, una fracción de su gasto) y del resto del gasto (`recorte`, en puntos del PIB), más lo que se suba de impuestos (`impuestos`, en puntos del PIB). El resto del gasto, lo que no es de la edad ni intereses, es el 18,5% del PIB: el 45,3% del gasto total, menos el 2,4% de intereses y el 24,4% de la edad.
+
+**Tu tarea.**
+
+1. Completa `trayectoria()`: la deuda de cada año a partir de la del anterior, con la fórmula de arriba.
+2. Completa `saldo()`.
+3. La primera cifra es la deuda de 2070 sin hacer nada, con tres diferencias entre el interés y el crecimiento. Las dos tablas dan la subida de impuestos, en puntos del PIB y para siempre desde 2026, que hace falta con cada combinación de recortes: la primera, para que la deuda de 2070 sea la de hoy; la segunda, para bajarla al 60%. Las «subvenciones y exclusión» son todas las subvenciones a productores (1,2% del PIB) y todo el gasto contra la exclusión social (0,7%). ¿Cuándo tiene razón el tercer punto del tuit?
+4. La última línea repite la primera cuenta con los escenarios de migración del Ageing Report. ¿Qué dice del quinto punto?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Sin hacer nada, la deuda llegaría en 2070 al 258% del PIB si el interés iguala al crecimiento, al 199% si es un punto menor y al 341% si es un punto mayor. Con el interés igual al crecimiento, mantener la deuda donde está pide un ajuste permanente de 3,5 puntos del PIB, unos 59.000 millones de euros de hoy cada año, y bajarla al 60%, de 4,4 puntos.
+
+Las «cuentas del Gran Capitán» no llegan: suprimir todas las subvenciones y todo el gasto contra la exclusión, 1,9 puntos, deja 1,6 puntos de impuestos para estabilizar la deuda y 2,5 para bajarla al 60%. Bajar las pensiones un 10% ahorra algo menos, de 1,4 puntos hoy a 1,7 cuando el gasto en pensiones toca techo, y deja 1,9 y 2,8 puntos. Que haga falta subir impuestos con los dos primeros puntos depende de cuánto se recorte y de la meta. Con un 10% menos de pensiones y un 10% menos del resto, la deuda se estabiliza sin subir impuestos, pero bajarla al 60% pide 0,9 puntos, y 1,6 si el interés supera al crecimiento en un punto. Con un 20% menos del resto no hace falta subir impuestos en ningún caso. Un 20% del resto son 3,7 puntos del PIB, de todo lo que no es pensiones, sanidad, cuidados, educación ni intereses: defensa, justicia, policía, infraestructuras, desempleo… «Drástico» es la palabra.
+
+El quinto punto choca con el tercero en estas cuentas. Con un tercio menos de migración, el gasto de la edad sube más, porque hay menos gente en edad de trabajar para el mismo número de jubilados, y el ajuste necesario pasa de 3,5 a 4,6 puntos; con un tercio más, baja a 2,5. Pero el Ageing Report no distingue la migración por cualificación, que es lo que propone el tuit, y si un inmigrante aporta más de lo que cuesta depende de su edad, su empleo y su salario a lo largo de la vida, y eso es lo que miden las cuentas de transferencias entre generaciones de Lee y Mason.
+
+El otro lado del debate está en el parámetro que más mueve las cifras, la diferencia entre $i$ y $g$. Olivier Blanchard defendió en 2019 que, si el interés se queda por debajo del crecimiento, la deuda pesa menos de lo que parece y se puede estabilizar con déficits primarios. En 2025 España pagaba de media un 2,5% por su deuda y su PIB creció un 5,7% en euros corrientes; el 3,2% de estas cuentas suma el 2% de inflación que persigue el BCE al 1,2% de crecimiento real que el Ageing Report da de media hasta 2070. Con el interés un punto por debajo, estabilizar la deuda pide 2,7 puntos en lugar de 3,5. Los puntos cuarto, sexto y séptimo, más horas, más ahorro y menos regulación, actúan por ahí: buscan que $g$ crezca más que $i$.
+
+Las cuentas tienen límites. Todo va en % del PIB y no hay respuesta de la economía: ni el recorte frena el crecimiento ni el impuesto reduce la base sobre la que se cobra, dos efectos de segundo orden que cada lado del debate pondera de forma distinta. Y el gasto de la edad es una proyección con las leyes de 2024, que cambiará si cambian las leyes.
+
+**Para ir más allá:** ¿qué corte de pensiones hace falta, sin tocar el resto ni los impuestos, para mantener la deuda en el 100,7% con el interés igual al crecimiento? Prueba con `impuestos_necesarios()` y varios valores de `corte_pensiones`.
+
+Blanchard, O. (2019). Public debt and low interest rates. *American Economic Review*, 109(4), 1197–1229.
+
+European Commission (2024). *The 2024 Ageing Report: Economic and Budgetary Projections for the EU Member States (2022-2070)*. Institutional Paper 279. Tablas II.1.14, II.1.64 y II.1.135 a II.1.139.
+
+Lee, R. y Mason, A. (Eds.) (2011). *Population Aging and the Generational Economy: A Global Perspective*. Edward Elgar.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: fiscal
+#| caption: "Tu código"
+# El gasto ligado a la edad y el de pensiones, % del PIB, del Ageing Report 2024 (no hace falta tocarlo)
+anios <- 2025:2070
+cada5 <- seq(2025, 2070, 5)
+serie <- function(x) approx(cada5, x, anios)$y
+envejecimiento <- list(
+  base            = serie(c(24.4, 25.1, 26.3, 27.3, 28.4, 29.2, 29.4, 29.2, 29.0, 29.0)),
+  menos_migracion = serie(c(24.6, 25.5, 27.0, 28.2, 29.7, 30.8, 31.3, 31.2, 30.8, 30.7)),
+  mas_migracion   = serie(c(24.3, 24.7, 25.7, 26.4, 27.3, 27.8, 27.9, 27.7, 27.5, 27.7)))
+pensiones <- serie(c(13.7, 14.3, 15.4, 16.2, 16.9, 17.3, 17.2, 16.9, 16.6, 16.7))
+
+# 1. La deuda de cada año, % del PIB, a partir del saldo primario de cada año
+trayectoria <- function(saldo, i, g, d0 = 100.7) {
+  d <- numeric(length(saldo))
+  d[1] <- d0
+  for (t in 2:length(saldo)) d[t] <- ______
+  d
+}
+
+# 2. El saldo primario de cada año: el de 2025 (cero), menos lo que sube el gasto de la edad,
+#    más los recortes y la subida de impuestos
+saldo <- function(impuestos, coste = envejecimiento$base, corte_pensiones = 0, recorte = 0) {
+  ______
+}
+
+# La subida de impuestos con la que la deuda de 2070 es igual a la meta
+impuestos_necesarios <- function(meta, i, g, ...) {
+  uniroot(function(x) tail(trayectoria(saldo(x, ...), i, g), 1) - meta, c(-20, 30))$root
+}
+
+# 3. Sin hacer nada: la deuda de 2070 con el interés igual, un punto menor y un punto mayor que el crecimiento
+g <- 0.032
+round(c(i_igual_g = tail(trayectoria(saldo(0), g, g), 1),
+        i_menor   = tail(trayectoria(saldo(0), g - 0.01, g), 1),
+        i_mayor   = tail(trayectoria(saldo(0), g + 0.01, g), 1)))
+
+recortes <- list(
+  "solo impuestos"                 = list(),
+  "pensiones -10%"                 = list(corte_pensiones = 0.1),
+  "subvenciones y exclusión fuera" = list(recorte = 1.9),
+  "pensiones -10% y resto -10%"    = list(corte_pensiones = 0.1, recorte = 1.85),
+  "pensiones -10% y resto -20%"    = list(corte_pensiones = 0.1, recorte = 3.7))
+tabla <- function(meta) {
+  x <- t(sapply(recortes, function(r) sapply(c(-0.01, 0, 0.01), function(dif)
+    do.call(impuestos_necesarios, c(list(meta = meta, i = g + dif, g = g), r)))))
+  colnames(x) <- c("i-g = -1", "i = g", "i-g = +1")
+  round(x, 1)
+}
+tabla(100.7)   # mantener la deuda de hoy
+tabla(60)      # bajarla al 60%
+
+# 4. Mantener la deuda de hoy, sin recortes y con i = g, con más o menos migración
+round(sapply(envejecimiento, function(co) impuestos_necesarios(100.7, g, g, coste = co)), 1)
+```
+
+```{webr}
+#| exercise: fiscal
+#| solution: true
+anios <- 2025:2070
+cada5 <- seq(2025, 2070, 5)
+serie <- function(x) approx(cada5, x, anios)$y
+envejecimiento <- list(
+  base            = serie(c(24.4, 25.1, 26.3, 27.3, 28.4, 29.2, 29.4, 29.2, 29.0, 29.0)),
+  menos_migracion = serie(c(24.6, 25.5, 27.0, 28.2, 29.7, 30.8, 31.3, 31.2, 30.8, 30.7)),
+  mas_migracion   = serie(c(24.3, 24.7, 25.7, 26.4, 27.3, 27.8, 27.9, 27.7, 27.5, 27.7)))
+pensiones <- serie(c(13.7, 14.3, 15.4, 16.2, 16.9, 17.3, 17.2, 16.9, 16.6, 16.7))
+
+trayectoria <- function(saldo, i, g, d0 = 100.7) {
+  d <- numeric(length(saldo))
+  d[1] <- d0
+  for (t in 2:length(saldo)) d[t] <- d[t - 1] * (1 + i) / (1 + g) - saldo[t]
+  d
+}
+
+saldo <- function(impuestos, coste = envejecimiento$base, corte_pensiones = 0, recorte = 0) {
+  0 - (coste - coste[1]) + corte_pensiones * pensiones + recorte + impuestos
+}
+
+impuestos_necesarios <- function(meta, i, g, ...) {
+  uniroot(function(x) tail(trayectoria(saldo(x, ...), i, g), 1) - meta, c(-20, 30))$root
+}
+
+g <- 0.032
+round(c(i_igual_g = tail(trayectoria(saldo(0), g, g), 1),
+        i_menor   = tail(trayectoria(saldo(0), g - 0.01, g), 1),
+        i_mayor   = tail(trayectoria(saldo(0), g + 0.01, g), 1)))
+
+recortes <- list(
+  "solo impuestos"                 = list(),
+  "pensiones -10%"                 = list(corte_pensiones = 0.1),
+  "subvenciones y exclusión fuera" = list(recorte = 1.9),
+  "pensiones -10% y resto -10%"    = list(corte_pensiones = 0.1, recorte = 1.85),
+  "pensiones -10% y resto -20%"    = list(corte_pensiones = 0.1, recorte = 3.7))
+tabla <- function(meta) {
+  x <- t(sapply(recortes, function(r) sapply(c(-0.01, 0, 0.01), function(dif)
+    do.call(impuestos_necesarios, c(list(meta = meta, i = g + dif, g = g), r)))))
+  colnames(x) <- c("i-g = -1", "i = g", "i-g = +1")
+  round(x, 1)
+}
+tabla(100.7)
+tabla(60)
+
+round(sapply(envejecimiento, function(co) impuestos_necesarios(100.7, g, g, coste = co)), 1)
+```
+
+```{webr}
+#| exercise: fiscal
+#| check: true
+# trayectoria() y saldo() se comprueban con casos propios.
+e <- .envir_result
+num <- function(x) format(round(x, 2), decimal.mark = ",")
+tr <- e$trayectoria
+sa <- e$saldo
+if (!is.function(tr) || !is.function(sa)) {
+  list(correct = FALSE, message = "No encuentro las funciones trayectoria() y saldo().")
+} else if (!isTRUE(all.equal(tr(c(0, 0, 0), 0.05, 0.05), c(100.7, 100.7, 100.7)))) {
+  list(correct = FALSE, message = paste0(
+    "Con saldo cero y el interés igual al crecimiento, la deuda no debería moverse del 100,7%, y trayectoria() da ",
+    paste(num(tr(c(0, 0, 0), 0.05, 0.05)), collapse = "; "), "."))
+} else if (!isTRUE(all.equal(tr(c(0, 0), 0.5, 0.25, d0 = 100), c(100, 120)))) {
+  list(correct = FALSE, message = paste0(
+    "Con d0 = 100, i = 0,5, g = 0,25 y saldo cero, la deuda del año siguiente debería ser 100 · 1,5 / 1,25 = 120, ",
+    "y trayectoria() da ", num(tr(c(0, 0), 0.5, 0.25, d0 = 100)[2]), ". La fórmula es exacta: (1 + i) / (1 + g), no 1 + i - g."))
+} else if (!isTRUE(all.equal(tr(c(0, 10, 0), 0, 0, d0 = 100), c(100, 90, 90)))) {
+  list(correct = FALSE, message = paste0(
+    "Con d0 = 100, i = g = 0 y saldos (0, 10, 0), la deuda debería ser 100, 90 y 90: un superávit primario la reduce el mismo año. ",
+    "trayectoria() da ", paste(num(tr(c(0, 10, 0), 0, 0, d0 = 100)), collapse = "; "), "."))
+} else if (!isTRUE(all.equal(sa(0)[c(1, 46)], c(0, -4.6)))) {
+  list(correct = FALSE, message = paste0(
+    "Sin recortes ni impuestos, saldo(0) debería ser 0 en 2025 y -4,6 en 2070, lo que sube el gasto de la edad desde 2025 ",
+    "(de 24,4 a 29), y da ", num(sa(0)[1]), " y ", num(sa(0)[46]), ". Resta la subida del gasto, no el gasto entero."))
+} else if (!isTRUE(all.equal(sa(1, corte_pensiones = 0.1)[1], 2.37))) {
+  list(correct = FALSE, message = paste0(
+    "saldo(1, corte_pensiones = 0.1) debería dar 2,37 en 2025: 1 punto de impuestos más el 10% de las pensiones, que eran el 13,7% del PIB. ",
+    "Da ", num(sa(1, corte_pensiones = 0.1)[1]), "."))
+} else if (!isTRUE(all.equal(sa(0, recorte = 2)[46], -2.6))) {
+  list(correct = FALSE, message = paste0(
+    "saldo(0, recorte = 2) debería dar -2,6 en 2070: los 2 puntos del recorte menos los 4,6 que sube el gasto de la edad. ",
+    "Da ", num(sa(0, recorte = 2)[46]), "."))
+} else {
+  x <- e$impuestos_necesarios(100.7, 0.032, 0.032)
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Con el interés igual al crecimiento, mantener la deuda de hoy pide ", num(x),
+    " puntos del PIB de ajuste permanente; mira cuánto cubre cada recorte en las tablas."))
+}
+```
+
+::: {.hint exercise="fiscal"}
+En `trayectoria()`, la deuda del año `t` sale de la del año `t - 1`, multiplicada por `(1 + i) / (1 + g)`, menos el saldo del año `t`. En `saldo()`, lo que sube el gasto de la edad es `coste - coste[1]`; los recortes de pensiones son `corte_pensiones * pensiones`.
+:::
+
+::: {.solution exercise="fiscal"}
+`d[t - 1] * (1 + i) / (1 + g) - saldo[t]` en `trayectoria()`, y `0 - (coste - coste[1]) + corte_pensiones * pensiones + recorte + impuestos` en `saldo()`.
+:::
+:::
+
+::::
