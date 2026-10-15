@@ -1,0 +1,259 @@
+---
+title: "¿Se desploma la fecundidad o se retrasa?"
+numero: 81
+nivel: 2
+duracion: "30 min"
+lectura: "[O'Brien (2014)](https://nuevasomosaguas.github.io/biblioteca.html#obrien2014age); Bongaarts y Feeney (1998)"
+dificultad: "Intermedio"
+categories: [demografía, paradojas de agregación]
+description: "Si cada generación de mujeres acaba teniendo 1,8 hijos, pero cada una los tiene un poco más tarde, la fecundidad del año cae a 1,57 y parece un desplome que no lo es."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+<!-- Los datos de España, copiados en el código: espana.csv (SHA-256 10a4032b958b0d8235c5482bda4d04f1a3951f6d50b9ab6e1078116be344f510),
+     de la API de difusión de Eurostat, consultada el 15-10-2026: demo_frate (age = TOTAL), el índice sintético con cinco decimales;
+     demo_find, AGEMOTH1, AGEMOTH2, AGEMOTH3 y AGEMOTH4_MAX (edad media de la madre por orden del nacimiento) y LBIRTHR1PC, LBIRTHR2PC,
+     LBIRTHR3PC y LBIRTHR4_MAXPC (porcentaje de los nacimientos de cada orden), de 1985, el primer año con las edades por orden, a 2024.
+     El índice de cada orden se aproxima con el total por el porcentaje de nacimientos de ese orden: Eurostat no publica las tasas por orden.
+
+     Las cifras de América Latina: CEPAL, Observatorio Demográfico de América Latina y el Caribe 2025 (repositorio.cepal.org,
+     SHA-256 da01c6ede965ebc956c1e3b4f7e64203746520cd1020a02e9f50d95340e6a007): por debajo del reemplazo desde 2015; edad media de la
+     fecundidad, 26,9 años en 2010, su mínimo, y 27,6 en 2024; tasa ajustada por tempo en torno a 2,2 de 2010 a 2017, que después cae
+     hacia la observada, sobre todo por la fecundidad de las adolescentes y las jóvenes; y el recuadro III.2 sobre el efecto tempo en
+     las proyecciones. Chile, 1,14 hijos por mujer en 2024: Observatorio Demográfico 2024 (SHA-256
+     652f9df0d5807890469d25ab3dc3a8345785f0c42a581965b9cb2187a8345986). -->
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+«La fecundidad se desploma.» Según la CEPAL, América Latina y el Caribe están por debajo del nivel de reemplazo desde 2015, con 1,8 hijos por mujer en 2024, y Chile tiene 1,14. España tuvo 1,10 en 2024, según Eurostat. Pero esas cifras son el *índice sintético de fecundidad* de un año: los hijos que tendría una mujer si a cada edad tuviera los que tienen ese año las mujeres de esa edad. Si las mujeres retrasan los hijos, ese año nacen menos, aunque al final de su vida acaben teniendo los mismos.
+
+John Bongaarts y Griffith Feeney lo formalizaron en 1998. El índice de un año mezcla dos cosas: el *quantum*, cuántos hijos tienen las mujeres, y el *tempo*, cuándo. Si la edad media a la maternidad sube $r$ años cada año, el índice del año se queda en $(1 - r)$ veces el que habría sin retraso, así que el índice corregido es
+
+$$\text{ISF}^* = \frac{\text{ISF}}{1 - r}.$$
+
+En la práctica se aplica a cada orden de nacimiento por separado, primeros hijos, segundos…, con la edad media de cada orden, y se suman.
+
+El código simula una población en la que cada generación de mujeres acaba teniendo `Q` hijos de media, repartidos por edad alrededor de su edad media a la maternidad, `edad_madre`. Las nacidas antes de 1960 los tienen a los 27 años de media; las de 1960 a 1985, cada una 0,15 años más tarde que la anterior, y las siguientes, a los 30,75. `tasa(g, a)` da los hijos por mujer de la generación `g` a la edad `a`. A la derecha, los mismos cálculos con los datos de España.
+
+**Tu tarea.**
+
+1. Completa `isf_del_anyo()`: la suma de las tasas de todas las edades en el año `t`. Quien tiene `a` años en el año `t` nació en `t - a`.
+2. Completa `bongaarts_feeney()`: el índice corregido, con la `r` que ya calcula la función.
+3. Mira el gráfico de la izquierda. Ninguna generación tiene menos de 1,8 hijos. ¿Cuánto baja el índice del año, y cuándo? ¿Qué da la corrección?
+4. Cuando la comprobación te dé por bueno el código, haz que la fecundidad caiga de verdad: debajo de `Q <- rep(1.8, length(generaciones))`, añade `Q <- 1.8 - 0.01 * pmin(pmax(generaciones - 1960, 0), 25)`, que lleva a las generaciones de 1985 a 1,55 hijos. ¿Esconde la corrección una caída real?
+5. Mira el gráfico de la derecha y la tabla: España en 1998, en su mínimo de los noventa; en 2008, y en 2022, el último año que se puede corregir. ¿Qué parte de su baja fecundidad es calendario?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Ninguna generación de la simulación tiene menos de 1,8 hijos, y sin embargo el índice del año cae hasta 1,57 en 2002, un 13% menos. Es puro calendario: mientras cada generación tiene sus hijos un poco más tarde que la anterior, los nacimientos de cada año se reparten entre más años y en ninguno se ven todos. Cuando el retraso se detiene, el índice vuelve a 1,8 sin que nadie haya cambiado de opinión sobre cuántos hijos quiere. La corrección de Bongaarts y Feeney da 1,79 en 2002, y entre 1,74 y 1,86 en todo el periodo. No es exacta, porque supone que en cada año todas las edades se retrasan a la vez, y aquí se retrasa cada generación, pero se acerca mucho más que el índice sin corregir.
+
+La tarea 4 es la otra cara. Si las generaciones de 1960 a 1985 tienen además cada vez menos hijos, hasta 1,55, el índice del año baja a 1,42 en 2009, y el corregido cae con él: 1,54 en 2010 y 1,59 en 2020. La corrección quita el calendario, pero no esconde la caída real.
+
+En España, el mínimo de los noventa era en buena parte calendario: en 1998, un índice de 1,13 corregido da 1,37. En 2008, 1,45 y 1,52. Pero en 2022, 1,16 corregido da solo 1,24: casi toda la caída reciente es de quantum. Son aproximaciones, porque Eurostat no publica el índice de cada orden y aquí sale del total por el porcentaje de nacimientos de ese orden, y porque las edades medias vienen con un decimal y el ritmo del retraso se mide en cinco años.
+
+Lo mismo vale para el titular de partida. La CEPAL mide el efecto tempo en América Latina: corregido, el índice de la región se mantuvo en torno a 2,2 hijos por mujer de 2010 a 2017, y después cayó hacia el observado, sobre todo porque bajó la fecundidad de las adolescentes y las jóvenes. Y la propia CEPAL avisa de que proyectar con el índice de un año en plena oleada de retrasos puede dar escenarios «artificialmente alarmistas». Pero el retraso tiene un límite: la edad media de la fecundidad de la región pasó de 26,9 años en 2010 a 27,6 en 2024, unos 0,05 años por año, y eso solo explica un 5% del índice. Para que el 1,14 de Chile fuera un 2,1 retrasado, la edad media tendría que subir casi medio año cada año. Quien hable de desplome tiene que separar el tempo del quantum, y quien lo niegue, también. La respuesta definitiva llega cuando cada generación cumple 50 años: su *descendencia final*.
+
+Bongaarts, J. y Feeney, G. (1998). On the Quantum and Tempo of Fertility. *Population and Development Review*, 24(2), 271-291.
+
+CEPAL (2025). *Observatorio Demográfico de América Latina y el Caribe 2025*. Comisión Económica para América Latina y el Caribe.
+
+O'Brien, R. M. (2014). *Age-Period-Cohort Models: Approaches and Analyses with Aggregate Data*. CRC Press.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: tempo
+#| caption: "Tu código"
+# Una población simulada: cada generación de mujeres acaba teniendo Q hijos de media, repartidos por
+# edad alrededor de su edad media a la maternidad. Las nacidas entre 1960 y 1985 retrasan los hijos:
+# cada generación, 0,15 años más tarde que la anterior.
+edades <- 15:49
+generaciones <- 1920:2010
+Q <- rep(1.8, length(generaciones))
+edad_madre <- 27 + 0.15 * pmin(pmax(generaciones - 1960, 0), 25)
+
+# Hijos por mujer de la generación g a la edad a
+tasa <- function(g, a) {
+  i <- g - 1919
+  forma <- dnorm(edades, edad_madre[i], 5)
+  Q[i] * forma[a - 14] / sum(forma)
+}
+
+# 1. El índice sintético del año t: las tasas de todas las edades en ese mismo año.
+#    Quien tiene a años en el año t nació en t - a.
+isf_del_anyo <- function(t) {
+  sum(sapply(edades, function(a) ______))
+}
+edad_media_del_anyo <- function(t) {
+  x <- sapply(edades, function(a) tasa(t - a, a))
+  sum(edades * x) / sum(x)
+}
+
+# 2. La corrección de Bongaarts y Feeney: r es lo que sube la edad media en un año, medido entre
+#    el año anterior y el siguiente (o entre los que están a lag / 2 años).
+bongaarts_feeney <- function(isf, edad_media, lag = 2) {
+  r <- c(rep(NA, lag / 2), diff(edad_media, lag = lag) / lag, rep(NA, lag / 2))
+  ______
+}
+
+anyos <- 1970:2025
+isf <- sapply(anyos, isf_del_anyo)
+ajustada <- bongaarts_feeney(isf, sapply(anyos, edad_media_del_anyo))
+
+# España (Eurostat), 1985-2024: el índice sintético, la edad media de la madre en los nacimientos
+# de primer, segundo, tercer y cuarto o más orden, y el porcentaje de los nacimientos de cada orden
+espana <- data.frame(
+  anyo = 1985:2024,
+  isf = c(1.6398, 1.55585, 1.49362, 1.44773, 1.3972, 1.36027, 1.32666, 1.31045, 1.25636, 1.19047, 1.1553, 1.14053, 1.15008, 1.12907, 1.16783, 1.21524, 1.23218, 1.25179, 1.29604, 1.31319, 1.32955, 1.36227, 1.37687, 1.44608, 1.37935, 1.36904, 1.34238, 1.32109, 1.27306, 1.31771, 1.33016, 1.33316, 1.30508, 1.25616, 1.22868, 1.17977, 1.18054, 1.15727, 1.11863, 1.10275),
+  edad1 = c(25.8, 25.9, 26.1, 26.3, 26.6, 26.8, 27.2, 27.5, 27.8, 28.1, 28.4, 28.5, 28.7, 28.9, 29, 29.1, 29.2, 29.2, 29.3, 29.4, 29.4, 29.4, 29.4, 29.3, 29.6, 29.8, 30.1, 30.3, 30.4, 30.6, 30.7, 30.8, 30.9, 31, 31.1, 31.2, 31.5, 31.6, 31.5, 31.5),
+  edad2 = c(28.7, 28.8, 29.1, 29.3, 29.5, 29.7, 29.9, 30.1, 30.4, 30.7, 30.9, 31.2, 31.5, 31.8, 32, 32.1, 32.2, 32.3, 32.4, 32.5, 32.5, 32.6, 32.5, 32.4, 32.5, 32.6, 32.8, 32.9, 33, 33.1, 33.1, 33.2, 33.2, 33.2, 33.3, 33.3, 33.5, 33.5, 33.5, 33.5),
+  edad3 = c(31.8, 31.9, 32.1, 32.2, 32.3, 32.4, 32.6, 32.7, 32.7, 32.9, 33, 33.3, 33.5, 33.6, 33.8, 33.8, 33.9, 33.9, 33.9, 33.9, 33.9, 33.8, 33.7, 33.5, 33.5, 33.4, 33.6, 33.6, 33.6, 33.6, 33.7, 33.6, 33.6, 33.7, 33.7, 33.7, 34, 33.9, 34, 34),
+  edad4 = c(35, 35, 35, 35.1, 35.1, 35.1, 35.1, 35.1, 35, 35, 35, 35.2, 35.2, 35.3, 35.4, 35.3, 35.3, 35.2, 35.2, 35.1, 35.1, 35, 34.7, 34.7, 34.6, 34.5, 34.7, 34.6, 34.6, 34.5, 34.6, 34.5, 34.5, 34.7, 34.6, 34.8, 34.9, 35.1, 35.2, 35.3),
+  pct1 = c(46.4, 44.5, 48.1, 49.3, 50, 50.3, 51.3, 51.9, 52.1, 51.8, 51.2, 49.7, 50.9, 51.5, 52.1, 53, 54.3, 55.3, 55.5, 55.7, 55.8, 55.7, 57.4, 53.3, 53.5, 52.6, 52.4, 52.1, 52.7, 52, 51.2, 50.3, 49.7, 49.1, 49.5, 50.8, 49.9, 50.5, 50.3, 50.7),
+  pct2 = c(32, 35.1, 33.2, 33.4, 34, 34.6, 34.7, 34.8, 35.1, 35.7, 36.5, 37.8, 37.4, 37.1, 36.9, 36.3, 35.7, 34.9, 34.9, 34.8, 34.8, 34.9, 32.5, 36.4, 36.1, 36.8, 37.3, 37.4, 36.8, 37.3, 37.9, 38.2, 38.1, 38, 37, 35.7, 36.2, 35.4, 36.1, 35.8),
+  pct3 = c(13, 12.6, 11.9, 11.2, 10.7, 10.3, 9.7, 9.4, 9.1, 9.1, 9, 9.2, 8.7, 8.6, 8.4, 8.1, 7.5, 7.4, 7.4, 7.3, 7.1, 7.1, 7.5, 7.7, 7.8, 7.9, 7.8, 7.9, 7.9, 8.1, 8.3, 8.7, 9.2, 9.5, 9.9, 9.8, 10.1, 10.1, 9.7, 9.5),
+  pct4 = c(8.5, 7.7, 6.8, 6.1, 5.3, 4.8, 4.3, 3.9, 3.7, 3.5, 3.2, 3.2, 3, 2.9, 2.7, 2.5, 2.4, 2.4, 2.3, 2.3, 2.3, 2.2, 2.5, 2.6, 2.7, 2.7, 2.5, 2.6, 2.6, 2.6, 2.6, 2.8, 3, 3.4, 3.6, 3.7, 3.9, 4, 3.9, 4))
+# El índice de cada orden es el total por su porcentaje de nacimientos, y cada uno se corrige con su
+# propia edad media, con lag = 4 porque las edades vienen con un solo decimal
+espana$ajustada <- with(espana,
+  bongaarts_feeney(isf * pct1 / 100, edad1, lag = 4) + bongaarts_feeney(isf * pct2 / 100, edad2, lag = 4) +
+  bongaarts_feeney(isf * pct3 / 100, edad3, lag = 4) + bongaarts_feeney(isf * pct4 / 100, edad4, lag = 4))
+
+par(mfrow = c(1, 2))
+plot(anyos, isf, type = "l", lwd = 2, col = "#c0392b", ylim = c(1, 2), xlab = "Año", ylab = "Hijos por mujer",
+     main = "Simulación")
+lines(anyos, ajustada, lwd = 2, col = "grey40")
+abline(h = 1.8, lty = 2)
+plot(espana$anyo, espana$isf, type = "l", lwd = 2, col = "#c0392b", ylim = c(1, 2), xlab = "Año", ylab = "Hijos por mujer",
+     main = "España")
+lines(espana$anyo, espana$ajustada, lwd = 2, col = "grey40")
+# Las cifras: el mínimo de la simulación y tres años de España
+round(rbind(
+  simulacion = c(anyo = anyos[which.min(isf)], isf = min(isf), ajustada = ajustada[which.min(isf)]),
+  espana_1998 = unlist(espana[espana$anyo == 1998, c("anyo", "isf", "ajustada")]),
+  espana_2008 = unlist(espana[espana$anyo == 2008, c("anyo", "isf", "ajustada")]),
+  espana_2022 = unlist(espana[espana$anyo == 2022, c("anyo", "isf", "ajustada")])), 2)
+```
+
+```{webr}
+#| exercise: tempo
+#| solution: true
+# Una población simulada: cada generación de mujeres acaba teniendo Q hijos de media, repartidos por
+# edad alrededor de su edad media a la maternidad. Las nacidas entre 1960 y 1985 retrasan los hijos:
+# cada generación, 0,15 años más tarde que la anterior.
+edades <- 15:49
+generaciones <- 1920:2010
+Q <- rep(1.8, length(generaciones))
+edad_madre <- 27 + 0.15 * pmin(pmax(generaciones - 1960, 0), 25)
+
+# Hijos por mujer de la generación g a la edad a
+tasa <- function(g, a) {
+  i <- g - 1919
+  forma <- dnorm(edades, edad_madre[i], 5)
+  Q[i] * forma[a - 14] / sum(forma)
+}
+
+# 1. El índice sintético del año t: las tasas de todas las edades en ese mismo año.
+#    Quien tiene a años en el año t nació en t - a.
+isf_del_anyo <- function(t) {
+  sum(sapply(edades, function(a) tasa(t - a, a)))
+}
+edad_media_del_anyo <- function(t) {
+  x <- sapply(edades, function(a) tasa(t - a, a))
+  sum(edades * x) / sum(x)
+}
+
+# 2. La corrección de Bongaarts y Feeney: r es lo que sube la edad media en un año, medido entre
+#    el año anterior y el siguiente (o entre los que están a lag / 2 años).
+bongaarts_feeney <- function(isf, edad_media, lag = 2) {
+  r <- c(rep(NA, lag / 2), diff(edad_media, lag = lag) / lag, rep(NA, lag / 2))
+  isf / (1 - r)
+}
+
+anyos <- 1970:2025
+isf <- sapply(anyos, isf_del_anyo)
+ajustada <- bongaarts_feeney(isf, sapply(anyos, edad_media_del_anyo))
+
+# España (Eurostat), 1985-2024: el índice sintético, la edad media de la madre en los nacimientos
+# de primer, segundo, tercer y cuarto o más orden, y el porcentaje de los nacimientos de cada orden
+espana <- data.frame(
+  anyo = 1985:2024,
+  isf = c(1.6398, 1.55585, 1.49362, 1.44773, 1.3972, 1.36027, 1.32666, 1.31045, 1.25636, 1.19047, 1.1553, 1.14053, 1.15008, 1.12907, 1.16783, 1.21524, 1.23218, 1.25179, 1.29604, 1.31319, 1.32955, 1.36227, 1.37687, 1.44608, 1.37935, 1.36904, 1.34238, 1.32109, 1.27306, 1.31771, 1.33016, 1.33316, 1.30508, 1.25616, 1.22868, 1.17977, 1.18054, 1.15727, 1.11863, 1.10275),
+  edad1 = c(25.8, 25.9, 26.1, 26.3, 26.6, 26.8, 27.2, 27.5, 27.8, 28.1, 28.4, 28.5, 28.7, 28.9, 29, 29.1, 29.2, 29.2, 29.3, 29.4, 29.4, 29.4, 29.4, 29.3, 29.6, 29.8, 30.1, 30.3, 30.4, 30.6, 30.7, 30.8, 30.9, 31, 31.1, 31.2, 31.5, 31.6, 31.5, 31.5),
+  edad2 = c(28.7, 28.8, 29.1, 29.3, 29.5, 29.7, 29.9, 30.1, 30.4, 30.7, 30.9, 31.2, 31.5, 31.8, 32, 32.1, 32.2, 32.3, 32.4, 32.5, 32.5, 32.6, 32.5, 32.4, 32.5, 32.6, 32.8, 32.9, 33, 33.1, 33.1, 33.2, 33.2, 33.2, 33.3, 33.3, 33.5, 33.5, 33.5, 33.5),
+  edad3 = c(31.8, 31.9, 32.1, 32.2, 32.3, 32.4, 32.6, 32.7, 32.7, 32.9, 33, 33.3, 33.5, 33.6, 33.8, 33.8, 33.9, 33.9, 33.9, 33.9, 33.9, 33.8, 33.7, 33.5, 33.5, 33.4, 33.6, 33.6, 33.6, 33.6, 33.7, 33.6, 33.6, 33.7, 33.7, 33.7, 34, 33.9, 34, 34),
+  edad4 = c(35, 35, 35, 35.1, 35.1, 35.1, 35.1, 35.1, 35, 35, 35, 35.2, 35.2, 35.3, 35.4, 35.3, 35.3, 35.2, 35.2, 35.1, 35.1, 35, 34.7, 34.7, 34.6, 34.5, 34.7, 34.6, 34.6, 34.5, 34.6, 34.5, 34.5, 34.7, 34.6, 34.8, 34.9, 35.1, 35.2, 35.3),
+  pct1 = c(46.4, 44.5, 48.1, 49.3, 50, 50.3, 51.3, 51.9, 52.1, 51.8, 51.2, 49.7, 50.9, 51.5, 52.1, 53, 54.3, 55.3, 55.5, 55.7, 55.8, 55.7, 57.4, 53.3, 53.5, 52.6, 52.4, 52.1, 52.7, 52, 51.2, 50.3, 49.7, 49.1, 49.5, 50.8, 49.9, 50.5, 50.3, 50.7),
+  pct2 = c(32, 35.1, 33.2, 33.4, 34, 34.6, 34.7, 34.8, 35.1, 35.7, 36.5, 37.8, 37.4, 37.1, 36.9, 36.3, 35.7, 34.9, 34.9, 34.8, 34.8, 34.9, 32.5, 36.4, 36.1, 36.8, 37.3, 37.4, 36.8, 37.3, 37.9, 38.2, 38.1, 38, 37, 35.7, 36.2, 35.4, 36.1, 35.8),
+  pct3 = c(13, 12.6, 11.9, 11.2, 10.7, 10.3, 9.7, 9.4, 9.1, 9.1, 9, 9.2, 8.7, 8.6, 8.4, 8.1, 7.5, 7.4, 7.4, 7.3, 7.1, 7.1, 7.5, 7.7, 7.8, 7.9, 7.8, 7.9, 7.9, 8.1, 8.3, 8.7, 9.2, 9.5, 9.9, 9.8, 10.1, 10.1, 9.7, 9.5),
+  pct4 = c(8.5, 7.7, 6.8, 6.1, 5.3, 4.8, 4.3, 3.9, 3.7, 3.5, 3.2, 3.2, 3, 2.9, 2.7, 2.5, 2.4, 2.4, 2.3, 2.3, 2.3, 2.2, 2.5, 2.6, 2.7, 2.7, 2.5, 2.6, 2.6, 2.6, 2.6, 2.8, 3, 3.4, 3.6, 3.7, 3.9, 4, 3.9, 4))
+# El índice de cada orden es el total por su porcentaje de nacimientos, y cada uno se corrige con su
+# propia edad media, con lag = 4 porque las edades vienen con un solo decimal
+espana$ajustada <- with(espana,
+  bongaarts_feeney(isf * pct1 / 100, edad1, lag = 4) + bongaarts_feeney(isf * pct2 / 100, edad2, lag = 4) +
+  bongaarts_feeney(isf * pct3 / 100, edad3, lag = 4) + bongaarts_feeney(isf * pct4 / 100, edad4, lag = 4))
+
+par(mfrow = c(1, 2))
+plot(anyos, isf, type = "l", lwd = 2, col = "#c0392b", ylim = c(1, 2), xlab = "Año", ylab = "Hijos por mujer",
+     main = "Simulación")
+lines(anyos, ajustada, lwd = 2, col = "grey40")
+abline(h = 1.8, lty = 2)
+plot(espana$anyo, espana$isf, type = "l", lwd = 2, col = "#c0392b", ylim = c(1, 2), xlab = "Año", ylab = "Hijos por mujer",
+     main = "España")
+lines(espana$anyo, espana$ajustada, lwd = 2, col = "grey40")
+# Las cifras: el mínimo de la simulación y tres años de España
+round(rbind(
+  simulacion = c(anyo = anyos[which.min(isf)], isf = min(isf), ajustada = ajustada[which.min(isf)]),
+  espana_1998 = unlist(espana[espana$anyo == 1998, c("anyo", "isf", "ajustada")]),
+  espana_2008 = unlist(espana[espana$anyo == 2008, c("anyo", "isf", "ajustada")]),
+  espana_2022 = unlist(espana[espana$anyo == 2022, c("anyo", "isf", "ajustada")])), 2)
+```
+
+```{webr}
+#| exercise: tempo
+#| check: true
+# Se comprueba con casos propios: la tarea 4 cambia Q.
+e <- .envir_result
+f <- e$isf_del_anyo
+g <- e$bongaarts_feeney
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+referencia <- function(t) sum(sapply(e$edades, function(a) e$tasa(t - a, a)))
+prueba_f <- if (is.function(f)) tryCatch(c(f(1975), f(2002)), error = function(err) NULL)
+prueba_g <- if (is.function(g)) tryCatch(g(c(1, 1, 1), c(30, 30.1, 30.2))[2], error = function(err) NULL)
+if (!is.function(f) || !is.function(g)) {
+  list(correct = FALSE, message = "No encuentro las funciones isf_del_anyo() y bongaarts_feeney().")
+} else if (is.null(prueba_f) || anyNA(prueba_f)) {
+  list(correct = FALSE, message = "isf_del_anyo() da un error o un NA. ¿Qué generación tiene a años en el año t?")
+} else if (!isTRUE(all.equal(prueba_f, c(referencia(1975), referencia(2002))))) {
+  list(correct = FALSE, message = "isf_del_anyo() no suma las tasas del año t. Quien tiene a años en el año t nació en t - a, y su tasa es tasa(t - a, a).")
+} else if (is.null(prueba_g) || is.na(prueba_g)) {
+  list(correct = FALSE, message = "bongaarts_feeney() da un error o un NA donde ya hay r.")
+} else if (isTRUE(all.equal(prueba_g, 0.9))) {
+  list(correct = FALSE, message = "bongaarts_feeney() multiplica por 1 - r. El retraso baja el índice; la corrección tiene que subirlo.")
+} else if (isTRUE(all.equal(prueba_g, 1))) {
+  list(correct = FALSE, message = "bongaarts_feeney() devuelve el índice sin corregir.")
+} else if (!isTRUE(all.equal(prueba_g, 1 / 0.9))) {
+  list(correct = FALSE, message = "bongaarts_feeney() no da la fórmula de arriba. Con un índice de 1 y una edad media que sube 0,1 años al año, el corregido es 1 / 0,9.")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! El índice del año baja a ", coma(min(e$isf)), " en ", e$anyos[which.min(e$isf)],
+    ", y el corregido da ", coma(e$ajustada[which.min(e$isf)]), ". En España, el 1,13 de 1998 corregido es ",
+    coma(e$espana$ajustada[e$espana$anyo == 1998]), ", y el 1,16 de 2022, ", coma(e$espana$ajustada[e$espana$anyo == 2022]), "."))
+}
+```
+
+::: {.hint exercise="tempo"}
+En `isf_del_anyo()`, la tasa de la mujer de `a` años en el año `t` es la de su generación a esa edad. En `bongaarts_feeney()`, la fórmula del enunciado, con `isf` y `r`.
+:::
+
+::: {.solution exercise="tempo"}
+`tasa(t - a, a)` en `isf_del_anyo()`, e `isf / (1 - r)` en `bongaarts_feeney()`.
+:::
+:::
+
+::::
