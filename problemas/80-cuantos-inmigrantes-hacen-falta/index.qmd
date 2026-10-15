@@ -29,6 +29,12 @@ engine: markdown
        la de Zamora (75,25 y 82,17 años de esperanza de vida al nacer). En tablas.csv, las filas de esas tres.
      - Eurostat, API de difusión: demo_gind (nacidos vivos de 1991 a 2000) y demo_frate (tasas de fecundidad de 2001
        por grupos de edad, tasas2001 en el código; ISF de 2001, 1,23).
+     Para «Qué está pasando», también consultados el 15-10-2026: INE, tabla 56934, 1 de enero de 2009 (SHA-256 7555cd61cb5bea1a31e2a508559fce3c77008fa8c1b1db44a9296db3244cec3b),
+       para la edad de llegada de la ola de 2001-2008 (población de 2009 con edad a+8 menos la de 2001 con edad a: 20-24 años, 691.000; 25-29, 716.000; 30-34, 560.000);
+       CEPAL, Observatorio Demográfico 2024 (repositorio.cepal.org, SHA-256 652f9df0d5807890469d25ab3dc3a8345785f0c42a581965b9cb2187a8345986): 1,8 en 2024, y Argentina, Chile,
+       Costa Rica y Uruguay 1,5, 1,14, 1,32 y 1,4; Observatorio Demográfico 2025 (SHA-256 da01c6ede965ebc956c1e3b4f7e64203746520cd1020a02e9f50d95340e6a007):
+       por debajo del reemplazo desde 2015, y la tasa ajustada por tempo en torno a 2,2 de 2010 a 2017 (gráfico III.6); Naciones Unidas, World Population Prospects 2024:
+       Summary of Results (SHA-256 b5421436f2a0afc6ab5d668b9afb79418234d09c3115f1de4252419b26d748d7): uno de cada diez países, sobre todo del África subsahariana, con cuatro hijos o más.
      La tabla de 2050 conserva el patrón por edad de la mejora de 1980-1998 (sin las edades en que la mortalidad subió)
      y lo escala hasta la esperanza de vida que fija Zamora (p. 334): 83,73 años los hombres y 91,42 las mujeres.
      El saldo de 1991-2000 se calcula por residuo, como lo describe Zamora en su nota 7.
@@ -89,6 +95,10 @@ Los rendimientos son decrecientes. Los primeros 400.000 inmigrantes al año baja
 
 La tarea 4 es la razón. Los inmigrantes también envejecen, y en 2051 los primeros en llegar apenas empiezan a jubilarse. Espenshade, Bouvier y Arthur demostraron en 1982 que, si la fecundidad está por debajo del reemplazo, un número constante de inmigrantes al año, con edades fijas, lleva a una población *estacionaria*, y que su estructura por edad no depende de cuántos inmigrantes llegan: de eso solo depende su tamaño. Tras 500 años, con un millón al año la tasa es de 53,27, y con diez millones, de 53,21: más del doble que en 2001, y mucho más que el límite de 2051. La foto de 2051 favorece a la inmigración porque la toma a mitad de camino. Las Naciones Unidas llegaron a una conclusión parecida en 2000, en su informe sobre la *migración de reemplazo*.
 
+Se ve también en la propia tabla de Zamora: el número de mayores de 2051 no cambia con la fecundidad, porque ya habían nacido en 2001, pero se dispara con la inmigración. En este modelo serían 13,65 millones sin migración; 18,70 con 400.000 inmigrantes al año; 38,88 con 2 millones, y 139,81 con 10 millones. Zamora da 14,10, 19,34, 40,29 y 145,07. Los mayores de más son inmigrantes que llegaron con edad de trabajar entre 2001 y 2036: cada generación de inmigrantes rejuvenece la pirámide al llegar y la envejece cuarenta años después. En España el calendario aprieta. La gran ola de 2001 a 2008 llegó sobre todo con 20 a 35 años, según las cifras de población del INE, y cumplirá 65 entre los años treinta y los cincuenta, en parte a la vez que las últimas generaciones del *baby boom*, las nacidas hasta 1977. Una parte de los inmigrantes vuelve a su país antes de la vejez y se lleva con ella algo de envejecimiento; el modelo no lo recoge, porque sus inmigrantes se quedan.
+
+Y el planeta no tiene migración. Para el mundo entero, la estructura por edad depende solo de la fecundidad y la mortalidad, como en el problema 29: la migración reparte la juventud, pero no la crea. La principal fuente de inmigrantes de España ya lo nota. Según la CEPAL, América Latina y el Caribe tenían en 2024 una fecundidad de 1,8 hijos por mujer, por debajo del reemplazo desde 2015, con Chile en 1,14, Costa Rica en 1,32, Uruguay en 1,4 y Argentina en 1,5. Esos países envejecerán y necesitarán a sus propios jóvenes. Quedan jóvenes en el mundo, porque más de uno de cada diez países, la mayoría del África subsahariana, tiene cuatro hijos por mujer o más, según las Naciones Unidas, pero cada vez más lejos y con más países ricos compitiendo por ellos. Una cautela antes de hablar de desplome: el índice sintético de un año baja también cuando las mujeres retrasan los hijos, aunque acaben teniendo los mismos, el *efecto tempo* de Bongaarts y Feeney. La CEPAL lo mide: corregido por el retraso, el índice de la región se mantuvo en torno a 2,2 hijos por mujer de 2010 a 2017, y solo después cayó hacia el observado, sobre todo porque bajó la fecundidad de las adolescentes y las jóvenes. Parte de la caída es calendario, y parte es real.
+
 La tarea 5 es una lección de lectura. Con la fecundidad constante desde 2002, el modelo da 20,39 millones de personas de 15 a 64 años con 1,7 hijos por mujer y 24,46 con 2,1. Así debe ser: las generaciones nacidas entre 2002 y 2036 tendrán en 2051 de 15 a 49 años, y con más fecundidad son más grandes. La tabla de Zamora no es una errata, porque el texto, la nota 11 y los cuatro cuadros dicen lo mismo, pero el artículo no cuenta cómo llega la fecundidad a cada nivel. Si el 1,7 se alcanza hacia 2016 y el 2,1 solo hacia 2051, el modelo da 18,96 y 18,32 millones, y el orden de Zamora. Lo que se compara en la tabla no son dos fecundidades, sino dos caminos. Antes de citar una cifra de un escenario, hay que leer sus hipótesis.
 
 Y un contrapeso. La tasa de dependencia demográfica no es la económica: las pensiones no las pagan las personas de 15 a 64 años, sino las que trabajan, y la tasa de empleo, la edad de jubilación y la productividad mueven la carga tanto o más que la pirámide, como mostraba la jubilación a los 70 en el problema 29. Zamora muestra que la inmigración no detiene el envejecimiento, una cuestión de estructura. No muestra que sea indiferente para financiar las pensiones, una cuestión de cotizantes, salarios y prestaciones: un inmigrante cotiza mientras trabaja y cobra después, y el saldo depende de su empleo y su salario a lo largo de la vida. Las cuentas de transferencias de Lee y Mason separan las dos cosas, edad por edad.
@@ -98,6 +108,14 @@ Zamora López, F. (2005). La España que viene. *Papeles de Economía Española*
 Espenshade, T. J., Bouvier, L. F. y Arthur, W. B. (1982). Immigration and the Stable Population Model. *Demography*, 19(1), 125-133.
 
 Naciones Unidas (2000). *Replacement Migration: Is It a Solution to Declining and Ageing Populations?* ESA/P/WP.160. División de Población.
+
+CEPAL (2024). *Observatorio Demográfico de América Latina y el Caribe 2024*. Comisión Económica para América Latina y el Caribe.
+
+CEPAL (2025). *Observatorio Demográfico de América Latina y el Caribe 2025*. Comisión Económica para América Latina y el Caribe.
+
+Bongaarts, J. y Feeney, G. (1998). On the Quantum and Tempo of Fertility. *Population and Development Review*, 24(2), 271-291.
+
+Naciones Unidas (2024). *World Population Prospects 2024: Summary of Results*. División de Población.
 
 Lee, R. y Mason, A. (eds.) (2011). *Population Aging and the Generational Economy: A Global Perspective*. Edward Elgar.
 
