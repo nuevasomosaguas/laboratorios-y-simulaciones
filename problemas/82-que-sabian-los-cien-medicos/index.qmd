@@ -1,0 +1,314 @@
+---
+title: "¿Qué sabían los cien médicos?"
+numero: 82
+nivel: 3
+duracion: "45 min"
+lectura: "[Coleman (1990)](https://nuevasomosaguas.github.io/biblioteca.html#coleman1990foundations); [Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting); [McElreath (2020)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2020statistical); Bikhchandani, Hirshleifer y Welch (1992)"
+dificultad: "Avanzado"
+categories: [DBO, modelos de agentes, estadística]
+description: "Cien médicos recetan, uno tras otro, el mismo fármaco. El registro parece unánime, pero solo los cuatro primeros dijeron lo que sabían."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+James Coleman abrió *Foundations of Social Theory*, en 1990, con *La ética protestante* de Weber. La proposición «el calvinismo favorece el capitalismo» une dos hechos de la sociedad, pero Coleman la parte en tres: la doctrina protestante genera ciertos valores en sus fieles, del macro al micro; quien tiene esos valores se orienta de cierta manera hacia la economía, del micro al micro; y esas orientaciones, juntas, producen la organización capitalista, del micro al macro. El sistema empieza y acaba en la sociedad, pero entre medias baja al individuo. Es la **barca de Coleman**, y él mismo dice que la tercera flecha, la que vuelve a subir, es la más interesante, y aquella sobre la que Weber casi no dice nada.
+
+Muchas veces la barca no se cruza una sola vez. En 1957, Coleman, Elihu Katz y Herbert Menzel estudiaron cómo se extendía un fármaco nuevo entre los médicos. Cada receta cambia lo que saben los demás, y lo que saben cambia la receta siguiente: el final de una barca es el principio de otra, y lo que hizo el médico anterior pesa sobre el siguiente. Hedström llama a este mecanismo **imitación racional**. Otros hacen A; si creo que tienen buenas razones, sus actos cambian lo que creo de A, sobre todo si pueden saber algo que yo no sé; y así, cuantos más hacen A, más probable es que yo también lo haga.
+
+Sushil Bikhchandani, David Hirshleifer e Ivo Welch lo formalizaron en 1992. Hay dos fármacos, A y B, y uno de los dos es mejor. Cien médicos eligen uno tras otro. Cada uno tiene su experiencia, la de sus pacientes, que apunta al mejor con probabilidad $q$, y ve qué han recetado todos los anteriores. Con eso forma una **creencia pública** $\ell$, el logaritmo de la razón de probabilidades de que A sea el mejor según las recetas que ha visto. Su experiencia suma $\lambda = \log\frac{q}{1-q}$ si apunta a A y la resta si apunta a B, y receta A si el total es positivo; en esta versión, si empata, sigue su experiencia. En cuanto $|\ell| > \lambda$, lo que diga su experiencia ya no cambia nada: receta lo que recetaron los anteriores, y el siguiente, sabiéndolo, tampoco aprende nada de su receta. Es una **cascada**. Para que no se cierre del todo, el laboratorio añade una fracción $\varepsilon$ de médicos que va por libre: sigue su experiencia sin mirar a nadie, y los demás lo saben.
+
+Las tres flechas están en el código. `prob_A()` es la de micro a micro: la probabilidad de que un médico recete A según la creencia pública, si A es el mejor ($p_G$) o si lo es B ($p_B$). `creencia()` es la de macro a micro: lo que aprende de una receta quien la ve. Por la regla de Bayes, una receta de A multiplica la razón de probabilidades por $p_G / p_B$, y una de B, por $(1 - p_G) / (1 - p_B)$. Y `mundos()` es la de micro a macro: suma las recetas, una tras otra.
+
+Años después, un ensayo clínico demuestra que el mejor era A. Una socióloga tiene el registro de las cien recetas y quiere saber cuánto sabía cada médico, $q$, y cuántos iban por libre, $\varepsilon$: quiere remar la barca al revés, del macro al micro. Parte de un prior uniforme, $q$ entre 0,5 y 1 y $\varepsilon$ entre 0 y 1, y explora la posterior con el **algoritmo de Metropolis**: veinte cadenas proponen saltos al azar, y cada una salta con probabilidad $\min\left(1, \frac{\text{posterior nueva}}{\text{posterior actual}}\right)$. Con el prior uniforme, la razón de posteriores es la de verosimilitudes, y `logver()` la calcula reproduciendo la creencia pública receta a receta.
+
+**Tu tarea.**
+
+1. Completa `creencia()`: la creencia pública después de ver la receta `a`, que es `TRUE` si es de A. Tiene que funcionar con vectores, un mundo por elemento.
+2. Mira el gráfico: veinte mundos con $q = 0{,}7$ y nadie por libre, con la fracción de médicos que han recetado A, el mejor.
+3. Lee la tabla: en qué fracción de 2.000 mundos receta B, el peor, el médico número cien, según $q$, sin nadie por libre y con un 10%, frente a la teoría.
+4. Completa `acepta()`: la regla de Metropolis en logaritmos, una decisión por cadena.
+5. Lee la posterior de $q$, con su intervalo del 90%, y la media de $\varepsilon$: con las 10 primeras recetas del registro, con las 100 y con 100 médicos que no se miran. ¿Cuánto aprende la socióloga de los 90 últimos?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+Hacia delante, la barca repetida lleva a casi todos al mismo sitio. En el gráfico, las veinte líneas se quedan quietas antes del décimo médico, y una de ellas en B, el peor. Sin nadie por libre, la cascada empieza en cuanto un fármaco saca dos recetas de ventaja. Hasta entonces, cada médico sigue su experiencia, y la ventaja es un paseo al azar entre +2 y −2. Por la fórmula de la ruina del jugador, el paseo acaba en el fármaco peor con probabilidad $(1-q)^2 / (q^2 + (1-q)^2)$: con $q = 0{,}7$, el 15,5% de las veces, y la simulación da el 15,0%. Con $q = 0{,}6$, el 30,8%, y con $q = 0{,}9$, el 1,2%. Mirarse unos a otros ayuda: un médico que solo tuviera su experiencia acertaría el 70% de las veces, y, según la fórmula, el 84,5% de los mundos acaba en el bueno. Pero en el resto se encierra en el malo para siempre. Es la dependencia de la trayectoria del laboratorio [*¿Por qué R es como es?*](../69-por-que-r-es-como-es/), con la misma fórmula, pero con otro micro: allí cada colega hacía más útil la práctica, y aquí solo cambia lo que se cree de ella. Hedström separa las interacciones que pasan por las creencias de las que pasan por los deseos o las oportunidades, y desde lo macro no se distinguen. Con un 10% de médicos por libre, el último se equivoca menos, el 7,6% de las veces: una receta contra la cascada solo puede venir de uno de ellos, así que dice exactamente lo que sabe, y basta con unas cuantas para romperla.
+
+Hacia atrás es donde la barca se resiste. En el registro, los cuatro primeros recetan A, B, A y A, y los 96 siguientes, A. Con las 10 primeras recetas, la posterior de $q$ tiene media 0,77, entre 0,55 y 0,95; con las 100, media 0,82, entre 0,58 y 0,98. El prior uniforme tenía media 0,75, entre 0,525 y 0,975. Las 90 últimas recetas apenas dicen nada sobre lo que sabían los médicos, porque son la cascada repitiendo lo que dijeron los cuatro primeros, y lo poco que suben $q$ se debe a que los que iban por libre, si los había, también recetaron A. Sí dicen algo de $\varepsilon$, que baja de 0,40 a 0,12: si muchos fueran por libre, alguno habría recetado B. Con cien médicos que no se miran y la misma $q$, el registro está lleno de B, y la posterior de $q$ tiene media 0,66, entre 0,53 y 0,77, en torno al 0,7 verdadero. Los mismos cien médicos, con la misma experiencia, dejan un registro que sabe mucho menos cuando se miran. La interacción mejora las decisiones y destruye la información: la cifra macro, 99 de 100 recetas de A, es compatible con médicos que sabían casi todo y con médicos que no sabían casi nada.
+
+Es la advertencia de Coleman, al revés. La flecha que sube es la difícil de teorizar, y la que baja es la difícil de estimar: del macro no se deduce el micro, porque el camino que lleva de uno a otro borra lo que lo distinguiría. Es el mismo problema de identificación que el de [*El problema de la reflexión*](../40-problema-de-la-reflexion/), donde con datos de grupos no se separa la influencia del grupo de que se junten los parecidos. Y explica por qué el algoritmo de Metropolis, que McElreath presenta en el capítulo 9 con el rey Markov y sus islas, sirve aquí sin trucos: no hace falta saber escribir la posterior, solo evaluarla en dos puntos y comparar, y la verosimilitud se evalúa simulando la propia barca.
+
+**Para ir más allá:** las cadenas son cortas, 400 pasos, para que el navegador no se eternice. Con `pasos = 4000, quema = 500` en `metropolis()`, ¿cambia la posterior de $q$? ¿Y la de $\varepsilon$? Prueba después con un registro con un 10% de médicos por libre, `registro <- mundos(100, q, 0.1)[, 1]`: ¿aprende ahora la socióloga algo de $q$?
+
+Bikhchandani, S., Hirshleifer, D. y Welch, I. (1992). A theory of fads, fashion, custom, and cultural change as informational cascades. *Journal of Political Economy*, 100(5), 992–1026.
+
+Coleman, J. S. (1990). *Foundations of Social Theory*. Belknap Press of Harvard University Press.
+
+Coleman, J. S., Katz, E. y Menzel, H. (1957). The diffusion of an innovation among physicians. *Sociometry*, 20(4), 253–270.
+
+Hedström, P. (2005). *Dissecting the Social: On the Principles of Analytical Sociology*. Cambridge University Press.
+
+McElreath, R. (2020). *Statistical Rethinking: A Bayesian Course with Examples in R and Stan* (2.ª ed.). Chapman and Hall/CRC.
+
+Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H. y Teller, E. (1953). Equation of state calculations by fast computing machines. *The Journal of Chemical Physics*, 21(6), 1087–1092.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: cascada
+#| caption: "Tu código"
+q   <- 0.7   # probabilidad de que la experiencia de un médico apunte al fármaco mejor
+eps <- 0     # fracción de médicos que van por libre: siguen su experiencia sin mirar a nadie
+
+# Micro → micro: con la creencia pública ell, la probabilidad de que un médico recete A,
+# si el mejor es A (bueno_A = TRUE) o si es B
+prob_A <- function(ell, bueno_A, q, eps) {
+  lambda <- log(q / (1 - q))         # lo que pesa la experiencia propia
+  pa <- if (bueno_A) q else 1 - q    # probabilidad de que su experiencia apunte a A
+  con_a <- ell + lambda > -1e-9      # experiencia a favor de A: receta A (si empata, sigue su experiencia)
+  con_b <- ell - lambda > 1e-9       # experiencia en contra: receta A solo si los colegas pesan más
+  eps * pa + (1 - eps) * (pa * con_a + (1 - pa) * con_b)
+}
+
+# 1. Macro → micro: lo que aprende quien ve la receta a (TRUE si es de A), si pG y pB son
+#    las probabilidades de que se recete A si el mejor es A y si es B
+creencia <- function(ell, a, pG, pB) {
+  ell + log(______)
+}
+
+# Micro → macro: R mundos de N médicos en los que el mejor es A; cada columna, las recetas de un mundo
+mundos <- function(N, q, eps, R = 1) {
+  ell <- rep(0, R)
+  a <- matrix(NA, N, R)
+  for (t in 1:N) {
+    pG <- prob_A(ell, TRUE, q, eps)
+    pB <- prob_A(ell, FALSE, q, eps)
+    a[t, ] <- runif(R) < pG
+    ell <- creencia(ell, a[t, ], pG, pB)
+  }
+  a
+}
+
+# 2. Veinte mundos
+set.seed(1957)
+m <- mundos(100, q, eps, R = 20)
+matplot(apply(m, 2, cumsum) / 1:100, type = "l", lty = 1, col = "grey50", ylim = c(0, 1),
+        xlab = "Médico", ylab = "Fracción que ha recetado A, el mejor")
+
+# 3. ¿En qué fracción de 2.000 mundos receta B el médico número cien?
+tabla <- data.frame(q = c(0.6, 0.7, 0.8, 0.9))
+tabla$sin_libres <- sapply(tabla$q, function(x) mean(!mundos(100, x, 0, R = 2000)[100, ]))
+tabla$teoria     <- (1 - tabla$q)^2 / (tabla$q^2 + (1 - tabla$q)^2)
+tabla$con_libres <- sapply(tabla$q, function(x) mean(!mundos(100, x, 0.1, R = 2000)[100, ]))
+round(tabla, 3)
+
+# La barca al revés: la log-verosimilitud de unas recetas, sabiendo que el mejor era A,
+# para un vector de valores de q y eps a la vez
+logver <- function(q, eps, a) {
+  ell <- rep(0, length(q))
+  s <- 0
+  for (t in seq_along(a)) {
+    pG <- prob_A(ell, TRUE, q, eps)
+    pB <- prob_A(ell, FALSE, q, eps)
+    s <- s + log(if (a[t]) pG else 1 - pG)
+    ell <- creencia(ell, rep(a[t], length(q)), pG, pB)
+  }
+  s
+}
+
+# 4. La regla de Metropolis, en logaritmos: ¿salta cada cadena a su propuesta?
+acepta <- function(lp_nuevo, lp_viejo) ______
+
+# Veinte cadenas que salen de puntos al azar del prior; fuera del prior, la posterior es cero
+metropolis <- function(a, cadenas = 20, pasos = 400, quema = 150, paso = 0.1) {
+  q <- runif(cadenas, 0.5, 1)
+  eps <- runif(cadenas)
+  lp <- logver(q, eps, a)
+  muestras <- matrix(NA, (pasos - quema) * cadenas, 2, dimnames = list(NULL, c("q", "eps")))
+  for (i in 1:pasos) {
+    q_nuevo <- q + rnorm(cadenas, 0, paso)
+    eps_nuevo <- eps + rnorm(cadenas, 0, paso)
+    dentro <- q_nuevo > 0.5 & q_nuevo < 1 & eps_nuevo > 0 & eps_nuevo < 1
+    lp_nuevo <- rep(-Inf, cadenas)
+    lp_nuevo[dentro] <- logver(q_nuevo[dentro], eps_nuevo[dentro], a)
+    salta <- acepta(lp_nuevo, lp)
+    q[salta] <- q_nuevo[salta]
+    eps[salta] <- eps_nuevo[salta]
+    lp[salta] <- lp_nuevo[salta]
+    if (i > quema) muestras[(i - quema - 1) * cadenas + 1:cadenas, ] <- cbind(q, eps)
+  }
+  muestras
+}
+
+# 5. Lo que aprende la socióloga
+set.seed(1990)
+registro <- mundos(100, q, eps)[, 1]
+independientes <- mundos(100, q, 1)[, 1]
+cat(ifelse(registro, "A", "B"), "\n", sep = "")
+casos <- list("las 10 primeras recetas" = registro[1:10], "las 100 recetas" = registro,
+              "100 médicos que no se miran" = independientes)
+posterior <- t(sapply(casos, function(a) {
+  m <- metropolis(a)
+  c(q = mean(m[, "q"]), quantile(m[, "q"], c(0.05, 0.95)), eps = mean(m[, "eps"]))
+}))
+round(posterior, 2)
+```
+
+```{webr}
+#| exercise: cascada
+#| solution: true
+q   <- 0.7
+eps <- 0
+
+prob_A <- function(ell, bueno_A, q, eps) {
+  lambda <- log(q / (1 - q))
+  pa <- if (bueno_A) q else 1 - q
+  con_a <- ell + lambda > -1e-9
+  con_b <- ell - lambda > 1e-9
+  eps * pa + (1 - eps) * (pa * con_a + (1 - pa) * con_b)
+}
+
+creencia <- function(ell, a, pG, pB) {
+  ell + log(ifelse(a, pG / pB, (1 - pG) / (1 - pB)))
+}
+
+mundos <- function(N, q, eps, R = 1) {
+  ell <- rep(0, R)
+  a <- matrix(NA, N, R)
+  for (t in 1:N) {
+    pG <- prob_A(ell, TRUE, q, eps)
+    pB <- prob_A(ell, FALSE, q, eps)
+    a[t, ] <- runif(R) < pG
+    ell <- creencia(ell, a[t, ], pG, pB)
+  }
+  a
+}
+
+set.seed(1957)
+m <- mundos(100, q, eps, R = 20)
+matplot(apply(m, 2, cumsum) / 1:100, type = "l", lty = 1, col = "grey50", ylim = c(0, 1),
+        xlab = "Médico", ylab = "Fracción que ha recetado A, el mejor")
+
+tabla <- data.frame(q = c(0.6, 0.7, 0.8, 0.9))
+tabla$sin_libres <- sapply(tabla$q, function(x) mean(!mundos(100, x, 0, R = 2000)[100, ]))
+tabla$teoria     <- (1 - tabla$q)^2 / (tabla$q^2 + (1 - tabla$q)^2)
+tabla$con_libres <- sapply(tabla$q, function(x) mean(!mundos(100, x, 0.1, R = 2000)[100, ]))
+round(tabla, 3)
+
+logver <- function(q, eps, a) {
+  ell <- rep(0, length(q))
+  s <- 0
+  for (t in seq_along(a)) {
+    pG <- prob_A(ell, TRUE, q, eps)
+    pB <- prob_A(ell, FALSE, q, eps)
+    s <- s + log(if (a[t]) pG else 1 - pG)
+    ell <- creencia(ell, rep(a[t], length(q)), pG, pB)
+  }
+  s
+}
+
+acepta <- function(lp_nuevo, lp_viejo) log(runif(length(lp_nuevo))) < lp_nuevo - lp_viejo
+
+metropolis <- function(a, cadenas = 20, pasos = 400, quema = 150, paso = 0.1) {
+  q <- runif(cadenas, 0.5, 1)
+  eps <- runif(cadenas)
+  lp <- logver(q, eps, a)
+  muestras <- matrix(NA, (pasos - quema) * cadenas, 2, dimnames = list(NULL, c("q", "eps")))
+  for (i in 1:pasos) {
+    q_nuevo <- q + rnorm(cadenas, 0, paso)
+    eps_nuevo <- eps + rnorm(cadenas, 0, paso)
+    dentro <- q_nuevo > 0.5 & q_nuevo < 1 & eps_nuevo > 0 & eps_nuevo < 1
+    lp_nuevo <- rep(-Inf, cadenas)
+    lp_nuevo[dentro] <- logver(q_nuevo[dentro], eps_nuevo[dentro], a)
+    salta <- acepta(lp_nuevo, lp)
+    q[salta] <- q_nuevo[salta]
+    eps[salta] <- eps_nuevo[salta]
+    lp[salta] <- lp_nuevo[salta]
+    if (i > quema) muestras[(i - quema - 1) * cadenas + 1:cadenas, ] <- cbind(q, eps)
+  }
+  muestras
+}
+
+set.seed(1990)
+registro <- mundos(100, q, eps)[, 1]
+independientes <- mundos(100, q, 1)[, 1]
+cat(ifelse(registro, "A", "B"), "\n", sep = "")
+casos <- list("las 10 primeras recetas" = registro[1:10], "las 100 recetas" = registro,
+              "100 médicos que no se miran" = independientes)
+posterior <- t(sapply(casos, function(a) {
+  m <- metropolis(a)
+  c(q = mean(m[, "q"]), quantile(m[, "q"], c(0.05, 0.95)), eps = mean(m[, "eps"]))
+}))
+round(posterior, 2)
+```
+
+```{webr}
+#| exercise: cascada
+#| check: true
+# creencia() se comprueba con creencias elegidas a mano; acepta(), con 10.000 decisiones a la vez.
+e <- .envir_result
+coma <- function(x) format(round(x, 2), decimal.mark = ",")
+prueba <- function(expr) tryCatch(expr, error = function(err) NULL, warning = function(w) NULL)
+l <- log(0.7 / 0.3)
+if (!is.function(e$creencia) || !is.function(e$acepta)) {
+  list(correct = FALSE, message = "No encuentro creencia() o acepta().")
+} else if (!isTRUE(all.equal(prueba(e$creencia(c(0, 0), c(TRUE, FALSE), 0.7, 0.3)), c(l, -l)))) {
+  list(correct = FALSE, message = paste0(
+    "Antes de la primera receta, cada médico sigue su experiencia: pG = 0,7 y pB = 0,3. Una receta de A ",
+    "debería subir la creencia en log(0,7 / 0,3) = 0,85, y una de B, bajarla lo mismo, cada mundo con la suya. ",
+    "¿Distingues las recetas de A de las de B, elemento a elemento?"))
+} else if (!isTRUE(all.equal(prueba(e$creencia(1.7, TRUE, 1, 1)), 1.7))) {
+  list(correct = FALSE, message = paste0(
+    "En una cascada sin nadie por libre, todos recetan A sea cual sea el mejor: pG = pB = 1. ",
+    "Esa receta no enseña nada, y la creencia debería quedarse en 1,7. ",
+    "No cuentes cada receta como si fuera la experiencia de quien la firma."))
+} else if (!isTRUE(all.equal(prueba(e$creencia(1.7, FALSE, 0.97, 0.93)), 1.7 + log(0.03 / 0.07)))) {
+  list(correct = FALSE, message = paste0(
+    "Con un 10% por libre en una cascada, pG = 0,97 y pB = 0,93, así que una receta de B tiene probabilidad ",
+    "0,03 si el mejor es A y 0,07 si es B. La creencia debería bajar de 1,7 a ", coma(1.7 + log(0.03 / 0.07)), "."))
+} else {
+  set.seed(1)
+  baja <- prueba(e$acepta(rep(log(0.3), 10000), rep(0, 10000)))
+  sube <- prueba(e$acepta(rep(0, 10000), rep(log(0.3), 10000)))
+  if (length(sube) != 10000 || !all(sube)) {
+    list(correct = FALSE, message = paste0(
+      "Una propuesta con más posterior que la actual se acepta siempre, y acepta() no lo hace. ",
+      "¿Comparas en el sentido correcto?"))
+  } else if (length(baja) != 10000 || abs(mean(baja) - 0.3) > 0.03) {
+    list(correct = FALSE, message = paste0(
+      "Una propuesta con el 30% de la posterior actual, lp_nuevo - lp_viejo = log(0,3), debería aceptarse ",
+      "el 30% de las veces, y acepta() la acepta el ", round(100 * mean(baja)), "%. ",
+      "Compara un número al azar entre 0 y 1 con la razón de posteriores, en la misma escala, y uno distinto para cada cadena."))
+  } else if (!identical(prueba(e$acepta(-Inf, 0)), FALSE)) {
+    list(correct = FALSE, message = "Una propuesta fuera del prior, con lp_nuevo = -Inf, no se acepta nunca.")
+  } else {
+    p <- .result
+    if (is.matrix(p) && all(c("las 10 primeras recetas", "las 100 recetas", "100 médicos que no se miran") %in% rownames(p))) {
+      list(correct = TRUE, message = paste0(
+        "¡Correcto! Con las 10 primeras recetas, q sale ", coma(p["las 10 primeras recetas", "q"]),
+        ", y con las 100, ", coma(p["las 100 recetas", "q"]), ", entre ", coma(p["las 100 recetas", "5%"]),
+        " y ", coma(p["las 100 recetas", "95%"]), ": casi el prior. Con 100 médicos que no se miran, ",
+        coma(p["100 médicos que no se miran", "q"]), ", entre ", coma(p["100 médicos que no se miran", "5%"]),
+        " y ", coma(p["100 médicos que no se miran", "95%"]), "."))
+    } else {
+      list(correct = TRUE, message = "¡Correcto! creencia() y acepta() hacen lo que deben.")
+    }
+  }
+}
+```
+
+::: {.hint exercise="cascada"}
+En `creencia()`, la razón de probabilidades de la receta observada depende de qué receta sea: `ifelse()` elige, elemento a elemento, entre $p_G / p_B$ y $(1 - p_G) / (1 - p_B)$. En `acepta()`, saltar con probabilidad $\min(1, e^{\Delta})$, donde $\Delta$ es `lp_nuevo - lp_viejo`, es lo mismo que comprobar si el logaritmo de un número uniforme es menor que $\Delta$. Cada cadena necesita su propio número: `runif(length(lp_nuevo))`.
+:::
+
+::: {.solution exercise="cascada"}
+`ifelse(a, pG / pB, (1 - pG) / (1 - pB))` en `creencia()`, y `log(runif(length(lp_nuevo))) < lp_nuevo - lp_viejo` en `acepta()`.
+:::
+:::
+
+::::
