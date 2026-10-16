@@ -3,7 +3,7 @@ title: "¿Qué sabían los cien médicos?"
 numero: 82
 nivel: 3
 duracion: "45 min"
-lectura: "[Coleman (1990)](https://nuevasomosaguas.github.io/biblioteca.html#coleman1990foundations); [Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting); [McElreath (2020)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2020statistical); Bikhchandani, Hirshleifer y Welch (1992)"
+lectura: "[Coleman (1990)](https://nuevasomosaguas.github.io/biblioteca.html#coleman1990foundations); [Hedström (2005)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting); [McElreath (2020)](https://nuevasomosaguas.github.io/biblioteca.html#mcelreath2020statistical); [Bikhchandani, Hirshleifer y Welch (1992)](https://nuevasomosaguas.github.io/biblioteca.html#hedstrom2005dissecting)"
 dificultad: "Avanzado"
 categories: [DBO, modelos de agentes, estadística]
 description: "Cien médicos recetan, uno tras otro, el mismo fármaco. El registro parece unánime, pero solo los cuatro primeros dijeron lo que sabían."

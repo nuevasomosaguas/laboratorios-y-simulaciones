@@ -3,7 +3,7 @@ title: "¿Se desploma la fecundidad o se retrasa?"
 numero: 81
 nivel: 2
 duracion: "30 min"
-lectura: "[O'Brien (2014)](https://nuevasomosaguas.github.io/biblioteca.html#obrien2014age); Bongaarts y Feeney (1998)"
+lectura: "[O'Brien (2014)](https://nuevasomosaguas.github.io/biblioteca.html#obrien2014age); [Bongaarts y Feeney (1998)](https://nuevasomosaguas.github.io/biblioteca.html#obrien2014age)"
 dificultad: "Intermedio"
 categories: [demografía, paradojas de agregación]
 description: "Si cada generación de mujeres acaba teniendo 1,8 hijos, pero cada una los tiene un poco más tarde, la fecundidad del año cae a 1,57 y parece un desplome que no lo es."
