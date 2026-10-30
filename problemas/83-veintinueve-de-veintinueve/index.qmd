@@ -1,0 +1,254 @@
+---
+title: "Veintinueve de veintinueve"
+numero: 83
+nivel: 2
+duracion: "30 min"
+lectura: "Tversky y Kahneman (1971); Schimmack, Heene y Kesavan (2017); [Open Science Collaboration (2015)](https://nuevasomosaguas.github.io/biblioteca.html#opensciencecollaboration2015estimating)"
+dificultad: "Intermedio"
+categories: [estadística, sesgo de selección]
+description: "Kahneman escribió que no creer en el priming no era una opción. Los 29 contrastes que citaba salían todos significativos, y eso era justo lo que no cuadraba."
+page-layout: full
+# Los bloques {webr} se ejecutan en el navegador: al renderizar no hace falta ni R ni Python.
+engine: markdown
+---
+
+:::: {.laboratorio}
+
+::: {.enunciado}
+En el capítulo 4 de *Pensar rápido, pensar despacio* (2011), Daniel Kahneman presentaba los estudios de *priming* social: estudiantes que andan más despacio tras ordenar frases con palabras de la vejez, votantes que apoyan más la financiación de las escuelas si votan en un colegio, gente que se vuelve más egoísta tras ver billetes del Monopoly. Y zanjaba: «No creer no es una opción. Los resultados no son inventados, ni fruto del azar. No tienes más remedio que aceptar que las conclusiones principales de estos estudios son ciertas». Pocos meses después, Doyen y colaboradores no consiguieron replicar el estudio de la vejez de Bargh, y en 2012 Kahneman escribió una carta abierta a los investigadores del área: veía venir un choque de trenes.
+
+En 2017, Ulrich Schimmack, Moritz Heene y Kamini Kesavan revisaron uno por uno los artículos del capítulo. De cada contraste se puede calcular la **potencia observada**: la probabilidad de que una réplica idéntica vuelva a salir significativa si el efecto verdadero fuera justo el que se observó. Si el estadístico, pasado a la escala normal, vale $z$, la réplica da un $z$ normal centrado en él, y pasa el criterio, 1,96 para $p < 0{,}05$ de dos colas, con probabilidad $\Phi(z - 1{,}96)$. Un resultado que roza el 0,05 tiene una potencia observada del 50%: lanzar otra vez el estudio es lanzar una moneda.
+
+Con estudios así, unos tienen que fallar. Si la mediana de la potencia es del 60%, cabe esperar que salgan significativos en torno al 60%, y si salen todos, sobran. Esa diferencia es la **inflación**: la tasa de éxito menos la mediana de la potencia. El **R-Index** de Schimmack resta la inflación a la mediana. No estima la potencia real, pero la ordena: con estudios bien hechos y publicados todos, se acerca a la mediana; con un cajón lleno de fracasos, se hunde.
+
+Los datos de la derecha son los 29 contrastes del capítulo que Schimmack y sus coautores pudieron emparejar con lo que cuenta el libro, de diez artículos. Algunos son *t*, otros *F*, otros $\chi^2$; el código los pasa todos a una *p* y a un $z$. Dos artículos usaron el criterio de una cola, $p < 0{,}05$ con $z > 1{,}65$, y para ellos el criterio es ese.
+
+**Tu tarea.**
+
+1. Completa `potencia_observada()`: la probabilidad de que una réplica pase el criterio.
+2. Completa `r_index()`: la mediana de la potencia menos la inflación. `exito` es la tasa de éxito publicada; aquí, todos los contrastes se presentaron como significativos.
+3. Mira la mediana de cada artículo y, abajo, la del capítulo, cuántos significativos cabía esperar de 29 y cuántas veces habría que repetir el capítulo entero para que salieran los 29.
+4. `publicados()` simula el cajón: se hacen estudios con una potencia real dada y solo se publican los significativos. Con potencia 0,025, ningún efecto existe: es el 2,5% de veces que el ruido cae al lado predicho. ¿Qué R-Index da el puro ruido con cajón? ¿Y el capítulo?
+
+::: {.callout-note collapse="true"}
+## Qué está pasando
+
+La mediana de la potencia observada es del 56%: cada estudio del capítulo, repetido tal cual, tendría algo más de media probabilidad de volver a salir. De 29, cabía esperar 17 significativos, y salieron 29. Si cada estudio tuviera de verdad la potencia que aparenta, la probabilidad de que salieran todos sería de una entre cuatro millones. La inflación es del 44% y el R-Index, del 12%. Solo un artículo se salva, el de Wells y Petty sobre asentir con la cabeza, con un efecto enorme y una potencia del 100%. Los demás se apiñan justo encima del criterio: ocho de los 29 contrastes tienen una potencia de entre el 50% y el 53%, es decir, una *p* que roza el 0,05.
+
+Schimmack y sus coautores publicaron una mediana del 57% y un R-Index del 14%. La diferencia sale de una fila: a la *t*(75) = 1,78 de Strack la tabla del blog le pone la *p* de la fila de arriba, 0,034, cuando de una cola es 0,040. Al rehacer las cuentas desde los estadísticos, como en el laboratorio [*El umbral del 90%*](../42-umbral-del-90/), estas cosas aparecen. Aquí no cambian nada.
+
+La simulación añade algo que el R-Index solo no dice. Si ningún efecto existiera y los estudios no significativos se hubieran quedado en el cajón, el R-Index saldría en torno al 23%: el ruido que pasa el criterio se reparte por encima de 1,96, no se queda pegado a él. El capítulo da el 12%, y el puro ruido con cajón da eso o menos solo el 1,5% de las veces. Los resultados están demasiado pegados al 0,05 incluso para ser ruido seleccionado. Es la huella de empujar cada estudio hasta que pase: probar otra variable dependiente, quitar a unos cuantos participantes, mirar los datos cada día como en [*Mirar los datos cada día*](../67-mirar-los-datos-cada-dia/). Kahneman lo dijo en su respuesta: un problema grave de cajón, «y/o *p-hacking*».
+
+Kahneman respondió en los comentarios del blog. Aceptó las conclusiones básicas, sin pronunciarse sobre las técnicas ni sobre cada estudio: «Lo que el blog acierta de lleno es que deposité demasiada fe en estudios con poca potencia». Y explicó por qué su razonamiento había fallado. Le había convencido la unanimidad de tantos laboratorios, pero «la unanimidad de estudios con poca potencia es una prueba contundente de un problema grave de cajón», porque esos estudios tienen que fallar a veces aunque la hipótesis sea cierta, y que no falle ninguno indica que algo va mal en lo publicado. La ironía la señaló él mismo: el primer artículo que publicó con Amos Tversky, «Belief in the law of small numbers», trataba de la confianza exagerada de los investigadores en muestras pequeñas. «Lo escribimos en 1969 y lo publicamos en 1971, pero no llegué a interiorizar su mensaje».
+
+Tampoco se rindió del todo, y eso lo hace más creíble. Seguía creyendo que las acciones se pueden *primar*, por las piezas que sí tienen buena evidencia, pero había cambiado de idea sobre el tamaño de los efectos: «no pueden ser tan grandes ni tan robustos como sugería mi capítulo». Seguía apegado a cada estudio citado y le gustaría verlos replicados con muestras grandes. Y dejó la lección de método: quien revisa un campo debe desconfiar de los resultados memorables de estudios con poca potencia. El del lápiz en la boca, el de Strack, se replicó en 2016 en 17 laboratorios a la vez, y ninguno encontró el efecto.
+
+Kahneman, D. (2017). Comentario del 14 de febrero en Schimmack, Heene y Kesavan (2017).
+
+Schimmack, U., Heene, M. y Kesavan, K. (2017). Reconstruction of a train wreck: How priming research went off the rails. *Replicability-Index*, 2 de febrero.
+
+Tversky, A. y Kahneman, D. (1971). Belief in the law of small numbers. *Psychological Bulletin*, 76(2), 105–110.
+:::
+:::
+
+::: {.ejercicio}
+```{webr}
+#| exercise: veintinueve
+#| caption: "Tu código"
+# Los 29 contrastes del capítulo 4 de «Pensar rápido, pensar despacio», tal como los
+# recogen Schimmack, Heene y Kesavan (2017). colas = 1 si el artículo usó p < 0,05 de una cola.
+capitulo <- read.csv(text = "
+articulo,prueba,valor,gl1,gl2,colas
+Bargh 1996,t,2.86,28,,2
+Bargh 1996,t,2.16,28,,2
+Mussweiler 2006,t,2.10,18,,2
+Mussweiler 2006,t,2.10,35,,2
+Mussweiler 2006,t,2.50,31,,2
+Strack 1988,t,1.85,89,,1
+Strack 1988,t,1.78,75,,1
+Wells 1980,F,44.70,2,66,2
+Berger 2008,z,2.10,,,2
+Berger 2008,p,0.05,,,2
+Vohs 2006,F,3.73,2,49,2
+Vohs 2006,t,2.03,35,,2
+Vohs 2006,t,2.06,37,,2
+Vohs 2006,t,2.13,42,,2
+Vohs 2006,F,4.34,2,32,2
+Vohs 2006,t,2.13,38,,2
+Vohs 2006,t,2.37,33,,2
+Vohs 2006,F,4.04,2,58,2
+Vohs 2006,chi2,10.10,2,,2
+Greenberg 1990,t,2.18,44,,2
+Greenberg 1990,F,4.08,1,145,2
+Greenberg 1990,t,2.42,49,,2
+Zhong 2006,F,4.26,1,58,2
+Zhong 2006,F,6.99,1,25,2
+Zhong 2006,chi2,4.57,1,,2
+Zhong 2006,chi2,5.02,1,,2
+Lee 2010,F,2.93,1,81,1
+Lee 2010,F,3.25,1,81,1
+Bateson 2006,F,11.55,1,7,2")
+
+# De cada estadístico, su p de dos colas, y de la p, el z que la deja a cada lado
+capitulo$p <- with(capitulo, ifelse(prueba == "t", 2 * pt(-abs(valor), gl1),
+                             ifelse(prueba == "F", pf(valor, gl1, gl2, lower.tail = FALSE),
+                             ifelse(prueba == "chi2", pchisq(valor, gl1, lower.tail = FALSE),
+                             ifelse(prueba == "z", 2 * pnorm(-abs(valor)), valor)))))
+capitulo$z <- qnorm(capitulo$p / 2, lower.tail = FALSE)
+capitulo$criterio <- ifelse(capitulo$colas == 1, qnorm(0.95), qnorm(0.975))  # 1,65 o 1,96
+
+# 1. La potencia observada: la probabilidad de volver a pasar el criterio
+#    si el efecto verdadero fuera justo el que salió
+potencia_observada <- function(z, criterio = qnorm(0.975)) ______  # el z de la réplica es normal, centrado en z
+
+# 2. El R-Index: la mediana de la potencia menos la inflación,
+#    que es lo que la tasa de éxito excede a esa mediana
+r_index <- function(potencia, exito = 1) {
+  mediana <- median(potencia)
+  ______  # la mediana menos la inflación
+}
+
+# 3. El capítulo: todos los contrastes se publicaron como significativos, así que exito = 1
+capitulo$potencia <- potencia_observada(capitulo$z, capitulo$criterio)
+print(round(tapply(capitulo$potencia, capitulo$articulo, median), 2))
+
+# 4. El cajón: se hacen estudios con una potencia real y solo se publican los significativos
+publicados <- function(potencia_real, k = 29) {
+  centro <- qnorm(0.975) + qnorm(potencia_real)  # el z medio de un estudio con esa potencia
+  z <- rnorm(100 * k, centro)                     # los estudios que se hacen
+  head(z[z > qnorm(0.975)], k)                    # los k primeros significativos; el resto, al cajón
+}
+set.seed(1971)
+nulos <- replicate(2000, r_index(potencia_observada(publicados(0.025))))  # ningún efecto: 2,5% de aciertos en su dirección
+
+list(
+  mediana   = round(median(capitulo$potencia), 2),
+  r_index   = round(r_index(capitulo$potencia), 2),
+  esperados = round(sum(capitulo$potencia), 1),       # de 29, cuántos significativos cabía esperar
+  una_entre = round(1 / prod(capitulo$potencia)),     # la probabilidad de que salieran los 29, al revés
+  r_index_si_todo_fuera_ruido = round(mean(nulos), 2),
+  ruido_por_debajo_del_capitulo = mean(nulos <= r_index(capitulo$potencia))
+)
+```
+
+```{webr}
+#| exercise: veintinueve
+#| solution: true
+# Los 29 contrastes del capítulo 4 de «Pensar rápido, pensar despacio», tal como los
+# recogen Schimmack, Heene y Kesavan (2017). colas = 1 si el artículo usó p < 0,05 de una cola.
+capitulo <- read.csv(text = "
+articulo,prueba,valor,gl1,gl2,colas
+Bargh 1996,t,2.86,28,,2
+Bargh 1996,t,2.16,28,,2
+Mussweiler 2006,t,2.10,18,,2
+Mussweiler 2006,t,2.10,35,,2
+Mussweiler 2006,t,2.50,31,,2
+Strack 1988,t,1.85,89,,1
+Strack 1988,t,1.78,75,,1
+Wells 1980,F,44.70,2,66,2
+Berger 2008,z,2.10,,,2
+Berger 2008,p,0.05,,,2
+Vohs 2006,F,3.73,2,49,2
+Vohs 2006,t,2.03,35,,2
+Vohs 2006,t,2.06,37,,2
+Vohs 2006,t,2.13,42,,2
+Vohs 2006,F,4.34,2,32,2
+Vohs 2006,t,2.13,38,,2
+Vohs 2006,t,2.37,33,,2
+Vohs 2006,F,4.04,2,58,2
+Vohs 2006,chi2,10.10,2,,2
+Greenberg 1990,t,2.18,44,,2
+Greenberg 1990,F,4.08,1,145,2
+Greenberg 1990,t,2.42,49,,2
+Zhong 2006,F,4.26,1,58,2
+Zhong 2006,F,6.99,1,25,2
+Zhong 2006,chi2,4.57,1,,2
+Zhong 2006,chi2,5.02,1,,2
+Lee 2010,F,2.93,1,81,1
+Lee 2010,F,3.25,1,81,1
+Bateson 2006,F,11.55,1,7,2")
+
+# De cada estadístico, su p de dos colas, y de la p, el z que la deja a cada lado
+capitulo$p <- with(capitulo, ifelse(prueba == "t", 2 * pt(-abs(valor), gl1),
+                             ifelse(prueba == "F", pf(valor, gl1, gl2, lower.tail = FALSE),
+                             ifelse(prueba == "chi2", pchisq(valor, gl1, lower.tail = FALSE),
+                             ifelse(prueba == "z", 2 * pnorm(-abs(valor)), valor)))))
+capitulo$z <- qnorm(capitulo$p / 2, lower.tail = FALSE)
+capitulo$criterio <- ifelse(capitulo$colas == 1, qnorm(0.95), qnorm(0.975))  # 1,65 o 1,96
+
+# 1. La potencia observada: la probabilidad de volver a pasar el criterio
+#    si el efecto verdadero fuera justo el que salió
+potencia_observada <- function(z, criterio = qnorm(0.975)) pnorm(z - criterio)
+
+# 2. El R-Index: la mediana de la potencia menos la inflación,
+#    que es lo que la tasa de éxito excede a esa mediana
+r_index <- function(potencia, exito = 1) {
+  mediana <- median(potencia)
+  mediana - (exito - mediana)
+}
+
+# 3. El capítulo: todos los contrastes se publicaron como significativos, así que exito = 1
+capitulo$potencia <- potencia_observada(capitulo$z, capitulo$criterio)
+print(round(tapply(capitulo$potencia, capitulo$articulo, median), 2))
+
+# 4. El cajón: se hacen estudios con una potencia real y solo se publican los significativos
+publicados <- function(potencia_real, k = 29) {
+  centro <- qnorm(0.975) + qnorm(potencia_real)  # el z medio de un estudio con esa potencia
+  z <- rnorm(100 * k, centro)                     # los estudios que se hacen
+  head(z[z > qnorm(0.975)], k)                    # los k primeros significativos; el resto, al cajón
+}
+set.seed(1971)
+nulos <- replicate(2000, r_index(potencia_observada(publicados(0.025))))  # ningún efecto: 2,5% de aciertos en su dirección
+
+list(
+  mediana   = round(median(capitulo$potencia), 2),
+  r_index   = round(r_index(capitulo$potencia), 2),
+  esperados = round(sum(capitulo$potencia), 1),       # de 29, cuántos significativos cabía esperar
+  una_entre = round(1 / prod(capitulo$potencia)),     # la probabilidad de que salieran los 29, al revés
+  r_index_si_todo_fuera_ruido = round(mean(nulos), 2),
+  ruido_por_debajo_del_capitulo = mean(nulos <= r_index(capitulo$potencia))
+)
+```
+
+```{webr}
+#| exercise: veintinueve
+#| check: true
+e <- .envir_result
+coma <- function(x, d = 2) format(round(x, d), nsmall = d, decimal.mark = ",")
+po <- e$potencia_observada
+ri <- e$r_index
+if (!is.function(po) || !is.function(ri)) {
+  list(correct = FALSE, message = "No encuentro potencia_observada() o r_index().")
+} else if (!isTRUE(all.equal(po(qnorm(0.975)), 0.5))) {
+  list(correct = FALSE, message = paste0(
+    "Con z = 1,96, justo en el criterio, potencia_observada() debería dar 0,5, y da ", coma(po(qnorm(0.975))),
+    ". La réplica da un z normal centrado en 1,96: la mitad de las veces pasa."))
+} else if (!isTRUE(all.equal(po(qnorm(0.975) + 1), pnorm(1)))) {
+  list(correct = FALSE, message = paste0(
+    "Con z = 2,96, un punto por encima del criterio, potencia_observada() debería dar 0,84, y da ", coma(po(qnorm(0.975) + 1)),
+    ". ¿Cuentas la cola de abajo en lugar de la de arriba?"))
+} else if (!isTRUE(all.equal(po(3, qnorm(0.95)), pnorm(3 - qnorm(0.95))))) {
+  list(correct = FALSE, message = "potencia_observada() tiene que usar el criterio que recibe, no siempre 1,96.")
+} else if (!isTRUE(all.equal(ri(c(0.5, 0.5, 0.9)), 0))) {
+  list(correct = FALSE, message = paste0(
+    "Con potencias 0,5, 0,5 y 0,9, todas publicadas, r_index() debería dar 0, y da ", coma(ri(c(0.5, 0.5, 0.9))),
+    ". ¿Usas la mediana, o le restas la inflación?"))
+} else if (!isTRUE(all.equal(ri(c(0.5, 0.6, 0.7), exito = 0.8), 0.4))) {
+  list(correct = FALSE, message = "Con mediana 0,6 y una tasa de éxito de 0,8, la inflación es 0,2 y r_index() debería dar 0,4. ¿Usas exito?")
+} else {
+  list(correct = TRUE, message = paste0(
+    "¡Correcto! Cabía esperar ", coma(.result$esperados, 0), " significativos de 29 y salieron todos. El R-Index del capítulo es ",
+    coma(.result$r_index), ", por debajo del ", coma(.result$r_index_si_todo_fuera_ruido), " del puro ruido con cajón."))
+}
+```
+
+::: {.hint exercise="veintinueve"}
+La potencia es `pnorm()` de lo que el $z$ observado supera al criterio. Para el R-Index, la inflación es `exito - mediana`, y hay que restársela a `mediana`.
+:::
+
+::: {.solution exercise="veintinueve"}
+`potencia_observada <- function(z, criterio = qnorm(0.975)) pnorm(z - criterio)` y, en `r_index()`, `mediana - (exito - mediana)`.
+:::
+:::
+
+::::
