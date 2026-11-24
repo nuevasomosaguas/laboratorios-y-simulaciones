@@ -91,17 +91,17 @@ El código reproduce sus simulaciones con el *método de los componentes*. Parte
 
 En 2001 había 24,47 mayores por cada 100 personas de 15 a 64 años. Zamora da 24,73, con otra estimación de la población de 2001: 40,38 millones de habitantes, frente a los 40,67 de la serie actual del INE. Sin migración y con 1,7 hijos por mujer, en 2051 serían 66,97. Con 400.000 inmigrantes al año, 52,29; con 2 millones, 39,99; con 10 millones, 34,55, en una España de 631 millones de habitantes. Zamora obtiene 74,82, 57,31, 43,16 y 37,07, y 627,7 millones: el modelo reproduce la forma de su tabla, con 2,5 a 5 puntos menos cuando hay migración.
 
-Los rendimientos son decrecientes. Los primeros 400.000 inmigrantes al año bajan la tasa casi 15 puntos; pasar de 5 a 10 millones, menos de 2. Los inmigrantes llegan sobre todo con 20 a 40 años y diluyen a los mayores que ya había en 2001, pero cuantos más llegan, más se parece la población de 2051 a la de los propios inmigrantes y sus hijos. Ese es el límite: 32,83 mayores por cada 100, que ningún saldo, por grande que sea, deja atrás. Es la «franja eficiente» de Zamora, entre cero y unos 2 millones al año.
+Los rendimientos son decrecientes. Los primeros 400.000 inmigrantes al año bajan la tasa casi 15 puntos; pasar de 5 a 10 millones, menos de 2. Los inmigrantes llegan sobre todo con 20 a 40 años y diluyen a los mayores que ya había en 2001. Pero cuantos más llegan, más se parece la población de 2051 a la de los propios inmigrantes y sus hijos. Ese es el límite: 32,83 mayores por cada 100, que ningún saldo, por grande que sea, deja atrás. Es la «franja eficiente» de Zamora, entre cero y unos 2 millones al año.
 
-La tarea 4 es la razón. Los inmigrantes también envejecen, y en 2051 los primeros en llegar apenas empiezan a jubilarse. Espenshade, Bouvier y Arthur demostraron en 1982 que, si la fecundidad está por debajo del reemplazo, un número constante de inmigrantes al año, con edades fijas, lleva a una población *estacionaria*, y que su estructura por edad no depende de cuántos inmigrantes llegan: de eso solo depende su tamaño. Tras 500 años, con un millón al año la tasa es de 53,27, y con diez millones, de 53,21: más del doble que en 2001, y mucho más que el límite de 2051. La foto de 2051 favorece a la inmigración porque la toma a mitad de camino. Las Naciones Unidas llegaron a una conclusión parecida en 2000, en su informe sobre la *migración de reemplazo*.
+La tarea 4 es la razón. Los inmigrantes también envejecen, y en 2051 los primeros en llegar apenas empiezan a jubilarse. Espenshade, Bouvier y Arthur demostraron en 1982 que, si la fecundidad está por debajo del reemplazo, un número constante de inmigrantes al año con edades fijas lleva a una población *estacionaria*. Su estructura por edad no depende de cuántos llegan: de eso solo depende su tamaño. Tras 500 años, con un millón al año la tasa es de 53,27, y con diez millones, de 53,21: más del doble que en 2001, y mucho más que el límite de 2051. La foto de 2051 favorece a la inmigración porque la toma a mitad de camino. Las Naciones Unidas llegaron a una conclusión parecida en 2000, en su informe sobre la *migración de reemplazo*.
 
-Se ve también en la propia tabla de Zamora: el número de mayores de 2051 no cambia con la fecundidad, porque ya habían nacido en 2001, pero se dispara con la inmigración. En este modelo serían 13,65 millones sin migración; 18,70 con 400.000 inmigrantes al año; 38,88 con 2 millones, y 139,81 con 10 millones. Zamora da 14,10, 19,34, 40,29 y 145,07. Los mayores de más son inmigrantes que llegaron con edad de trabajar entre 2001 y 2036: cada generación de inmigrantes rejuvenece la pirámide al llegar y la envejece cuarenta años después. En España el calendario aprieta. La gran ola de 2001 a 2008 llegó sobre todo con 20 a 35 años, según las cifras de población del INE, y cumplirá 65 entre los años treinta y los cincuenta, en parte a la vez que las últimas generaciones del *baby boom*, las nacidas hasta 1977. Una parte de los inmigrantes vuelve a su país antes de la vejez y se lleva con ella algo de envejecimiento; el modelo no lo recoge, porque sus inmigrantes se quedan.
+Se ve también en la propia tabla de Zamora: el número de mayores de 2051 no cambia con la fecundidad, porque ya habían nacido en 2001, pero se dispara con la inmigración. En este modelo serían 13,65 millones sin migración; 18,70 con 400.000 inmigrantes al año; 38,88 con 2 millones, y 139,81 con 10 millones. Zamora da 14,10, 19,34, 40,29 y 145,07. Los mayores de más son inmigrantes que llegaron con edad de trabajar entre 2001 y 2036: cada generación de inmigrantes rejuvenece la pirámide al llegar y la envejece cuarenta años después. En España el calendario aprieta. La gran ola de 2001 a 2008 llegó sobre todo con 20 a 35 años, según las cifras de población del INE. Cumplirá 65 entre los años treinta y los cincuenta, en parte a la vez que las últimas generaciones del *baby boom* (las nacidas hasta 1977). Una parte de los inmigrantes vuelve a su país antes de la vejez y se lleva con ella algo de envejecimiento; el modelo no lo recoge, porque sus inmigrantes se quedan.
 
-Y el planeta no tiene migración. Para el mundo entero, la estructura por edad depende solo de la fecundidad y la mortalidad, como en el problema 29: la migración reparte la juventud, pero no la crea. La principal fuente de inmigrantes de España ya lo nota. Según la CEPAL, América Latina y el Caribe tenían en 2024 una fecundidad de 1,8 hijos por mujer, por debajo del reemplazo desde 2015, con Chile en 1,14, Costa Rica en 1,32, Uruguay en 1,4 y Argentina en 1,5. Esos países envejecerán y necesitarán a sus propios jóvenes. Quedan jóvenes en el mundo, porque más de uno de cada diez países, la mayoría del África subsahariana, tiene cuatro hijos por mujer o más, según las Naciones Unidas, pero cada vez más lejos y con más países ricos compitiendo por ellos. Una cautela antes de hablar de desplome: el índice sintético de un año baja también cuando las mujeres retrasan los hijos, aunque acaben teniendo los mismos, el *efecto tempo* de Bongaarts y Feeney. La CEPAL lo mide: corregido por el retraso, el índice de la región se mantuvo en torno a 2,2 hijos por mujer de 2010 a 2017, y solo después cayó hacia el observado, sobre todo porque bajó la fecundidad de las adolescentes y las jóvenes. Parte de la caída es calendario, y parte es real.
+Y el planeta no tiene migración. Para el mundo entero, la estructura por edad depende solo de la fecundidad y la mortalidad, como en el problema 29: la migración reparte la juventud, pero no la crea. La principal fuente de inmigrantes de España ya lo nota. Según la CEPAL, América Latina y el Caribe tenían en 2024 una fecundidad de 1,8 hijos por mujer, por debajo del reemplazo desde 2015, con Chile en 1,14, Costa Rica en 1,32, Uruguay en 1,4 y Argentina en 1,5. Esos países envejecerán y necesitarán a sus propios jóvenes. Quedan jóvenes en el mundo: más de uno de cada diez países, la mayoría del África subsahariana, tiene cuatro hijos por mujer o más, según las Naciones Unidas. Pero están cada vez más lejos y con más países ricos compitiendo por ellos. Una cautela antes de hablar de desplome: el índice sintético de un año baja también cuando las mujeres retrasan los hijos, aunque acaben teniendo los mismos, el *efecto tempo* de Bongaarts y Feeney. La CEPAL lo mide: corregido por el retraso, el índice de la región se mantuvo en torno a 2,2 hijos por mujer de 2010 a 2017. Solo después cayó hacia el observado, sobre todo porque bajó la fecundidad de las adolescentes y las jóvenes. Parte de la caída es calendario, y parte es real.
 
-La tarea 5 es una lección de lectura. Con la fecundidad constante desde 2002, el modelo da 20,39 millones de personas de 15 a 64 años con 1,7 hijos por mujer y 24,46 con 2,1. Así debe ser: las generaciones nacidas entre 2002 y 2036 tendrán en 2051 de 15 a 49 años, y con más fecundidad son más grandes. La tabla de Zamora no es una errata, porque el texto, la nota 11 y los cuatro cuadros dicen lo mismo, pero el artículo no cuenta cómo llega la fecundidad a cada nivel. Si el 1,7 se alcanza hacia 2016 y el 2,1 solo hacia 2051, el modelo da 18,96 y 18,32 millones, y el orden de Zamora. Lo que se compara en la tabla no son dos fecundidades, sino dos caminos. Antes de citar una cifra de un escenario, hay que leer sus hipótesis.
+La tarea 5 es una lección de lectura. Con la fecundidad constante desde 2002, el modelo da 20,39 millones de personas de 15 a 64 años con 1,7 hijos por mujer y 24,46 con 2,1. Así debe ser: las generaciones nacidas entre 2002 y 2036 tendrán en 2051 de 15 a 49 años, y con más fecundidad son más grandes. La tabla de Zamora no es una errata, porque el texto, la nota 11 y los cuatro cuadros dicen lo mismo, pero el artículo no cuenta cómo llega la fecundidad a cada nivel. Si el 1,7 se alcanza hacia 2016 y el 2,1 solo hacia 2051, el modelo da 18,96 y 18,32 millones, y el orden de Zamora. La tabla compara dos caminos, no dos fecundidades. Antes de citar una cifra de un escenario, hay que leer sus hipótesis.
 
-Y un contrapeso. La tasa de dependencia demográfica no es la económica: las pensiones no las pagan las personas de 15 a 64 años, sino las que trabajan, y la tasa de empleo, la edad de jubilación y la productividad mueven la carga tanto o más que la pirámide, como mostraba la jubilación a los 70 en el problema 29. Zamora muestra que la inmigración no detiene el envejecimiento, una cuestión de estructura. No muestra que sea indiferente para financiar las pensiones, una cuestión de cotizantes, salarios y prestaciones: un inmigrante cotiza mientras trabaja y cobra después, y el saldo depende de su empleo y su salario a lo largo de la vida. Las cuentas de transferencias de Lee y Mason separan las dos cosas, edad por edad.
+Y un contrapeso. La tasa de dependencia demográfica no es la económica: las pensiones las pagan quienes trabajan, no las personas de 15 a 64 años. La tasa de empleo, la edad de jubilación y la productividad mueven la carga tanto o más que la pirámide, como mostraba la jubilación a los 70 en el problema 29. Zamora muestra que la inmigración no detiene el envejecimiento, una cuestión de estructura. No muestra que sea indiferente para financiar las pensiones, una cuestión de cotizantes, salarios y prestaciones: un inmigrante cotiza mientras trabaja y cobra después, y el saldo depende de su empleo y su salario a lo largo de la vida. Las cuentas de transferencias de Lee y Mason separan las dos cosas, edad por edad.
 
 Zamora López, F. (2005). La España que viene. *Papeles de Economía Española*, 104, 330-343.
 
@@ -146,9 +146,8 @@ L2050 <- cbind(
     4.78482, 4.73418, 4.6544, 4.53161, 4.36063, 4.06405, 3.52536, 2.47818, 0.92389, 0.16654),
   c(4.99992, 4.99987, 4.99979, 4.99905, 4.9978, 4.99665, 4.99432, 4.98906, 4.98251, 4.97573,
     4.97033, 4.96566, 4.95969, 4.95102, 4.93552, 4.90033, 4.7902, 4.28437, 2.27773, 0.45044))
-# El saldo migratorio de 1991-2000 por edad y sexo: lo que sobra en 2001 de la población de 1991
-# envejecida diez años y de los nacidos en esos años. Por encima de 75 sale negativo, por el ruido
-# de la estimación, y se pone a cero. El perfil es el reparto de cada inmigrante: suma 1.
+# Saldo migratorio de 1991-2000 por edad y sexo (los negativos por encima de 75 se ponen a cero).
+# perfil: reparto de cada inmigrante por edad y sexo (suma 1).
 saldo9100 <- cbind(
   c(6106, 17655, 58554, 58941, 98888, 82046, 79511, 89188, 79156, 54721,
     39034, 28880, 28745, 33640, 17085, 2705, -3008, -1644, -956, -8333),
@@ -209,15 +208,12 @@ round(rbind(saldo_millones = saldos, zamora, este_modelo = modelo, limite = limi
 ```{webr}
 #| exercise: inmigrantes
 #| solution: true
-# España, 1 de enero de 2001 (INE), por grupos de cinco años de edad: 0-4, 5-9, ..., 95 y más
 edad <- seq(0, 95, 5)
 N2001 <- cbind(
   hombres = c(965495, 994871, 1093998, 1315032, 1679401, 1771122, 1702764, 1625229, 1478949, 1271512,
               1191447, 1048687, 913276, 972144, 810578, 582816, 299128, 149213, 49105, 9122),
   mujeres = c(912757, 941184, 1036257, 1249616, 1603744, 1697149, 1653738, 1610632, 1484409, 1281792,
               1221049, 1094247, 1000534, 1109470, 1009274, 820850, 536763, 322396, 126550, 29243))
-# Años que vive en cada grupo de edad cada recién nacido: la tabla de 1998-99 (INE) y la de 2050,
-# con la esperanza de vida que supone Zamora: 83,73 años los hombres y 91,42 las mujeres
 L1998 <- cbind(
   c(4.97238, 4.96661, 4.96208, 4.95267, 4.93266, 4.90901, 4.87828, 4.83794, 4.78628, 4.71414,
     4.60648, 4.4464, 4.21096, 3.86025, 3.36226, 2.66987, 1.82845, 0.96232, 0.33397, 0.05971),
@@ -228,56 +224,45 @@ L2050 <- cbind(
     4.78482, 4.73418, 4.6544, 4.53161, 4.36063, 4.06405, 3.52536, 2.47818, 0.92389, 0.16654),
   c(4.99992, 4.99987, 4.99979, 4.99905, 4.9978, 4.99665, 4.99432, 4.98906, 4.98251, 4.97573,
     4.97033, 4.96566, 4.95969, 4.95102, 4.93552, 4.90033, 4.7902, 4.28437, 2.27773, 0.45044))
-# El saldo migratorio de 1991-2000 por edad y sexo: lo que sobra en 2001 de la población de 1991
-# envejecida diez años y de los nacidos en esos años. Por encima de 75 sale negativo, por el ruido
-# de la estimación, y se pone a cero. El perfil es el reparto de cada inmigrante: suma 1.
 saldo9100 <- cbind(
   c(6106, 17655, 58554, 58941, 98888, 82046, 79511, 89188, 79156, 54721,
     39034, 28880, 28745, 33640, 17085, 2705, -3008, -1644, -956, -8333),
   c(8573, 19943, 55071, 55552, 91921, 73126, 75800, 87504, 74071, 49180,
     34478, 23913, 20186, 21555, 10448, -1070, -5453, -1364, 338, -19535))
 perfil <- pmax(saldo9100, 0) / sum(pmax(saldo9100, 0))
-# El calendario de la fecundidad de 2001 (Eurostat), de 15-19 a 45-49 años: suma 1
 tasas2001 <- c(0.00964, 0.02628, 0.06449, 0.09459, 0.04477, 0.00717, 0.00036)
 calendario <- tasas2001 / sum(tasas2001)
 
-# Mayores de 65 por cada persona de 15 a 64 años, la medida de Zamora
 dependencia <- function(N) {
   n <- rowSums(N)
   sum(n[edad >= 65]) / sum(n[edad >= 15 & edad < 65])
 }
 
-# Los tres grandes grupos de edad, en millones
 grupos <- function(N) {
   n <- rowSums(N) / 1e6
   round(c("0-14" = sum(n[edad < 15]), "15-64" = sum(n[edad >= 15 & edad < 65]), "65+" = sum(n[edad >= 65])), 2)
 }
 
-# Cinco años por paso, de 2001 a 2051. isf: hijos por mujer, que suben en línea recta desde
-# los 1,24 de 2001 hasta llegar a isf en el año llega. saldo: inmigrantes netos al año.
 proyectar <- function(isf, saldo, N = N2001, llega = 2001, pasos = 10) {
   for (t in 1:pasos) {
-    anyo <- 2001 + 5 * t - 2.5                    # el centro del quinquenio
-    w <- min(1, (anyo - 2001) / 50)               # la mortalidad va de la de 1998 a la de 2050
+    anyo <- 2001 + 5 * t - 2.5
+    w <- min(1, (anyo - 2001) / 50)
     L <- (1 - w) * L1998 + w * L2050
-    P <- L[-1, ] / L[-20, ]                       # supervivencia de cada grupo al siguiente
-    P[19, ] <- L[20, ] / (L[19, ] + L[20, ])      # los de 90 y más pasan al grupo abierto
+    P <- L[-1, ] / L[-20, ]
+    P[19, ] <- L[20, ] / (L[19, ] + L[20, ])
     nuevo <- rbind(0, P * N[-20, ])
     nuevo[20, ] <- P[19, ] * (N[19, ] + N[20, ])
     hijos <- 1.24 + (isf - 1.24) * min(1, (anyo - 2001) / (llega - 2001))
-    madres <- (N[4:10, 2] + nuevo[4:10, 2]) / 2   # mujeres de 15 a 49, a mitad del quinquenio
+    madres <- (N[4:10, 2] + nuevo[4:10, 2]) / 2
     nacidos <- hijos * sum(calendario * madres)
     nuevo[1, ] <- nacidos * c(0.515, 0.485) * L[1, ] / 5
-    # Los inmigrantes de los cinco años, repartidos por edad y sexo
     N <- nuevo + 5 * saldo * perfil
   }
   N
 }
 
-# 1. Los escenarios de Zamora con 1,7 hijos por mujer: el saldo, en millones al año
 saldos <- c(0, 0.4, 2, 3, 5, 10)
 modelo <- sapply(saldos, function(s) 100 * dependencia(proyectar(1.7, s * 1e6)))
-# 2. El límite: una España hecha solo de inmigrantes y de sus hijos
 limite <- 100 * dependencia(proyectar(1.7, 1e6, N = 0 * N2001))
 
 zamora <- c(74.82, 57.31, 43.16, 40.88, 38.80, 37.07)

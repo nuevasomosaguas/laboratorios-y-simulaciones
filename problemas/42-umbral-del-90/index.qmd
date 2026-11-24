@@ -17,7 +17,7 @@ engine: markdown
 ::: {.enunciado}
 En 2010, Carmen Reinhart y Kenneth Rogoff publicaron *Growth in a Time of Debt*. Con datos de veinte economías avanzadas desde 1946, encontraron que, cuando la deuda pública supera el 90% del PIB, el crecimiento medio se hunde: −0,1% al año, frente a casi un 3% o más con deudas menores. El umbral del 90% se citó en parlamentos y comisiones de medio mundo como argumento para la austeridad.
 
-En 2013, Thomas Herndon, un estudiante de doctorado de la Universidad de Massachusetts, intentó replicarlo como ejercicio de un curso. No le salía. Los autores le pasaron su hoja de cálculo, y en ella encontró tres cosas. La fórmula de una media dejaba fuera las cinco primeras filas, Australia, Austria, Bélgica, Canadá y Dinamarca, por puro orden alfabético. Faltaban los años de posguerra de Nueva Zelanda, Australia y Canadá, en los que esos países crecieron con deuda alta. Y la media se calculaba país a país: primero la de cada país y después la de esas medias, de modo que el único año de Nueva Zelanda contaba lo mismo que los diecinueve del Reino Unido.
+En 2013, Thomas Herndon, un estudiante de doctorado de la Universidad de Massachusetts, intentó replicarlo como ejercicio de un curso. No le salía. Los autores le pasaron su hoja de cálculo, y en ella encontró tres cosas. La fórmula de una media dejaba fuera las cinco primeras filas (Australia, Austria, Bélgica, Canadá y Dinamarca), por puro orden alfabético. Faltaban los años de posguerra de Nueva Zelanda, Australia y Canadá, en los que esos países crecieron con deuda alta. Y la media se calculaba país a país: primero la de cada país y después la de esas medias, de modo que el único año de Nueva Zelanda contaba lo mismo que los diecinueve del Reino Unido.
 
 Los datos de la derecha son los 110 años-país con deuda por encima del 90%, tal como los publicaron Herndon, Ash y Pollin.
 
@@ -31,11 +31,11 @@ Los datos de la derecha son los 110 años-país con deuda por encima del 90%, ta
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Con la selección, el error de la hoja y la transcripción, la media sale −0,1%, el número publicado. Al corregir la hoja sube a 0,3%, y casi todo se debe a un solo país. De los cinco que perdía la fórmula, Austria y Dinamarca no tienen ningún año por encima del 90%, y los de Australia y Canadá ya los quitaba la selección de posguerra: solo se recuperan los veinticinco años de Bélgica, que crece de media un 2,6%. La corrección de Nueva Zelanda apenas suma unas centésimas. Los errores interactúan: el efecto de un fallo depende de los que ya había, y la selección había dejado sin nada que perder a dos de los países que perdía la hoja. Con los años de posguerra, a 1,9%. Y si cada año pesa lo mismo, en lugar de cada país, a 2,2%. El hundimiento desaparece: con deuda alta se crece algo menos que con deudas de entre el 30% y el 90%, en torno al 3%, pero no hay ningún umbral a partir del cual el crecimiento se desplome.
+Con la selección, el error de la hoja y la transcripción, la media sale −0,1%, el número publicado. Al corregir la hoja sube a 0,3%, y casi todo se debe a un solo país. De los cinco que perdía la fórmula, Austria y Dinamarca no tienen ningún año por encima del 90%, y los de Australia y Canadá ya los quitaba la selección de posguerra. Solo se recuperan los veinticinco años de Bélgica, que crece de media un 2,6%. La corrección de Nueva Zelanda apenas suma unas centésimas. Los errores interactúan: el efecto de un fallo depende de los que ya había, y la selección había dejado sin nada que perder a dos de los países que perdía la hoja. Con los años de posguerra, a 1,9%. Y si cada año pesa lo mismo, en lugar de cada país, a 2,2%. El hundimiento desaparece: con deuda alta se crece algo menos que con deudas de entre el 30% y el 90% (en torno al 3%), pero no hay ningún umbral a partir del cual el crecimiento se desplome.
 
 Para ser justos con Reinhart y Rogoff: reconocieron el error de la fórmula, pero sostuvieron que no cambiaba lo esencial, que con deuda alta se crece menos. El debate de fondo pasó a la ponderación y a la causalidad. Ninguna de las dos medias es la buena sin más: pesar por país deja que un solo año de Nueva Zelanda arrastre la media, y pesar por año deja que Bélgica, con veinticinco, la domine. Y aunque la asociación fuera fuerte, podría ir al revés: crecer poco hace subir la deuda, porque cae la recaudación y suben los gastos.
 
-La lección va más allá del caso. Un análisis en una hoja de cálculo es opaco: el error estaba en un rango de celdas que nadie veía, y encontrarlo dependió de que los autores pasaran la hoja. Uno en un script, como el de la derecha, se puede auditar línea a línea. Es lo que defiende Jenny Bryan con el control de versiones, en el núcleo de cómputo de la biblioteca: el remedio a errores así no es tener más cuidado, sino trabajar de forma que se puedan ver.
+La lección va más allá del caso. Un análisis en una hoja de cálculo es opaco: el error estaba en un rango de celdas que nadie veía, y encontrarlo dependió de que los autores pasaran la hoja. Uno en un script, como el de la derecha, se puede auditar línea a línea. Es lo que defiende Jenny Bryan con el control de versiones, en el núcleo de cómputo de la biblioteca: el remedio a errores así está en trabajar para que se vean, no en tener más cuidado.
 
 Herndon, T., Ash, M. y Pollin, R. (2014). Does high public debt consistently stifle economic growth? A critique of Reinhart and Rogoff. *Cambridge Journal of Economics*, 38(2), 257–279.
 
@@ -93,15 +93,15 @@ deuda <- rbind(
 )
 
 # 1. La media de Reinhart y Rogoff: primero la de cada país, luego la de esas medias
-cada_pais <- function(d) ______  # cada país pesa lo mismo, tenga un año o veinticinco
+cada_pais <- function(d) ______
 
-# 2. La selección de Reinhart y Rogoff: fuera los años de posguerra de tres países
-seleccion <- ______  # todos menos Nueva Zelanda antes de 1950 y Australia y Canadá antes de 1951
+# 2. Selección de Reinhart y Rogoff: fuera Nueva Zelanda < 1950 y Australia y Canadá < 1951
+seleccion <- ______
 
 # 3. El error de la hoja: la fórmula dejaba fuera las cinco primeras filas, por orden alfabético
 hoja <- c("Australia", "Austria", "Belgium", "Canada", "Denmark")
 rr <- deuda[seleccion & !deuda$pais %in% hoja, ]
-rr$crecimiento[rr$pais == "New Zealand"] <- -7.9  # y un error de transcripción: era -7,6
+rr$crecimiento[rr$pais == "New Zealand"] <- -7.9  # error de transcripción: era -7,6
 
 # 4. Paso a paso, del número publicado al corregido
 cada_anio <- function(d) mean(d$crecimiento)
@@ -117,8 +117,6 @@ round(pasos, 1)
 ```{webr}
 #| exercise: umbral
 #| solution: true
-# Los 110 años-país con deuda pública por encima del 90% del PIB, 1946-2009:
-# crecimiento real del PIB (%) en cada año. Datos de Herndon, Ash y Pollin (2014).
 deuda <- rbind(
   data.frame(pais = "Australia",
              anio = c(1946, 1947, 1948, 1949, 1950),
@@ -162,19 +160,15 @@ deuda <- rbind(
              crecimiento = c(-10.9, -0.9, 4.4, -0.5))
 )
 
-# 1. La media de Reinhart y Rogoff: primero la de cada país, luego la de esas medias
 cada_pais <- function(d) mean(tapply(d$crecimiento, d$pais, mean))
 
-# 2. La selección de Reinhart y Rogoff: fuera los años de posguerra de tres países
 seleccion <- !((deuda$pais == "New Zealand" & deuda$anio < 1950) |
                (deuda$pais %in% c("Australia", "Canada") & deuda$anio < 1951))
 
-# 3. El error de la hoja: la fórmula dejaba fuera las cinco primeras filas, por orden alfabético
 hoja <- c("Australia", "Austria", "Belgium", "Canada", "Denmark")
 rr <- deuda[seleccion & !deuda$pais %in% hoja, ]
-rr$crecimiento[rr$pais == "New Zealand"] <- -7.9  # y un error de transcripción: era -7,6
+rr$crecimiento[rr$pais == "New Zealand"] <- -7.9
 
-# 4. Paso a paso, del número publicado al corregido
 cada_anio <- function(d) mean(d$crecimiento)
 pasos <- c(
   publicado            = cada_pais(rr),

@@ -53,15 +53,15 @@ Los recuentos de palabras por autor son 112.907 de Hamilton, 38.772 de Madison y
 :::: {.laboratorio}
 
 ::: {.enunciado}
-Entre octubre de 1787 y mayo de 1788, los periódicos de Nueva York publicaron 85 artículos en defensa de la nueva Constitución de los Estados Unidos, todos firmados por «Publius». Eran de Alexander Hamilton, James Madison y John Jay, y se reunieron como *El Federalista*. Antes de morir en su duelo con Aaron Burr, en 1804, Hamilton dejó una lista con el autor de cada uno; Madison dio la suya para la edición de 1818. Las dos listas no coinciden en doce artículos, el 49 al 58, el 62 y el 63, y uno de ellos, el 51, tiene la frase más citada de la serie: «si los hombres fueran ángeles, ningún gobierno sería necesario».
+Entre octubre de 1787 y mayo de 1788, los periódicos de Nueva York publicaron 85 artículos en defensa de la nueva Constitución de los Estados Unidos, todos firmados por «Publius». Eran de Alexander Hamilton, James Madison y John Jay, y se reunieron como *El Federalista*. Antes de morir en su duelo con Aaron Burr, en 1804, Hamilton dejó una lista con el autor de cada uno; Madison dio la suya para la edición de 1818. Las dos listas no coinciden en doce artículos (del 49 al 58, el 62 y el 63). Uno de ellos, el 51, tiene la frase más citada de la serie: «si los hombres fueran ángeles, ningún gobierno sería necesario».
 
-Los historiadores no lograron zanjarlo, porque Hamilton y Madison escribían de forma muy parecida, hasta en la longitud media de sus frases. En 1963, Frederick Mosteller y David Wallace lo zanjaron contando palabras pequeñas. Hamilton escribe *upon* donde Madison escribe *on*, y Madison escribe *whilst* donde Hamilton escribe *while*. Nadie elige esas palabras a propósito, y por eso delatan.
+Los historiadores no lograron zanjarlo, porque Hamilton y Madison tenían un estilo muy parecido, hasta en la longitud media de sus frases. En 1963, Frederick Mosteller y David Wallace lo zanjaron contando palabras pequeñas. Hamilton escribe *upon* donde Madison escribe *on*, y Madison escribe *whilst* donde Hamilton escribe *while*. Nadie elige esas palabras a propósito, y por eso delatan.
 
-Para decir a quién se parece más un texto hacen falta dos decisiones. Una, **qué se cuenta**: aquí, la frecuencia por mil palabras de veinte palabras, diez de **estilo**, las palabras funcionales que separan a los dos autores, y diez de **tema**, las más características de los artículos disputados, como *representatives*, *senate* o *house*. Otra, **cómo se compara**. La **distancia del coseno** mira el ángulo entre los dos vectores de frecuencias:
+Para decir a quién se parece más un texto hacen falta dos decisiones. Una, **qué se cuenta**: aquí, la frecuencia por mil palabras de veinte términos. Diez son de **estilo** (palabras funcionales que separan a los dos autores) y diez son de **tema** (las más características de los artículos disputados, como *representatives*, *senate* o *house*). Otra, **cómo se compara**. La **distancia del coseno** mira el ángulo entre los dos vectores de frecuencias:
 
 $$d_{\cos}(a, b) = 1 - \frac{\sum_i a_i b_i}{\sqrt{\sum_i a_i^2}\,\sqrt{\sum_i b_i^2}},$$
 
-que vale 0 si las frecuencias son proporcionales. La **Delta de Burrows**, la medida clásica de la estilometría, tipifica antes cada palabra, restándole su media y dividiendo por su desviación típica en los artículos de autor conocido, para que una palabra rara pese lo mismo que una común, y luego promedia las diferencias absolutas:
+que vale 0 si las frecuencias son proporcionales. La **Delta de Burrows**, medida clásica de la estilometría, tipifica primero cada palabra con su media y su desviación típica en los artículos de autor conocido, para que una palabra rara pese lo mismo que una común. Luego promedia las diferencias absolutas:
 
 $$\Delta(a, b) = \frac{1}{n} \sum_{i=1}^{n} |z_i(a) - z_i(b)|.$$
 
@@ -78,15 +78,15 @@ Para cada artículo disputado, el código busca el artículo de autor conocido m
 
 Con las palabras de estilo, el vecino más cercano de los doce disputados es un artículo de Madison con la distancia del coseno, y de once con la Delta. Con las de tema, solo de tres con el coseno y de cinco con la Delta. Elegir un artículo conocido al azar daría a Madison 2,6 de cada doce, porque 51 de los 65 son de Hamilton: las palabras de tema no saben nada del autor. Lo que cambia el resultado es el vocabulario, no la distancia.
 
-El gráfico dice por qué. Hamilton escribe *upon* en sus 51 artículos, entre 1,0 y 7,5 veces por mil palabras, 3,31 en el conjunto; Madison no la escribe en 11 de sus 14 artículos, y nunca más de 1,2 veces por mil. En diez de los doce disputados no sale ni una vez. Con *whilst* pasa lo contrario: 0,31 por mil en Madison y 0,01 en Hamilton, que solo la escribe en un artículo, mientras que *while* sale 0,32 veces por mil en Hamilton y ninguna en Madison. Los disputados se quedan con *whilst*, y no escriben *while*.
+El gráfico dice por qué. Hamilton escribe *upon* en sus 51 artículos, entre 1,0 y 7,5 veces por mil palabras (3,31 en el conjunto). Madison no la escribe en 11 de sus 14 artículos, y nunca más de 1,2 veces por mil. En diez de los doce disputados no sale ni una vez. Con *whilst* pasa lo contrario: 0,31 por mil en Madison y 0,01 en Hamilton, que solo la escribe en un artículo. Con *while*, al revés: sale 0,32 veces por mil en Hamilton y ninguna en Madison. Los disputados se quedan con *whilst*, y no escriben *while*.
 
-Las palabras de tema encuentran otra cosa: quién escribió sobre lo mismo. El 58, sobre si la Cámara de Representantes crecerá con la población, cae con la Delta junto al 59 de Hamilton, sobre la regulación de las elecciones al Congreso; con el coseno, el 62 y el 63, sobre el Senado, caen junto al 75, sobre el poder de firmar tratados que comparten el presidente y el Senado. Son vecinos de verdad, pero por el asunto, no por la mano. Una distancia entre textos no mide el parecido en general, sino el parecido en lo que se cuenta, y Grimmer, Roberts y Stewart insisten en que la representación del texto se elige para cada pregunta: no hay una que sirva para todas.
+Las palabras de tema encuentran otra cosa: quién escribió sobre lo mismo. Con la Delta, el 58 (sobre si la Cámara de Representantes crecerá con la población) cae junto al 59 de Hamilton, que trata de la regulación de las elecciones al Congreso. Con el coseno, el 62 y el 63 (sobre el Senado) caen junto al 75, que trata del poder de firmar tratados compartido por el presidente y el Senado. Son vecinos de verdad, pero por el asunto, no por la mano. Una distancia entre textos mide el parecido en lo que se cuenta, no en general. Grimmer, Roberts y Stewart insisten en que la representación del texto se elige para cada pregunta: no hay una que sirva para todas.
 
-La excepción es el 55, el que Mosteller y Wallace dieron por el caso menos claro. Con la Delta su vecino es el 79, de Hamilton, y con el coseno, el 10, de Madison. La Delta da a *enough*, *although* o *consequently*, que salen pocas veces, el mismo voto que a *on* o *by*, y en un artículo corto una sola aparición de más o de menos lo mueve mucho. Burrows no compara con el vecino más cercano, sino con el conjunto de los textos de cada autor, que promedia ese ruido, y Mosteller y Wallace no dieron una respuesta de sí o no, sino unas probabilidades, con un modelo bayesiano de la frecuencia de cada palabra.
+La excepción es el 55, el que Mosteller y Wallace dieron por el caso menos claro. Con la Delta su vecino es el 79, de Hamilton, y con el coseno, el 10, de Madison. La Delta da a *enough*, *although* o *consequently*, que salen pocas veces, el mismo voto que a *on* o *by*. En un artículo corto, una sola aparición de más o de menos lo mueve mucho. Burrows compara con el conjunto de los textos de cada autor, no con el vecino más cercano, y así promedia ese ruido. Mosteller y Wallace dieron probabilidades con un modelo bayesiano de la frecuencia de cada palabra, no una respuesta de sí o no.
 
 Las palabras de estilo de este problema se eligieron sabiendo ya la respuesta, entre las que separan a los dos autores en sus artículos conocidos. En un caso abierto, el vocabulario se elige solo con los textos de autoría segura y se comprueba con otros que no se usaron para elegirlo: si no, es [el jardín de senderos que se bifurcan](../66-el-jardin-de-senderos/index.qmd) con palabras en lugar de variables.
 
-R tiene una distancia para cada escala. Para cadenas cortas, `adist()`, en la base de R, da la distancia de Levenshtein, el número de letras que hay que cambiar: entre «Unidos Podemos», de 2016, y «Unidas Podemos», de 2019, 1, y entre «UNIDOS PODEMOS» y «PODEMOS-IU-EQUO», las siglas con las que la misma coalición de 2016 figura en los resultados del Ministerio del Interior, 12. El paquete stringdist añade Jaro-Winkler y los q-gramas; quanteda calcula el coseno, Jaccard y otras sobre la matriz de documentos y términos; stylo, la Delta y sus variantes; y text2vec, las distancias entre *embeddings*, que acercan sinónimos que no comparten ninguna letra. Cada una responde a la misma pregunta con otra respuesta, porque cada una cuenta otra cosa.
+R tiene una distancia para cada escala. Para cadenas cortas, `adist()` (en la base de R) da la distancia de Levenshtein, el número de letras que hay que cambiar. Entre «Unidos Podemos» (2016) y «Unidas Podemos» (2019) vale 1; entre «UNIDOS PODEMOS» y «PODEMOS-IU-EQUO» (las siglas con las que la misma coalición de 2016 figura en los resultados del Ministerio del Interior), 12. El paquete stringdist añade Jaro-Winkler y los q-gramas; quanteda calcula el coseno, Jaccard y otras sobre la matriz de documentos y términos; stylo, la Delta y sus variantes; y text2vec, las distancias entre *embeddings*, que acercan sinónimos que no comparten ninguna letra. Cada una responde a la misma pregunta con otra respuesta, porque cada una cuenta otra cosa.
 
 Burrows, J. (2002). «Delta»: A measure of stylistic difference and a guide to likely authorship. *Literary and Linguistic Computing*, 17(3), 267–287.
 
@@ -102,8 +102,7 @@ Mosteller, F. y Wallace, D. L. (1964). *Inference and Disputed Authorship: The F
 ```{webr}
 #| exercise: federalista
 #| caption: "Tu código"
-# Cuántas veces sale cada palabra en cada artículo de El Federalista, con el autor según
-# Mosteller y Wallace, y los doce disputados. Texto del Proyecto Gutenberg.
+# Recuento por artículo de El Federalista (autoría de Mosteller y Wallace; texto del Proyecto Gutenberg)
 federalist <- read.csv(check.names = FALSE, text = "
 numero,autor,palabras,upon,whilst,while,there,on,by,although,consequently,enough,kind,representatives,very,senate,legislative,two,house,within,years,different,legislature
 1,Hamilton,1610,6,0,0,2,9,14,0,0,1,0,0,0,0,0,0,0,0,0,0,0
@@ -237,8 +236,6 @@ sapply(cercanos, function(k) sum(federalist$autor[k] == "Madison"))  # cuántos 
 ```{webr}
 #| exercise: federalista
 #| solution: true
-# Cuántas veces sale cada palabra en cada artículo de El Federalista, con el autor según
-# Mosteller y Wallace, y los doce disputados. Texto del Proyecto Gutenberg.
 federalist <- read.csv(check.names = FALSE, text = "
 numero,autor,palabras,upon,whilst,while,there,on,by,although,consequently,enough,kind,representatives,very,senate,legislative,two,house,within,years,different,legislature
 1,Hamilton,1610,6,0,0,2,9,14,0,0,1,0,0,0,0,0,0,0,0,0,0,0
@@ -324,26 +321,22 @@ estilo <- c("upon", "whilst", "while", "there", "on", "by", "although", "consequ
 tema <- c("representatives", "very", "senate", "legislative", "two", "house", "within", "years", "different",
           "legislature")
 
-tasas <- as.matrix(1000 * federalist[, c(estilo, tema)] / federalist$palabras)  # por mil palabras
+tasas <- as.matrix(1000 * federalist[, c(estilo, tema)] / federalist$palabras)
 conocidos <- federalist$autor != "Disputado"
 
-# 1. La distancia del coseno: 0 si las dos frecuencias son proporcionales, 1 si no comparten palabras
 coseno <- function(a, b) {
   1 - sum(a * b) / sqrt(sum(a^2) * sum(b^2))
 }
 
-# 2. La Delta de Burrows: la diferencia media, en valor absoluto, entre dos perfiles tipificados
 delta <- function(a, b) {
   mean(abs(a - b))
 }
 
-# Cada palabra, tipificada con la media y la desviación típica de los artículos de autor conocido
 tipificar <- function(x) {
   x <- sweep(x, 2, colMeans(x[conocidos, ]))
   sweep(x, 2, apply(x[conocidos, ], 2, sd), "/")
 }
 
-# Para cada disputado, el artículo de autor conocido más cercano
 vecino <- function(x, distancia) {
   candidatos <- which(conocidos)
   sapply(which(!conocidos), function(i) {
@@ -357,16 +350,14 @@ cercanos <- list(
   estilo_delta = vecino(tipificar(tasas[, estilo]), delta)
 )
 
-# 3. «upon» frente a «on»: cada punto es un artículo
 color <- c(Hamilton = "firebrick", Madison = "steelblue", Disputado = "black")
 plot(tasas[, "upon"], tasas[, "on"], col = color[federalist$autor], pch = ifelse(conocidos, 1, 19),
      xlab = "«upon» por mil palabras", ylab = "«on» por mil palabras")
 legend("topright", names(color), col = color, pch = c(1, 1, 19), bty = "n")
 
-# 4. El artículo más cercano a cada disputado, y su autor, según el vocabulario y la distancia
 data.frame(disputado = federalist$numero[!conocidos],
            lapply(cercanos, function(k) paste(federalist$numero[k], federalist$autor[k])))
-sapply(cercanos, function(k) sum(federalist$autor[k] == "Madison"))  # cuántos van a Madison, de 12
+sapply(cercanos, function(k) sum(federalist$autor[k] == "Madison"))
 ```
 
 ```{webr}

@@ -21,14 +21,14 @@ El marqués de Condorcet lo descubrió en 1785. La pregunta es con qué frecuenc
 
 Con tres candidatos hay seis órdenes posibles. Una elección se resume en cuántos votantes tienen cada orden: el vector `conteos`.
 
-**Tu tarea.** Completa `gana()`, que dice si `x` gana a `y` por mayoría. El resto simula 10.000 elecciones de 101 votantes de dos maneras: con órdenes elegidos al azar, y con *preferencias unimodales*, en las que los candidatos están en un eje, A a la izquierda, B en el centro y C a la derecha, y nadie pone al del centro el último. ¿Con qué frecuencia aparecen los ciclos en cada caso? La simulación tarda unos segundos.
+**Tu tarea.** Completa `gana()`, que dice si `x` gana a `y` por mayoría. El resto simula 10.000 elecciones de 101 votantes en dos escenarios: con órdenes al azar y con *preferencias unimodales*. En las unimodales, los candidatos se ordenan en un eje (A a la izquierda, B en el centro y C a la derecha) y nadie pone al del centro en último lugar. ¿Con qué frecuencia aparecen los ciclos en cada caso? La simulación tarda unos segundos.
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
 Con preferencias al azar, hay un ciclo en un 8,6% de las elecciones simuladas; el valor teórico para muchos votantes, que calculó Guilbaud en 1952, es del 8,77%. Con tres votantes sería el 5,6%, y la frecuencia crece con el número de candidatos.
 
-Con preferencias unimodales no aparece ninguno. Es el *teorema del votante mediano* de Black: si las preferencias se ordenan en un solo eje, siempre gana el candidato que prefiere el votante mediano. La paradoja de Condorcet no depende de la irracionalidad de nadie, sino de la estructura de las preferencias: cuando la política tiene una sola dimensión, la mayoría funciona; cuando tiene varias, puede no haber nada que la mayoría prefiera. Es la puerta de entrada al teorema de imposibilidad de Arrow.
+Con preferencias unimodales no aparece ninguno. Es el *teorema del votante mediano* de Black: si las preferencias se ordenan en un solo eje, siempre gana el candidato que prefiere el votante mediano. La paradoja de Condorcet nace de la estructura de las preferencias, no de que los votantes sean irracionales. Cuando la política tiene una sola dimensión, la mayoría funciona; cuando tiene varias, puede no haber ninguna opción que la mayoría prefiera. Es la puerta de entrada al teorema de imposibilidad de Arrow.
 
 Black, D. (1948). On the rationale of group decision-making. *Journal of Political Economy*, 56(1), 23–34.
 

@@ -28,7 +28,7 @@ Cuando la tengas, cuenta en cuántos departamentos las mujeres tienen una tasa m
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-En cuatro de los seis departamentos las mujeres tienen una tasa de admisión más alta que los hombres. La tasa agregada se invierte porque las mujeres se presentaron sobre todo a los departamentos más difíciles, como C y E, que rechazan a la mayoría de los solicitantes, y los hombres a los más fáciles, A y B. El departamento confunde la relación entre el sexo y la admisión: al agregar, se mezcla con ella.
+En cuatro de los seis departamentos las mujeres tienen una tasa de admisión más alta que los hombres. La tasa agregada se invierte porque las mujeres se presentaron sobre todo a los departamentos más difíciles (C y E, que rechazan a la mayoría de los solicitantes) y los hombres a los más fáciles (A y B). El departamento confunde la relación entre el sexo y la admisión: al agregar, se mezcla con ella.
 
 Bickel, P. J., Hammel, E. A. y O'Connell, J. W. (1975). Sex bias in graduate admissions: Data from Berkeley. *Science*, 187(4175), 398–404.
 :::

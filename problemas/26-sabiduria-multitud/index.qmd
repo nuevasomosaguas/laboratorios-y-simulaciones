@@ -21,7 +21,7 @@ Scott Page explicó por qué con una identidad exacta, el *teorema de predicció
 
 $$\underbrace{(c - \theta)^2}_{\text{error colectivo}} = \underbrace{\frac{1}{n}\sum_i (s_i - \theta)^2}_{\text{error medio}} - \underbrace{\frac{1}{n}\sum_i (s_i - c)^2}_{\text{diversidad}}.$$
 
-La multitud se equivoca menos que el individuo medio exactamente en lo que se separan unas estimaciones de otras. No es una ley empírica: es álgebra, y se cumple siempre.
+La multitud se equivoca menos que el individuo medio en lo que se separan unas estimaciones de otras. Es álgebra, no una ley empírica, y se cumple siempre.
 
 Bryan Caplan le puso un límite. Los errores aleatorios se cancelan al promediar; los *sesgos sistemáticos*, no. Si casi todos los votantes se equivocan hacia el mismo lado, la democracia agrega el error en lugar de corregirlo.
 
@@ -40,7 +40,7 @@ La multitud con errores al azar estima 999 garbanzos, y ninguna de sus cien pers
 
 El gráfico lo explica. Con errores al azar, el error de la media baja con la raíz del tamaño: de 82 garbanzos con 10 personas a 7 con 1.000. Con un sesgo de 200, por grande que sea la multitud, el error se queda en 200: añadir gente solo promedia el ruido, no el sesgo.
 
-Es la misma lógica del *teorema del jurado* que Condorcet publicó en 1785, en el mismo libro que [su paradoja](../15-condorcet/index.qmd): si cada votante acierta con una probabilidad algo mayor que 1/2 y vota con independencia, la mayoría acierta casi con seguridad cuando son muchos. Pero si la probabilidad es algo menor que 1/2, la mayoría se equivoca casi con seguridad. Caplan sostiene que en economía los votantes tienen sesgos de ese tipo, como desconfiar del mercado y del comercio con extranjeros o creer que la economía siempre va a peor, y que por eso el «milagro de la agregación» no los salva.
+Es la misma lógica del *teorema del jurado* que Condorcet publicó en 1785, en el mismo libro que [su paradoja](../15-condorcet/index.qmd). Si cada votante acierta con una probabilidad algo mayor que 1/2 y vota con independencia, la mayoría acierta casi con seguridad cuando son muchos. Pero si la probabilidad es algo menor que 1/2, la mayoría se equivoca casi con seguridad. Caplan sostiene que en economía los votantes tienen sesgos de ese tipo, como desconfiar del mercado y del comercio con extranjeros o creer que la economía siempre va a peor. Por eso el «milagro de la agregación» no los salva.
 
 La lección del teorema de Page es que la diversidad vale tanto como la precisión: a igualdad de error medio, una multitud cuyos errores no se parecen se equivoca menos. La de Caplan, que la diversidad solo cancela lo que es independiente.
 
@@ -59,7 +59,7 @@ Caplan, B. (2007). *The Myth of the Rational Voter: Why Democracies Choose Bad P
 verdad <- 1000  # garbanzos en el tarro
 set.seed(1907)
 n <- 100
-al_azar <- verdad + rnorm(n, 0, 250)         # errores al azar
+al_azar <- verdad + rnorm(n, 0, 250)
 sesgados <- verdad + 200 + rnorm(n, 0, 250)  # el mismo ruido, y todos se pasan
 
 # El teorema de predicción por diversidad: error colectivo, error medio y diversidad

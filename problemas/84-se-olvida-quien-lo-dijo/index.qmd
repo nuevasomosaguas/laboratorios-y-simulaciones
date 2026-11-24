@@ -34,11 +34,11 @@ El modelo de la derecha es el de Hovland y Weiss: la opinión es lo que se apren
 
 La hipótesis del olvido no llega ni a la mitad. Predice que, a las cuatro semanas, la fuente poco fiable convence al 6,4%, casi lo mismo que el primer día, y convenció al 14,0%. El recuerdo de la firma cae más despacio que el del contenido: $\tau$ vale 6,4 semanas para el contenido y 10,2 para la firma. Así que, si todo dependiera de olvidar quién lo dijo, el descuento solo bajaría del 71% al 48%, y el mensaje perdería casi tanto por el olvido de lo que decía como ganaría por el de la firma. En los datos, el descuento a las cuatro semanas es nulo: −14%, dentro de lo que da el azar con 122 lecturas por grupo. El 63% sigue sabiendo que el artículo era de *Pravda*, pero ya no lo descuenta.
 
-Hovland y Weiss ya lo sospechaban: lo que se pierde no es el nombre, sino el vínculo entre el nombre y el mensaje. Es la **disociación**. Uno recuerda que *Pravda* escribió sobre submarinos y recuerda que los submarinos atómicos ya son posibles, pero no que lo segundo se lo dijo lo primero. En 1953, Kelman y Hovland lo comprobaron: si semanas después se recordaba la fuente a los lectores, la diferencia volvía. La firma seguía en la memoria; solo había dejado de ir pegada al mensaje.
+Hovland y Weiss ya lo sospechaban: lo que se pierde es el vínculo entre el nombre y el mensaje, no el nombre. Es la **disociación**. Uno recuerda que *Pravda* escribió sobre submarinos y recuerda que los submarinos atómicos ya son posibles, pero no que lo segundo se lo dijo lo primero. En 1953, Kelman y Hovland lo comprobaron: si semanas después se recordaba la fuente a los lectores, la diferencia volvía. La firma seguía en la memoria; solo había dejado de ir pegada al mensaje.
 
-Hay una parte racional en descontar a *Pravda*: cuando no puedes comprobar algo, la reputación de quien lo dice es información, y un prior razonable. El problema es que el descuento es frágil, y el mensaje, duradero. El contenido se copia, la firma se despega, y lo que queda es la impresión de que «se dice». Y la fuente cambia algo más que la credibilidad. Lorge (1936) atribuyó la frase «un poco de rebelión de vez en cuando es buena cosa» unas veces a Jefferson y otras a Lenin, y en 1948 Asch sostuvo que los lectores no la valoraban distinto, sino que leían frases distintas: con Jefferson, agitación cívica; con Lenin, revolución.
+Hay una parte racional en descontar a *Pravda*: cuando no puedes comprobar algo, la reputación de quien lo dice es información, y un prior razonable. El problema es que el descuento es frágil, y el mensaje, duradero. El contenido se copia, la firma se despega, y lo que queda es la impresión de que «se dice». Y la fuente cambia algo más que la credibilidad. Lorge (1936) atribuyó la frase «un poco de rebelión de vez en cuando es buena cosa» unas veces a Jefferson y otras a Lenin. En 1948, Asch sostuvo que los lectores leían frases distintas, más que valorar distinto la misma: con Jefferson, agitación cívica; con Lenin, revolución.
 
-Una advertencia, como en [*Veintinueve de veintinueve*](../83-veintinueve-de-veintinueve/): el efecto durmiente costó replicarlo. Gillig y Greenwald (1974) no lo encontraron en siete intentos. Pratkanis y sus coautores (1988) lo obtuvieron de forma fiable cuando el aviso sobre la fuente llega *después* del mensaje, y el metaanálisis de Kumkale y Albarracín (2004) confirma que existe, pero solo en ciertas condiciones: argumentos fuertes, el aviso al final y lectores que se fijan en lo que leen.
+Una advertencia, como en [*Veintinueve de veintinueve*](../83-veintinueve-de-veintinueve/): el efecto durmiente costó replicarlo. Gillig y Greenwald (1974) no lo encontraron en siete intentos. Pratkanis y sus coautores (1988) lograron replicarlo con regularidad cuando el aviso sobre la fuente llega *después* del mensaje. El metaanálisis de Kumkale y Albarracín (2004) confirma que existe, pero solo bajo ciertas condiciones: argumentos fuertes, el aviso al final y lectores que se fijan en lo que leen.
 
 Hovland, C. I. y Weiss, W. (1951). The influence of source credibility on communication effectiveness. *Public Opinion Quarterly*, 15(4), 635–650.
 
@@ -50,24 +50,20 @@ Kumkale, G. T. y Albarracín, D. (2004). The sleeper effect in persuasion: A met
 ```{webr}
 #| exercise: durmiente
 #| caption: "Tu código"
-# Hovland y Weiss (1951): % neto de lectores que cambian de opinión hacia lo que dice el
-# artículo, nada más leerlo y cuatro semanas después, según la fuente a la que se atribuía.
-# Y % que recuerda la fuente de los artículos de fuente poco fiable.
+# Hovland y Weiss (1951): % neto de cambio de opinión y proporción que recuerda la fuente poco fiable
 fiable      <- c(semana_0 = 23.0, semana_4 = 12.3)
 poco_fiable <- c(semana_0 =  6.6, semana_4 = 14.0)
 recuerda    <- c(semana_0 = 0.933, semana_4 = 0.630)
 
-# 1. El contenido se olvida igual venga de quien venga. Con una fuente fiable no hay descuento,
-#    así que su caída es la del contenido: 23,0 * exp(-4 / tau) = 12,3
-tau <- ______  # despeja tau
+# 1. Ritmo de olvido del contenido: 23,0 * exp(-4 / tau) = 12,3
+tau <- ______
 contenido <- function(t) fiable[["semana_0"]] * exp(-t / tau)
 
-# 2. La hipótesis del olvido: quien recuerda que la fuente es poco fiable descuenta el mensaje,
-#    y quien la olvida, no. El recuerdo cae igual que el contenido, a su ritmo
+# 2. Hipótesis del olvido de la fuente
 tau_fuente <- 4 / log(recuerda[["semana_0"]] / recuerda[["semana_4"]])
 recuerdo <- function(t) recuerda[["semana_0"]] * exp(-t / tau_fuente)
-descuento <- (1 - poco_fiable[["semana_0"]] / contenido(0)) / recuerdo(0)  # lo que descuenta quien la recuerda
-opinion_olvido <- function(t) ______  # el contenido, menos el descuento de quien aún recuerda la fuente
+descuento <- (1 - poco_fiable[["semana_0"]] / contenido(0)) / recuerdo(0)  # descuento de quien recuerda la fuente
+opinion_olvido <- function(t) ______
 
 semanas <- seq(0, 8, by = 0.1)
 plot(semanas, contenido(semanas), type = "l", ylim = c(0, 25),
@@ -89,23 +85,16 @@ round(c(
 ```{webr}
 #| exercise: durmiente
 #| solution: true
-# Hovland y Weiss (1951): % neto de lectores que cambian de opinión hacia lo que dice el
-# artículo, nada más leerlo y cuatro semanas después, según la fuente a la que se atribuía.
-# Y % que recuerda la fuente de los artículos de fuente poco fiable.
 fiable      <- c(semana_0 = 23.0, semana_4 = 12.3)
 poco_fiable <- c(semana_0 =  6.6, semana_4 = 14.0)
 recuerda    <- c(semana_0 = 0.933, semana_4 = 0.630)
 
-# 1. El contenido se olvida igual venga de quien venga. Con una fuente fiable no hay descuento,
-#    así que su caída es la del contenido: 23,0 * exp(-4 / tau) = 12,3
 tau <- 4 / log(fiable[["semana_0"]] / fiable[["semana_4"]])
 contenido <- function(t) fiable[["semana_0"]] * exp(-t / tau)
 
-# 2. La hipótesis del olvido: quien recuerda que la fuente es poco fiable descuenta el mensaje,
-#    y quien la olvida, no. El recuerdo cae igual que el contenido, a su ritmo
 tau_fuente <- 4 / log(recuerda[["semana_0"]] / recuerda[["semana_4"]])
 recuerdo <- function(t) recuerda[["semana_0"]] * exp(-t / tau_fuente)
-descuento <- (1 - poco_fiable[["semana_0"]] / contenido(0)) / recuerdo(0)  # lo que descuenta quien la recuerda
+descuento <- (1 - poco_fiable[["semana_0"]] / contenido(0)) / recuerdo(0)
 opinion_olvido <- function(t) contenido(t) * (1 - descuento * recuerdo(t))
 
 semanas <- seq(0, 8, by = 0.1)

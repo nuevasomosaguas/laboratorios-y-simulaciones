@@ -25,14 +25,14 @@ Los datos de la derecha son simulados, así que conocemos la respuesta. Cada est
 - `horas`: horas de estudio semanales. Las clases hacen que se estudie una hora más.
 - `nota`: la nota final, que depende de las tres cosas.
 
-El efecto *total* de las clases es de **0,5 puntos**: 0,3 directos y 0,2 que llegan a través de la hora de estudio de más.
+El efecto *total* de las clases es de **0,5 puntos**: 0,3 directos y 0,2 por la hora de estudio de más.
 
 **Tu tarea.** Cambia la regresión para que el coeficiente de `clases` estime ese efecto total. La última línea debe devolver ese coeficiente.
 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-`ingresos` es un *confusor*: causa a la vez las clases y la nota, así que hay que controlarlo. `horas`, en cambio, es un *mediador*: está en el camino entre las clases y la nota. Controlarla bloquea parte del efecto que queremos medir, y el coeficiente baja a unos 0,3. Meter en la regresión todas las variables disponibles no es prudencia: es un control malo.
+`ingresos` es un *confusor*: causa a la vez las clases y la nota, así que hay que controlarlo. `horas`, en cambio, es un *mediador*: está en el camino entre las clases y la nota. Controlarlo bloquea parte del efecto que queremos medir, y el coeficiente baja a unos 0,3. Meter en la regresión todas las variables disponibles es un mal control, no prudencia.
 
 Cinelli, C., Forney, A. y Pearl, J. (2024). A crash course in good and bad controls. *Sociological Methods & Research*, 53(3), 1071–1104.
 :::

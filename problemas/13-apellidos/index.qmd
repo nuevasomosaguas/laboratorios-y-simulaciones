@@ -18,7 +18,7 @@ engine: markdown
 ::: {.enunciado}
 En 1873, Francis Galton planteó en una revista una pregunta: ¿por qué se extinguen tantos apellidos de familias ilustres? El reverendo Henry Watson le contestó con un modelo. Si el apellido pasa de padres a hijos varones, y cada hombre tiene $k$ hijos varones con probabilidad $p_k$, cada apellido es un árbol que se ramifica al azar.
 
-La herramienta es la *función generatriz* $f(s) = \sum_k p_k s^k$. La probabilidad $q$ de que el apellido acabe extinguiéndose es el menor punto fijo de $f$, el menor $q$ con $q = f(q)$, y se encuentra iterando desde 0: $f(0)$ es la probabilidad de extinguirse en una generación, $f(f(0))$ en dos, y así.
+La herramienta es la *función generatriz* $f(s) = \sum_k p_k s^k$. La probabilidad $q$ de que el apellido acabe extinguiéndose es el menor punto fijo de $f$ (el menor $q$ con $q = f(q)$). Se encuentra iterando desde 0: $f(0)$ es la probabilidad de extinguirse en una generación, $f(f(0))$ en dos, y así.
 
 Alfred Lotka estimó la distribución de hijos varones de los hombres blancos de Estados Unidos en 1920: $p_0 = 0{,}4825$ y $p_k = 0{,}2126 \cdot 0{,}5893^{k-1}$ para $k \geq 1$, cuya función generatriz es
 
@@ -29,7 +29,7 @@ $$f(s) = \frac{0{,}4825 - 0{,}0717\,s}{1 - 0{,}5893\,s}.$$
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Cada hombre tiene de media 1,26 hijos varones, así que la población crece. Y sin embargo, el 82% de los apellidos acaba extinguiéndose. No hay contradicción: casi la mitad de los hombres no tiene ningún hijo varón, y un apellido recién nacido depende de muy pocas personas. Los que sobreviven crecen mucho, y compensan con creces a los que desaparecen. Por eso unos pocos apellidos acaban dominando, en Corea o en China, sin que ninguna familia haya sido especialmente prolífica.
+Cada hombre tiene de media 1,26 hijos varones, así que la población crece. Y sin embargo, el 82% de los apellidos acaba extinguiéndose. No hay contradicción: casi la mitad de los hombres no tiene ningún hijo varón, y un apellido recién nacido depende de muy pocas personas. Los que sobreviven crecen mucho, y compensan con creces a los que desaparecen. Por eso unos pocos apellidos acaban dominando, en Corea o en China, sin que ninguna familia haya sido más prolífica que las demás.
 
 Lo que sale de esta pregunta victoriana, los procesos de ramificación, describe también las cadenas de contagio, las reacciones nucleares en cadena y la supervivencia de una mutación nueva.
 

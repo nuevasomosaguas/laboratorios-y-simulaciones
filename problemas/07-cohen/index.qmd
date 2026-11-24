@@ -16,11 +16,11 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-La *d de Cohen* mide la diferencia entre las medias de dos grupos en unidades de desviación típica:
+Un valor p pequeño dice que dos grupos difieren, pero no en cuánto: con cien mil personas, una diferencia minúscula ya sale significativa. Para medir el tamaño del efecto se usa la *d de Cohen*, la diferencia entre las medias de dos grupos en unidades de desviación típica:
 
 $$d = \frac{\bar{x}_1 - \bar{x}_2}{s}, \qquad s = \sqrt{\frac{(n_1 - 1)\,s_1^2 + (n_2 - 1)\,s_2^2}{n_1 + n_2 - 2}},$$
 
-donde $s$ es la desviación típica combinada de los dos grupos. Como no depende de las unidades, permite comparar efectos de estudios muy distintos. Cohen propuso como referencia 0,2 para un efecto pequeño, 0,5 para uno mediano y 0,8 para uno grande, aunque él mismo advirtió que no debían usarse de forma mecánica.
+donde $s$ es la desviación típica combinada de los dos grupos. Como no depende de las unidades, permite comparar efectos de estudios muy distintos. Cohen propuso como referencia 0,2 para un efecto pequeño, 0,5 para uno mediano y 0,8 para uno grande, aunque él mismo advirtió que no debían aplicarse a ciegas.
 
 **Tu tarea.**
 
@@ -36,7 +36,7 @@ La tarea 2 desmonta la intuición sobre los efectos «pequeños»: con d = 0,2, 
 
 La tarea 3 muestra que con muestras enormes casi cualquier diferencia es significativa: el valor p dice si un efecto se distingue de cero, no si importa.
 
-Y la tarea 4 es el mecanismo de buena parte de la crisis de replicación. Con estudios pequeños, solo un 9% sale significativo, y para salirlo la d estimada tiene que ser enorme: la media de lo publicado ronda 0,8, cuatro veces el efecto real. Con una literatura que solo publica lo significativo, los efectos publicados se inflan sistemáticamente. Es una selección oculta, de la misma familia que la de [Kuran](../06-kuran/index.qmd): lo que vemos en las revistas no es lo que hay en los cajones.
+Y la tarea 4 es el mecanismo de buena parte de la crisis de replicación. Con estudios pequeños, solo un 9% sale significativo, y para salirlo la d estimada tiene que ser enorme: la media de lo publicado ronda 0,8, cuatro veces el efecto real. Cuando solo se publica lo significativo, los efectos que llegan a las revistas salen siempre inflados. Es una selección oculta, de la misma familia que la de [Kuran](../06-kuran/index.qmd): lo que vemos en las revistas no es lo que hay en los cajones.
 
 **Para ir más allá:** la d sobrestima un poco el efecto en muestras pequeñas. La corrección de Hedges la multiplica por $1 - 3/(4(n_1 + n_2) - 9)$. Escribe `hedges_g()` y compara.
 
