@@ -30,7 +30,7 @@ El código simula mil estudios de un efecto real de d = 0,2, con entre 10 y 200 
 
 1. Completa los pesos de `metaanalisis()`. Compara el efecto combinado de todos los estudios con el de los publicados.
 2. Mira el *gráfico de embudo*: cada punto es un estudio, con su d en horizontal y su error típico en vertical, los más precisos arriba. Sin sesgo, los puntos forman un embudo simétrico alrededor del efecto real. ¿Qué forma tienen los publicados, en rojo? La línea negra es $d = 1{,}96\,e$, la frontera de la significación.
-3. El *test de Egger* mide esa asimetría: regresa $z_i = d_i/e_i$ sobre la precisión $1/e_i$. Si no hay sesgo, la recta pasa por el origen; el término independiente mide cuánto se aparta. Completa `egger()` y compara todos los estudios con los publicados.
+3. El *test de Egger* mide esa asimetría: ajusta la regresión de $z_i = d_i/e_i$ sobre la precisión $1/e_i$. Si no hay sesgo, la recta pasa por el origen; el término independiente mide cuánto se aparta. Completa `egger()` y compara todos los estudios con los publicados.
 4. Compara la d media publicada de los estudios pequeños, de menos de 50 personas por grupo, con la de los grandes, de 150 o más.
 5. Cambia el efecto real a `efecto <- 0` y vuelve a ejecutar. ¿Qué dice ahora la literatura publicada?
 
@@ -43,7 +43,7 @@ El embudo lo delata. Los estudios precisos, arriba, se publican casi todos, porq
 
 De ahí el título. La d media publicada de los estudios pequeños es 0,579, y la de los grandes, 0,286: cuanto más grande es el estudio, más pequeño es el efecto. Es lo que se ve cuando un efecto llamativo se replica con muestras grandes, y no significa que el efecto haya cambiado: los primeros estudios eran pequeños y solo se publicaron los que exageraban. Con un efecto real de cero, se publica el 1,5% de los estudios, que son justo los falsos positivos a favor, y el metaanálisis de lo publicado encuentra un efecto de 0,322 donde no hay nada.
 
-Harrer y sus colegas dedican el capítulo 9 de su libro al sesgo de publicación: el gráfico de embudo, el test de Egger y los métodos que intentan corregirlo, como el *trim-and-fill*, PET-PEESE o los modelos de selección. Ninguno lo arregla del todo, y la solución de fondo no es estadística: registrar los estudios antes de hacerlos, como los *registered reports*, y publicar los resultados salgan como salgan.
+Harrer y sus colegas dedican el capítulo 9 de su libro al sesgo de publicación: el gráfico de embudo, el test de Egger y los métodos que intentan corregirlo, como el *trim-and-fill*, PET-PEESE o los modelos de selección. Ninguno lo arregla del todo. La solución de fondo viene antes de analizar los datos: registrar los estudios de antemano (como en los *registered reports*) y publicar los resultados salgan como salgan.
 
 **Para ir más allá:** la regresión de PET, `lm(d ~ ee, weights = 1 / ee^2)`, estima el efecto de un estudio infinitamente preciso con el término independiente. Pruébala con los publicados, con efecto 0,2 y con efecto 0: verás por qué se combina con PEESE, que usa `ee^2` en lugar de `ee`.
 

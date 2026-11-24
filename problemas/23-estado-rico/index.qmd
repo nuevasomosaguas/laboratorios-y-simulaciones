@@ -15,7 +15,7 @@ engine: markdown
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En las elecciones presidenciales de Estados Unidos de 2004, los estados más ricos, como Connecticut o Nueva Jersey, votaron a John Kerry, el demócrata, y los más pobres, como Misisipi o Alabama, a George W. Bush, el republicano. De ahí salió un tópico de los comentaristas: los republicanos serían el partido de la América trabajadora, y los demócratas, el de las élites de la costa.
+En las elecciones presidenciales de Estados Unidos de 2004, los estados más ricos (como Connecticut o Nueva Jersey) votaron al demócrata John Kerry, y los más pobres (como Misisipi o Alabama), al republicano George W. Bush. De ahí salió un tópico de los comentaristas: los republicanos serían el partido de la América trabajadora, y los demócratas, el de las élites de la costa.
 
 Andrew Gelman y sus colaboradores miraron las encuestas votante a votante y encontraron lo contrario. Dentro de cada estado, cuanto más rico es un votante, más probable es que vote republicano. Y la diferencia entre ricos y pobres no es igual en todas partes: es enorme en los estados pobres y casi desaparece en los ricos.
 

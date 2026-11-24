@@ -20,7 +20,7 @@ Imagina un país joven donde cada mujer tiene 4,5 hijos y la población crece ca
 
 La respuesta intuitiva es «enseguida», y es falsa. Para verlo hace falta proyectar la población por edades, con la *matriz de Leslie*: se divide a las mujeres en grupos de cinco años de edad, y cada paso de cinco años la matriz dice cuántas sobreviven al grupo siguiente y cuántas hijas tienen. Como es habitual en demografía, solo se cuentan las mujeres.
 
-El código de partida trae una tabla de vida inventada, con una esperanza de vida de 74 años: `lx` son las supervivientes a cada edad exacta, de cada nacida, y `L` los años que vive cada una, de media, dentro de cada grupo. `m` son las hijas que tiene cada mujer al año en cada grupo de edad. El país parte de su *población estable*, la que da el primer autovector de la matriz, como en la [semana 11 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/).
+El código de partida trae una tabla de vida inventada, con una esperanza de vida de 74 años. `lx` indica la proporción de nacidas que sobrevive a cada edad exacta, y `L` los años que vive cada nacida de media dentro de cada grupo. `m` son las hijas que tiene cada mujer al año en cada grupo de edad. El país parte de su *población estable*, la que da el primer autovector de la matriz, como en la [semana 11 del bootcamp](https://nuevasomosaguas.github.io/bootcamp/semanas/semana-11/).
 
 **Tu tarea.**
 
@@ -34,7 +34,7 @@ El código de partida trae una tabla de vida inventada, con una esperanza de vid
 
 Con 4,5 hijos por mujer, cada nacida tiene de media 2,14 hijas que llegan a la edad de su madre, y la población crece un 2,7% al año. El reemplazo está en 2,11 hijos por mujer, no en 2: algunas niñas mueren antes de ser madres y nacen algo más de niños que de niñas. Cuando la fecundidad cae ahí de golpe, la población todavía crece un 61% y tarda 65 años en dejar de hacerlo.
 
-La razón está en la estructura por edades. Un país que ha crecido deprisa es joven: el 64% de sus mujeres tiene menos de 30 años. Aunque cada una tenga solo una hija, hay muchas más madres que abuelas, y los nacimientos superan a las muertes hasta que las generaciones grandes envejecen y la pirámide se convierte en la de una *población estacionaria*, con la forma de la propia tabla de vida. Es la *inercia demográfica*, que Nathan Keyfitz midió en 1971. Con `tgf <- 3` la población es menos joven y la inercia, menor, un 29% en lugar de un 61%, pero sigue ahí.
+La razón está en la estructura por edades. Un país que ha crecido deprisa es joven: el 64% de sus mujeres tiene menos de 30 años. Aunque cada una tenga solo una hija, hay muchas más madres que abuelas. Los nacimientos superan a las muertes hasta que las generaciones grandes envejecen y la pirámide adopta la forma de una *población estacionaria* (la propia tabla de vida). Es la *inercia demográfica*, que Nathan Keyfitz midió en 1971. Con `tgf <- 3`, la población es menos joven y la inercia baja del 61% al 29%, pero sigue ahí.
 
 Es lo que ha pasado en buena parte del mundo: muchos países llegaron al reemplazo en los años noventa y su población ha seguido creciendo. Y funciona igual al revés: un país con la fecundidad por debajo del reemplazo durante décadas, como España, seguiría perdiendo población durante años aunque la fecundidad subiera mañana al reemplazo, porque le faltan madres.
 

@@ -23,7 +23,7 @@ $$p' = p + s\,p(1-p) + D\,p(1-p)(2p-1).$$
 
 El último término frena la idea mientras es minoritaria ($p < 1/2$) y la empuja cuando es mayoritaria. Con conformidad, hay un umbral $p^*$ en el que los dos sesgos se equilibran: por debajo, la idea se pierde; por encima, se impone.
 
-El prestigio entra así: durante las primeras $T$ generaciones, una fracción $w$ de la población copia directamente al modelo de prestigio, que tiene la idea nueva, y el resto aprende como antes.
+El prestigio entra así: durante las primeras $T$ generaciones, una fracción $w$ de la población copia al modelo de prestigio, que tiene la idea nueva, y el resto aprende como antes.
 
 **Tu tarea.**
 
@@ -37,7 +37,7 @@ El prestigio entra así: durante las primeras $T$ generaciones, una fracción $w
 
 Sin conformidad, la idea buena se abre paso sola, pero despacio: en 100 generaciones llega al 58%. Con conformidad ($D = 0{,}1$), la misma idea desaparece, porque su ventaja ($s = 0{,}05$) es menor que el freno de ser minoritaria. Su umbral es $p^* = 0{,}25$: tiene que llegar a una cuarta parte de la población para que la conformidad deje de frenarla y empiece a empujarla.
 
-Ahí entra el prestigio. Basta con que un 5% copie al modelo durante 10 generaciones para que la idea pase del 25%, y desde entonces la conformidad hace el resto: en la generación 100 la tiene toda la población, aunque el modelo de prestigio ya no esté. Es el mecanismo de Mokyr en miniatura: los emprendedores culturales no tienen que convencer a todos, solo empujar la idea más allá del umbral.
+Ahí entra el prestigio. Basta con que un 5% copie al modelo durante 10 generaciones para que la idea pase del 25%, y desde entonces la conformidad hace el resto. En la generación 100 la tiene toda la población, aunque el modelo de prestigio ya no esté. Es el mecanismo de Mokyr en miniatura: los emprendedores culturales no tienen que convencer a todos, solo empujar la idea más allá del umbral.
 
 El mismo empujón no basta para una idea peor ($s = -0{,}05$), cuyo umbral es 0,75: la conformidad, que frena las novedades, también protege de las malas. Pero un prestigio más fuerte, un 10% durante 20 generaciones, la lleva más allá del 75%, y entonces la conformidad la fija igual que fijaba la buena: en la generación 100 la tiene el 99%. Copiar al famoso acelera las ideas, buenas o malas, y copiar a la mayoría las congela donde estén.
 

@@ -24,7 +24,7 @@ $$\text{TBM} = \sum_x c_x \, m_x.$$
 
 Y la población española es mucho más vieja que la mexicana. Es [la paradoja de Simpson de Berkeley](../01-berkeley/index.qmd) llevada a la demografía: la edad hace el papel del departamento.
 
-Evelyn Kitagawa propuso en 1955 una forma de repartir la diferencia entre dos tasas brutas en dos partes que suman exactamente la diferencia:
+Evelyn Kitagawa propuso en 1955 descomponer la diferencia entre dos tasas brutas en dos partes que suman esa diferencia:
 
 - un **efecto composición**, $\sum_x (c^1_x - c^2_x) \, \frac{m^1_x + m^2_x}{2}$: lo que se debe a que las estructuras por edad son distintas, valorado con las tasas medias;
 - un **efecto tasas**, $\sum_x (m^1_x - m^2_x) \, \frac{c^1_x + c^2_x}{2}$: lo que se debe a que se muere más o menos a cada edad, valorado con la estructura media.
@@ -38,9 +38,9 @@ Los datos del código son cifras redondeadas e ilustrativas, del orden de las de
 
 España tiene una tasa bruta de 9,3 por mil y México de 6,8: España muere 2,5 por mil más. Pero en ningún grupo de edad muere más gente en España; en los más jóvenes, México multiplica por más de tres las tasas españolas.
 
-La descomposición lo aclara: la estructura por edades suma 5,7 puntos a la mortalidad española y las tasas le restan 3,2. Si los dos países tuvieran la misma población, la media de las dos, España moriría al 6,8 por mil y México al 10,0. El efecto tasas es exactamente esa diferencia entre tasas estandarizadas.
+La descomposición lo aclara: la estructura por edades suma 5,7 puntos a la mortalidad española y las tasas le restan 3,2. Si los dos países tuvieran la misma población, la media de las dos, España moriría al 6,8 por mil y México al 10,0. El efecto tasas coincide con esa diferencia entre tasas estandarizadas.
 
-Por eso los demógrafos no comparan nunca tasas brutas entre poblaciones con estructuras distintas, sino tasas estandarizadas o medidas que no dependen de la estructura, como la esperanza de vida: la tabla de vida aplica las tasas de cada edad a una cohorte ficticia, la misma para los dos países. La descomposición de Arriaga de la semana 9 hace con la esperanza de vida lo que Kitagawa hace con las tasas brutas: repartir una diferencia, exactamente, entre sus causas.
+Por eso, cuando dos poblaciones tienen estructuras distintas, los demógrafos comparan tasas estandarizadas o medidas independientes de la estructura, como la esperanza de vida. La tabla de vida aplica las tasas de cada edad a una misma cohorte ficticia para los dos países. La descomposición de Arriaga de la semana 9 hace con la esperanza de vida lo que Kitagawa hace con las tasas brutas: repartir una diferencia sin residuo entre sus causas.
 
 Kitagawa, E. M. (1955). Components of a difference between two rates. *Journal of the American Statistical Association*, 50(272), 1168–1194.
 

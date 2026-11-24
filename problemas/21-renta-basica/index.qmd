@@ -29,7 +29,7 @@ Un país **imaginario** tiene 5.000 hogares con rentas **simuladas**, que no cor
 
 El Gini de partida es 0,440. Subir todas las rentas un 10% lo deja igual: es una medida *relativa*, a la que no le importa la escala. El cheque igual de 1.000 euros lo baja a 0,425, porque la misma cantidad pesa más para quien menos tiene: el Gini se multiplica por $\mu / (\mu + 1000)$.
 
-La renta básica lo reduce exactamente al 70%, de 0,440 a 0,308, y no por casualidad: el impuesto proporcional, por sí solo, no cambia el Gini, como el crecimiento proporcional; lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
+La renta básica lo reduce al 70%, de 0,440 a 0,308. Igual que el crecimiento proporcional, el impuesto por sí solo no cambia el Gini: lo que redistribuye es repartir lo recaudado a partes iguales. El Gini resultante es $(1 - t)\,G$.
 
 La transferencia del más rico al más pobre apenas lo mueve, en el quinto decimal, pero lo baja. Es el *principio de Pigou-Dalton*: toda transferencia de un rico a un pobre que no invierta su orden debe reducir la desigualdad. Cualquier medida razonable lo cumple, y el Gini también.
 

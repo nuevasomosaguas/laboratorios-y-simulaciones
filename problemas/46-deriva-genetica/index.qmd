@@ -25,7 +25,7 @@ y luego se sortean las $2N$ copias con esa probabilidad. Motoo Kimura calculó e
 
 $$u = \frac{1 - e^{-4Nsp_0}}{1 - e^{-4Ns}}.$$
 
-Sin selección, $u = p_0$: un alelo neutro se fija con la misma probabilidad con la que está presente. Lo que decide si manda la selección o el azar no es $s$, sino $4Ns$.
+Sin selección, $u = p_0$: un alelo neutro se fija con la misma probabilidad con la que está presente. Lo que decide si manda la selección o el azar es $4Ns$, no $s$.
 
 **Tu tarea.**
 
@@ -37,11 +37,11 @@ Sin selección, $u = p_0$: un alelo neutro se fija con la misma probabilidad con
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-Sin selección, el alelo se fija en torno al 10% de las veces, en las poblaciones de 50 y en las de 500, como predice Kimura: la deriva no tiene dirección, y cada copia tiene la misma probabilidad de acabar siendo la antepasada de todas. El gráfico lo muestra: las 20 poblaciones empiezan igual, se separan por puro azar, y en pocos cientos de generaciones casi todas han fijado o perdido el alelo.
+Sin selección, el alelo se fija en torno al 10% de las veces tanto en las poblaciones de 50 como en las de 500, como predice Kimura. La deriva no tiene dirección, y cada copia tiene la misma probabilidad de acabar siendo la antepasada de todas. El gráfico lo muestra: las 20 poblaciones empiezan igual, se separan por puro azar, y en pocos cientos de generaciones casi todas han fijado o perdido el alelo.
 
 Con una ventaja del 1%, el resultado depende del tamaño. En una población de 50, $4Ns = 2$ y el alelo mejor se fija solo en el 21% de las poblaciones: casi cuatro de cada cinco veces se pierde, a pesar de ser mejor. En una de 500, $4Ns = 20$ y se fija en el 85%. Y un alelo un 1% peor, que en una población grande no tendría ninguna posibilidad, en una de 50 se impone en el 3% de los casos. Cuando $4Ns$ está cerca de 1 o por debajo, el azar puede más que la selección.
 
-Por eso la deriva importa fuera de la biología. Las poblaciones pequeñas y aisladas pierden variación y acumulan rasgos por azar, y lo mismo vale para la cultura: en un grupo pequeño, una innovación útil puede perderse porque nadie la copió a tiempo, que es parte del argumento de Henrich sobre Tasmania. Y no todo lo que se impone en una población tiene que ser una adaptación: antes de buscar la función de un rasgo, hay que descartar que lo haya fijado el azar.
+Por eso la deriva importa fuera de la biología. Las poblaciones pequeñas y aisladas pierden variación y acumulan rasgos por azar, y lo mismo vale para la cultura. En un grupo pequeño, una innovación útil puede perderse porque nadie la copió a tiempo (parte del argumento de Henrich sobre Tasmania). Y no todo lo que se impone en una población tiene que ser una adaptación: antes de buscar la función de un rasgo, hay que descartar que lo haya fijado el azar.
 
 Gillespie, J. H. (2004). *Population Genetics: A Concise Guide* (2.ª ed.). Johns Hopkins University Press.
 
@@ -115,7 +115,7 @@ fijacion <- function(N, s, p0 = 0.1, reps = 2000) {
   for (t in 1:10000) {
     if (!any(n > 0 & n < 2 * N)) break
     siguiente <- generacion(n, 2 * N, s)
-    if (identical(siguiente, n)) break  # sin deriva, nada cambiaría ya
+    if (identical(siguiente, n)) break
     n <- siguiente
   }
   mean(n == 2 * N)

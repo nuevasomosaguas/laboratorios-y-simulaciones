@@ -21,7 +21,7 @@ George Price escribió en 1970 una identidad que separa las dos fuerzas. Si $p_i
 
 $$\bar W \, \Delta \bar p = \underbrace{\operatorname{Cov}(W_i, p_i)}_{\text{entre grupos}} + \underbrace{\operatorname{E}(W_i \, \Delta p_i)}_{\text{dentro de los grupos}},$$
 
-donde la covarianza y la media se calculan con el peso de cada grupo, su tamaño entre el total. No es un modelo, sino contabilidad: vale para cualquier rasgo y cualquier forma de agruparlo.
+donde la covarianza y la media se calculan con el peso de cada grupo, su tamaño entre el total. Es contabilidad, no un modelo: vale para cualquier rasgo y cualquier forma de agruparlo.
 
 En el modelo, cada altruista paga un coste $c$ y cada miembro de un grupo recibe un beneficio $b \, p_i$, mayor cuanto más altruistas haya en él. Un egoísta tiene $1 + b \, p_i$ hijos, y un altruista, $1 - c + b \, p_i$. Hay dos grupos de 100 individuos: uno con un 20% de altruistas y otro con un 80%.
 
@@ -41,9 +41,9 @@ En el grupo con pocos altruistas, su proporción baja del 20% al 11%; en el otro
 
 $$\bar W \, \Delta \bar p = \bar p(1 - \bar p)\,[(b - c)\,r - c\,(1 - r)] = \bar p(1 - \bar p)\,(r b - c).$$
 
-El altruismo avanza si y solo si $r b > c$. Es la regla de Hamilton, y $r$ es el *parentesco*: lo que se parecen, en el rasgo, los miembros de un mismo grupo, sean o no familia. Con los grupos de partida, $r = 0,36$ y $r b = 1,8$, mayor que $c = 1$. Con los grupos de la tarea 3, más parecidos entre sí, $r = 0,04$, $r b = 0,2$, y el altruismo retrocede en el total aunque la proporción inicial sea la misma: la selección entre grupos solo actúa sobre la variación que hay entre ellos.
+El altruismo avanza si y solo si $r b > c$. Es la regla de Hamilton, y $r$ es el *parentesco*: lo que se parecen, en el rasgo, los miembros de un mismo grupo, sean o no familia. Con los grupos de partida, $r = 0,36$ y $r b = 1,8$, mayor que $c = 1$. Con los grupos de la tarea 3, más parecidos entre sí, $r = 0,04$ y $r b = 0,2$: el altruismo retrocede en el total aunque la proporción inicial sea la misma. La selección entre grupos solo actúa sobre la variación que hay entre ellos.
 
-La tarea 4 muestra el límite: si los grupos no se rehacen nunca, el altruismo sube tres generaciones, hasta el 64%, y luego cae hacia cero, porque dentro de cada grupo pierde siempre y la variación entre grupos se agota. Para que el altruismo se mantenga, los grupos tienen que disolverse y volver a formarse, de modo que se renueve la variación entre ellos: es el modelo de los *grupos de rasgo* de David Sloan Wilson.
+La tarea 4 muestra el límite: si los grupos no se rehacen nunca, el altruismo sube tres generaciones (hasta el 64%) y luego cae hacia cero. Dentro de cada grupo pierde siempre y la variación entre grupos acaba agotándose. Para que el altruismo se mantenga, los grupos tienen que disolverse y volver a formarse, de modo que se renueve la variación entre ellos: es el modelo de los *grupos de rasgo* de David Sloan Wilson.
 
 Price, G. R. (1970). Selection and covariance. *Nature*, 227, 520–521.
 

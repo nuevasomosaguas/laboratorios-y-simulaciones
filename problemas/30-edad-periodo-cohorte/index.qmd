@@ -32,9 +32,9 @@ El problema es que la cohorte es el periodo menos la edad. Quien tiene 40 años 
 ::: {.callout-note collapse="true"}
 ## Qué está pasando
 
-`lm()` da un `NA` en la cohorte: como la cohorte es una combinación exacta de la edad y el periodo, la descarta. Y el vector `c(0, 1, -1, 1)` lo explica: edad − periodo + cohorte es cero para todo el mundo, así que se puede sumar a los coeficientes de la edad, el periodo y la cohorte cualquier múltiplo de (1, −1, 1) sin cambiar ni una predicción.
+`lm()` da un `NA` en la cohorte: como la cohorte es una combinación exacta de la edad y el periodo, la descarta. Y el vector `c(0, 1, -1, 1)` lo explica: edad − periodo + cohorte es cero para todo el mundo. Por eso se puede sumar a los coeficientes de la edad, el periodo y la cohorte cualquier múltiplo de (1, −1, 1) sin cambiar ni una predicción.
 
-Las tres historias se ajustan exactamente igual, con la misma suma de cuadrados de los residuos, 11,588, y no pueden ser más distintas:
+Las tres historias se ajustan igual de bien (con la misma suma de cuadrados de los residuos, 11,588), y no pueden ser más distintas:
 
 - **Sin periodo**: la nota baja 0,21 puntos por cada año de edad y cada cohorte sale 0,29 puntos mejor que la anterior. Es como se inventaron los datos: −0,2 y +0,3, más ruido.
 - **Sin cohorte**: envejecer cuesta 0,50 puntos al año, pero los tiempos mejoran 0,29 al año.
@@ -42,7 +42,7 @@ Las tres historias se ajustan exactamente igual, con la misma suma de cuadrados 
 
 Cada fila es la anterior más un múltiplo de (1, −1, 1), y hay infinitas más. Si alguien asegura que el periodo baja la nota 0,1 puntos al año, los datos le dan la razón con una edad de −0,11 y una cohorte de +0,39. Los datos no eligen entre las historias: lo hace el supuesto con que se rompe la identidad, y ese supuesto tiene que venir de fuera, de la teoría o de otros datos.
 
-El problema no desaparece con modelos más flexibles, con una variable ficticia por cada edad, periodo y cohorte: lo que no se puede separar es exactamente una tendencia lineal común, y las curvaturas sí se identifican. Por eso las conclusiones sobre «generaciones» que salen de una sola tabla de edades y años merecen cautela.
+El problema no desaparece con modelos más flexibles (con una variable ficticia por cada edad, periodo y cohorte). Lo que no se puede separar es la tendencia lineal común; las curvaturas sí se identifican. Por eso las conclusiones sobre «generaciones» que salen de una sola tabla de edades y años merecen cautela.
 
 Mason, K. O., Mason, W. M., Winsborough, H. H. y Poole, W. K. (1973). Some methodological issues in cohort analysis of archival data. *American Sociological Review*, 38(2), 242–258.
 
