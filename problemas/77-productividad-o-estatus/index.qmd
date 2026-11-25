@@ -33,11 +33,11 @@ menos el 50% de la empresa y forman parte de su dirección.
 :::: {.laboratorio}
 
 ::: {.enunciado}
-En un fondo de capital riesgo como Bain Capital, en un gran bufete o en un banco de inversión, las semanas largas son parte del oficio, sobre todo los primeros años. En una empresa familiar alemana del Mittelstand se trabajan las horas pactadas. Hay dos explicaciones. La de la **productividad**: en esas firmas cada hora vale mucho, y quien la trabaja la cobra. La del **estatus**: las horas no se trabajan por lo que producen, sino por lo que dicen de quien las trabaja.
+En un fondo de capital riesgo como Bain Capital, en un gran bufete o en un banco de inversión, las semanas largas son parte del oficio, sobre todo los primeros años. En una empresa familiar alemana del Mittelstand se trabajan las horas pactadas. Hay dos explicaciones. La de la **productividad**: en esas firmas cada hora vale mucho, y quien la trabaja la cobra. La del **estatus**: las horas se echan por lo que dicen de quien las trabaja, no por lo que producen.
 
 La segunda tiene un modelo. En 1996, Renée Landers, James Rebitzer y Lowell Taylor estudiaron dos grandes bufetes estadounidenses. Los socios se reparten los beneficios, así que quieren como socios a los que trabajarán mucho toda la vida, los **incansables**. Pero eso no se ve en la cara: se ve en las horas facturadas de los años de asociado. Y si las horas sirven para elegir socio, un asociado normal tiene un motivo para trabajar como un incansable. Para separarlos, la firma pide tantas horas que a un normal ya no le compense fingir: es la **señal** de Spence (1973), y Akerlof (1976) lo llamó la **carrera de ratas**.
 
-El modelo, por semana. Producir: lo que dice Pencavel (2015) con los datos de las fábricas de municiones británicas de la Primera Guerra Mundial, en las que trabajaban sobre todo mujeres, proporcional a las horas hasta las 49, cada vez menos después, con el máximo a las 63 horas, y a las 70, lo mismo que a las 56. Trabajar cuesta $\theta h^2/2$, y menos al incansable ($\theta$ = 1/48) que al normal ($\theta$ = 1/40). Cada uno cobra lo que produce, y el **bienestar** es lo que produce menos lo que le cuesta. El **premio** es lo que vale llegar a socio, repartido por semana de los años de asociado y medido en horas de producción: un premio de 27 son dos tercios de lo que gana un normal.
+El modelo, por semana. Producir: la curva que Pencavel (2015) estimó con los datos de las fábricas de municiones británicas de la Primera Guerra Mundial, en las que trabajaban sobre todo mujeres. Sube en proporción a las horas hasta las 49, luego cada vez menos hasta el máximo a las 63, y a las 70 produce lo mismo que a las 56. Trabajar cuesta $\theta h^2/2$, y menos al incansable ($\theta$ = 1/48) que al normal ($\theta$ = 1/40). Cada uno cobra lo que produce, y el **bienestar** es lo que produce menos lo que le cuesta. El **premio** es lo que vale llegar a socio, repartido por semana de los años de asociado y medido en horas de producción: un premio de 27 son dos tercios de lo que gana un normal.
 
 **Tu tarea.**
 
@@ -52,9 +52,9 @@ Sin premio por horas, el incansable trabaja 48 horas y el normal, 40: todo es pr
 
 El gráfico de la derecha lo muestra según el premio. Con un premio de 5, el incansable trabaja 56 horas, y con 10, 60,5, y la producción extra sube hasta 7,8 horas. Pasadas las 63 horas, cada hora de más produce menos que nada: con un premio de 35 se trabajan 73,3 horas, y producen 4,2 horas más que las 48, menos que con un premio de 10. Cuanto más vale llegar a socio, más horas se piden, y no porque haga falta lo que producen. Es la diferencia con los torneos de Lazear y Rosen (1981): un ascenso al que más **produce** puede dar el esfuerzo justo; el que la carrera de ratas exagera es el ascenso al que más **aguanta**, porque mide al trabajador, no lo que hace.
 
-En el Mittelstand, el premio por horas es casi cero, por dos razones. La empresa es de una familia que la dirige, así que no hay sociedad que ganar facturando horas; según la definición del IfM Bonn, hasta dos personas o sus familias tienen al menos la mitad y están en la dirección. Y la ley alemana de jornada permite ocho horas por día laborable, diez si la media de seis meses no pasa de ocho: 48 horas a la semana, el mismo umbral de Pencavel, y el comité de empresa codecide cuándo empieza y acaba la jornada y cuándo se alarga. Las horas no pueden ser la señal si nadie puede trabajar muchas más que los demás. La ley no alcanza a los directivos, y ahí la carrera puede volver.
+En el Mittelstand, el premio por horas es casi cero, por dos razones. La empresa es de una familia que la dirige, así que no hay sociedad que ganar facturando horas; según la definición del IfM Bonn, hasta dos personas o sus familias tienen al menos la mitad y están en la dirección. Y la ley alemana de jornada permite ocho horas por día laborable, diez si la media de seis meses no pasa de ocho: 48 horas a la semana, el mismo umbral de Pencavel. Además, el comité de empresa codecide cuándo empieza y acaba la jornada y cuándo se alarga. Las horas no pueden ser la señal si nadie puede trabajar muchas más que los demás. La ley no alcanza a los directivos, y ahí la carrera puede volver.
 
-La otra explicación tiene su defensa. Claudia Goldin llama **trabajos codiciosos** a los que pagan cada hora más cuantas más horas se trabajan: en finanzas, en derecho o en la gran empresa, un trabajador no se sustituye por otro a mitad de una operación, y el cliente paga por tener a la misma persona disponible a cualquier hora. Ahí una hora puede valer mucho aunque se produzca cansado, y la curva de una fábrica de proyectiles no tiene por qué valer para cerrar una compra. Alexandra Michel siguió durante nueve años a los empleados de dos bancos de inversión: los tres primeros años, a los bancos les compensó el exceso de trabajo; desde el cuarto, el cuerpo empezó a fallar y el rendimiento bajó. Las dos explicaciones predicen cosas distintas: si las horas son estatus, deberían bajar en cuanto la firma sabe quién es quién, tras el ascenso; si son productividad, deberían seguir.
+La otra explicación tiene su defensa. Claudia Goldin llama **trabajos codiciosos** a los que pagan cada hora más cuantas más horas se trabajan. En finanzas, en derecho o en la gran empresa, un trabajador no se sustituye por otro a mitad de una operación, y el cliente paga por tener a la misma persona disponible a cualquier hora. Ahí una hora puede valer mucho aunque se produzca cansado, y la curva de una fábrica de proyectiles no tiene por qué valer para cerrar una compra. Alexandra Michel siguió durante nueve años a los empleados de dos bancos de inversión: los tres primeros años, a los bancos les compensó el exceso de trabajo; desde el cuarto, el cuerpo empezó a fallar y el rendimiento bajó. Las dos explicaciones predicen cosas distintas: si las horas son estatus, deberían bajar en cuanto la firma sabe quién es quién, tras el ascenso; si son productividad, deberían seguir.
 
 El mismo mecanismo está en [*Todos con máster*](../50-todos-con-master/): una credencial que vale porque ordena a los candidatos, y que todos tienen que perseguir aunque entre todos no ganen nada.
 
@@ -126,29 +126,22 @@ round(tabla, 2)
 ```{webr}
 #| exercise: estatus
 #| solution: true
-# Lo que produce una semana de h horas, en horas de trabajo descansado: la curva de Pencavel (2015),
-# proporcional hasta las 49 horas, máxima a las 63 y, a las 70, igual que a las 56
 produccion <- function(h) ifelse(h < 49, h, 49 + (h - 49) - (h - 49)^2 / 28)
 
-# Lo que cuesta trabajar: theta * h^2 / 2. A quien es incansable le cuesta menos
 incansable <- 1 / 48
 normal <- 1 / 40
 bienestar <- function(h, theta) produccion(h) - theta * h^2 / 2
 
-# 1. Productividad: las horas que haría cada uno si cobrara lo que produce y nada más
 horas_eficientes <- function(theta) {
   optimize(function(h) bienestar(h, theta), c(0, 100), maximum = TRUE)$maximum
 }
 
-# 2. Estatus: las horas que exige la firma para que a un normal no le compense fingirse incansable.
-#    premio: lo que vale llegar a socio, por semana de los años de asociado, en horas de producción
 horas_de_carrera <- function(premio, theta = normal) {
   h0 <- horas_eficientes(theta)
   if (premio <= 0) return(h0)
   uniroot(function(h) bienestar(h0, theta) - bienestar(h, theta) - premio, c(h0, 100), tol = 1e-9)$root
 }
 
-# 3. Las horas de un incansable, sin premio por horas (el Mittelstand) y con premios cada vez mayores
 premios <- c(0, 5, 10, 20, 27, 35)
 tabla <- t(sapply(premios, function(premio) {
   h_ef <- horas_eficientes(incansable)

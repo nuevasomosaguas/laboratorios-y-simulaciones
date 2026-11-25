@@ -19,7 +19,7 @@ La mayoría de las democratizaciones de la Europa del siglo XIX y de la América
 
 En el modelo, la élite es el 20% de la población y se lleva una parte `theta` de la renta, y la mayoría, el resto, `1 - theta`. Todo se mide por periodo y en proporción de la renta nacional. En cada periodo, con probabilidad `q`, la mayoría puede hacer una revolución que destruye una parte `mu` de la renta y le deja el resto, `1 - mu`, para siempre. Un impuesto `t`, repartido a partes iguales y con un coste de eficiencia, da a la mayoría `gana_pueblo(t, theta)` y le cuesta a la élite `pierde_elite(t, theta)`. Cuando hay amenaza, la élite tiene tres salidas:
 
-* **Prometer redistribución:** solo la cobrará la mayoría en los periodos de amenaza, y algo que solo ocurre en esos periodos pesa `k = 1 - beta * (1 - q)` veces lo que ocurre en todos, donde `beta` es cuánto pesa el futuro.
+* **Prometer redistribución:** la mayoría solo la cobrará en los periodos de amenaza. Lo que ocurre solo en esos periodos pesa `k = 1 - beta * (1 - q)` veces lo que ocurre en todos, donde `beta` mide cuánto pesa el futuro.
 * **Democratizar:** la mayoría vota para siempre el impuesto que prefiere, `impuesto_pueblo(theta)`.
 * **Reprimir:** la élite pierde una parte `kappa` de su renta en cada periodo de amenaza.
 
@@ -37,7 +37,7 @@ Hasta una desigualdad de 0,30, la élite no hace nada: la revolución destruye m
 
 La tarea 4 separa los dos mecanismos. Con `q <- 0.5`, la amenaza vuelve menos a menudo, la promesa vale menos y la élite tiene que democratizar antes, entre 0,32 y 0,34, y reprime desde 0,35. Con `kappa <- 0.8`, reprimir sale más caro, y la democracia ocupa un tramo mucho más ancho, de 0,36 a 0,64.
 
-El modelo simplifica: el de Acemoglu y Robinson tiene además una franja en la que la élite democratiza o no al azar, y otra en la que la democracia no basta para evitar la revolución. Su contrapeso es empírico. Haggard y Kaufman revisaron una a una las transiciones de 1980 a 2000: el conflicto distributivo aparece en poco más de la mitad, muchas de ellas en países muy desiguales, y menos de un tercio de los retrocesos democráticos se deben a un conflicto entre élites y mayoría.
+El modelo simplifica: el de Acemoglu y Robinson tiene además una franja en la que la élite democratiza o no al azar, y otra en la que la democracia no basta para evitar la revolución. Su contrapeso es empírico. Haggard y Kaufman revisaron una a una las transiciones de 1980 a 2000. El conflicto distributivo aparece en poco más de la mitad, muchas de ellas en países muy desiguales, y menos de un tercio de los retrocesos democráticos se deben a un conflicto entre élites y mayoría.
 
 Acemoglu, D. y Robinson, J. A. (2001). A theory of political transitions. *American Economic Review*, 91(4), 938–963.
 
