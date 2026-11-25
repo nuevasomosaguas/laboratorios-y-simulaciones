@@ -17,7 +17,7 @@ engine: markdown
 ::: {.enunciado}
 La letra del DNI no es un adorno. Se calcula a partir del número: el resto de dividirlo entre 23, que va de 0 a 22, se traduce a una de 23 letras con la tabla `TRWAGMYFPDXBNJZSQVHLCKE`. El 12345678 da de resto 14, y la letra que ocupa ese lugar, contando desde 0, es la Z. Faltan la I, la Ñ, la O y la U, para evitar confusiones.
 
-Para quien lee el DNI, la letra no añade nada: conocido el número, se sabe la letra. En términos de Claude Shannon, su información es nula. Lo que añade es **redundancia**, y la redundancia es lo que permite darse cuenta de que algo ha llegado mal. Si alguien copia el número con una cifra cambiada, el resto de dividir entre 23 cambia casi siempre, y la letra ya no cuadra.
+Para quien lee el DNI, la letra no añade nada: conocido el número, se sabe la letra. Para Claude Shannon, su información es nula. Lo que añade es **redundancia**, y la redundancia es lo que permite darse cuenta de que algo ha llegado mal. Si alguien copia el número con una cifra cambiada, el resto de dividir entre 23 cambia casi siempre, y la letra ya no cuadra.
 
 ¿Casi siempre o siempre? Cambiar la cifra que ocupa el lugar $k$ en una cantidad $\delta$, entre −9 y 9, suma al número $\delta \cdot 10^k$, y el resto no cambia solo si 23 divide a esa cantidad. El código lo comprueba a lo bruto: toma un DNI, le aplica todos los errores de cada tipo y cuenta cuántos se le escapan a la letra.
 

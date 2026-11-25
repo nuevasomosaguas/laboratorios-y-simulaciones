@@ -61,7 +61,7 @@ $$H = -\frac{\int_0^\infty l(x) \ln l(x)\, dx}{\int_0^\infty l(x)\, dx},$$
 
 donde $l(x)$ es la proporción de nacidos que sigue con vida a la edad $x$, y el denominador es la esperanza de vida al nacer, $e_0$. Si todos murieran a la misma edad, la curva sería un rectángulo y $H$ valdría 0: no habría ninguna incertidumbre sobre la edad de la muerte. Con una mortalidad igual a todas las edades, la curva sería una exponencial y $H$ valdría 1.
 
-La propiedad que la hace útil es otra. Si la mortalidad $\mu(x)$ baja un 1% a todas las edades, la esperanza de vida sube, aproximadamente, un $H$%. Como $l(x) = \exp\left(-\int_0^x \mu(t)\,dt\right)$, multiplicar toda la mortalidad por $1 - \delta$ convierte $l(x)$ en $l(x)^{1-\delta}$.
+La propiedad que la hace útil es otra. Si la mortalidad $\mu(x)$ baja un 1% a todas las edades, la esperanza de vida sube cerca de un $H$%. Como $l(x) = \exp\left(-\int_0^x \mu(t)\,dt\right)$, multiplicar toda la mortalidad por $1 - \delta$ convierte $l(x)$ en $l(x)^{1-\delta}$.
 
 Los datos son los supervivientes de 100.000 nacidas en catorce tablas de mortalidad de mujeres en España, de 1900 a 2024, casi todas del INE, a las edades 0, 1, 5, 10 y así hasta 100. Las integrales se calculan por trapecios, y la esperanza de vida se corta a los 100 años.
 
@@ -80,7 +80,7 @@ La columna `ganancia` confirma la propiedad de Keyfitz: si la mortalidad baja un
 
 La entropía tiene otra lectura. El numerador de $H$ es $e^\dagger$, los años de vida que se pierden de media al morir: lo que le quedaba por vivir a cada persona, según la tabla, cuando murió. En 1900, 26,2 años; en 2024, 8,0. $H = e^\dagger / e_0$ mide la desigualdad en la edad de la muerte, y su caída dice que la longevidad se ha vuelto mucho más igual. Mientras haya esa desigualdad, habrá margen para que la esperanza de vida siga subiendo: un $H$ cercano a 0 sería una población en la que ya nadie muere joven, y solo se ganaría vida retrasando la muerte de los viejos.
 
-Keyfitz llamó entropía a $H$ por su parecido formal con la de Shannon, y el parecido tiene fondo: los dos números miden cuánta incertidumbre hay en una distribución, aquí la de la edad de la muerte. Pero lo que hace útil a $H$ no es ninguna noción de información, sino un teorema sobre derivadas. Es un caso intermedio: más que un índice de dispersión con buen pedigrí, menos que una cantidad de información.
+Keyfitz llamó entropía a $H$ por su parecido formal con la de Shannon, y el parecido tiene fondo: los dos números miden cuánta incertidumbre hay en una distribución, aquí la de la edad de la muerte. Pero lo que hace útil a $H$ es un teorema sobre derivadas, no ninguna noción de información. Es un caso intermedio: más que un índice de dispersión con buen pedigrí, menos que una cantidad de información.
 
 Fernández, O. E. y Beltrán-Sánchez, H. (2015). The entropy of the life table: A reappraisal. *Theoretical Population Biology*, 104, 26–45.
 
